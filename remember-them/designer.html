@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Remember Them — design a memorial: choose the form, the stone, the lettering and the emblem, and see it before you order. From Healing Partners.">
+<title>Remember Them</title>
+<style>
+  /* ============================================================
+     Remember Them — memorial designer
+     Healing Partners "blue hour" tokens.
+     Light is the base; dark redefines values only.
+     ============================================================ */
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --glow:rgba(200,150,60,.30);
+    --danger:#A3352F;
+    --stage:#E4E8F1;
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:1rem; --f-lg:1.0625rem;
+    --f-xl:1.375rem; --f-2xl:1.875rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06;
+      --glow:rgba(224,177,102,.28); --danger:#E08078;
+      --stage:#0A0D1B;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06;
+    --glow:rgba(224,177,102,.28); --danger:#E08078;
+    --stage:#0A0D1B;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:var(--f-base); line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
+  .masthead-in {
+    max-width:78rem; margin:0 auto; padding:1rem 1.5rem;
+    display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+  }
+  .brand { display:flex; align-items:baseline; gap:.625rem; margin-right:auto; }
+  .brand h1 {
+    font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+    margin:0; letter-spacing:-.01em;
+  }
+  .brand .parent {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); border-left:1px solid var(--line-strong); padding-left:.625rem;
+  }
+
+  button { font:inherit; cursor:pointer; border-radius:var(--radius);
+           transition:background-color .15s, border-color .15s, color .15s; }
+  .btn { padding:.5rem .9rem; border:1px solid var(--line-strong);
+         background:var(--surface); color:var(--ink); }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent);
+                 color:var(--on-accent); font-weight:550; }
+  .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
+  .btn-quiet { background:none; border:none; color:var(--ink-3);
+               padding:.35rem .5rem; font-size:var(--f-sm); cursor:pointer; }
+  .btn-quiet:hover { color:var(--ink); background:var(--surface-2); }
+  .btn-quiet.danger:hover { color:var(--danger); }
+  :is(button,input,textarea,select,a,[role="button"]):focus-visible {
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+
+  .studio {
+    max-width:78rem; margin:0 auto; padding:2rem 1.5rem 5rem;
+    display:grid; grid-template-columns:minmax(0,1fr) 24rem; gap:2.5rem;
+    align-items:start;
+  }
+  @media (max-width:64rem) { .studio { grid-template-columns:1fr; gap:2rem; } }
+
+  .stage-col { position:sticky; top:2rem; }
+  @media (max-width:64rem) { .stage-col { position:static; } }
+  .stage {
+    background:var(--stage); border:1px solid var(--line);
+    border-radius:var(--radius); padding:2rem 1.5rem;
+    display:flex; align-items:center; justify-content:center;
+    min-height:30rem; box-shadow:var(--shadow); overflow:hidden;
+  }
+  .stage svg { max-width:100%; height:auto; max-height:32rem;
+               filter:drop-shadow(0 14px 22px rgba(0,0,0,.28)); }
+  .stage-meta {
+    display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap;
+    margin-top:1rem; font-size:var(--f-sm); color:var(--ink-3);
+  }
+  .stage-meta .spec { color:var(--ink-2); }
+  .stage-meta .spacer { margin-left:auto; }
+
+  .panel {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
+  }
+  .panel > .group { padding:1.25rem 1.25rem 1.375rem; border-bottom:1px solid var(--line); }
+  .panel > .group:last-child { border-bottom:none; }
+  .group > h2 {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin:0 0 .875rem; font-weight:600;
+  }
+
+  .field { display:flex; flex-direction:column; gap:.375rem; margin-bottom:.875rem; }
+  .field:last-child { margin-bottom:0; }
+  .field label { font-size:var(--f-sm); color:var(--ink-2); }
+  input[type="text"], textarea {
+    font:inherit; color:var(--ink); background:var(--ground);
+    border:1px solid var(--line-strong); border-radius:var(--radius);
+    padding:.5rem .625rem; width:100%;
+  }
+  textarea { min-height:4.5rem; resize:vertical; line-height:1.5; }
+  input:focus, textarea:focus {
+    outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent);
+  }
+  .row { display:flex; gap:.75rem; }
+  .row > * { flex:1; min-width:0; }
+
+  .choices { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; }
+  .choice {
+    display:flex; flex-direction:column; align-items:center; gap:.375rem;
+    padding:.625rem .25rem; background:var(--ground);
+    border:1px solid var(--line-strong); border-radius:var(--radius);
+    font-size:var(--f-xs); color:var(--ink-2); text-align:center; line-height:1.3;
+  }
+  .choice:hover { border-color:var(--accent); }
+  .choice[aria-pressed="true"] {
+    border-color:var(--accent); background:var(--accent-soft); color:var(--ink);
+    box-shadow:inset 0 0 0 1px var(--accent);
+  }
+  .choice .dot { width:1.75rem; height:1.75rem; border-radius:999px;
+                 border:1px solid rgba(0,0,0,.25); }
+  .choice .glyph { width:1.75rem; height:1.75rem; display:block; }
+  .choice .glyph svg { width:100%; height:100%; fill:currentColor; }
+  .choice .shape { width:1.75rem; height:2rem; display:block; }
+  .choice .shape svg { width:100%; height:100%; }
+
+  .saved-list { display:flex; flex-direction:column; gap:.5rem; }
+  .saved {
+    display:flex; align-items:center; gap:.625rem; text-align:left; width:100%;
+    background:var(--ground); border:1px solid var(--line-strong);
+    border-radius:var(--radius); padding:.5rem .625rem; font-size:var(--f-sm);
+  }
+  .saved:hover { border-color:var(--accent); }
+  .saved .nm { font-weight:550; color:var(--ink); }
+  .saved .sub { color:var(--ink-3); font-size:var(--f-xs); }
+  .saved .rm { margin-left:auto; flex:none; }
+  .saved-empty { font-size:var(--f-sm); color:var(--ink-3); font-style:italic; }
+
+  .actions { display:flex; flex-direction:column; gap:.5rem; }
+  .actions .btn { width:100%; text-align:center; text-decoration:none; display:block; }
+  .fineprint { font-size:var(--f-xs); color:var(--ink-3); margin:.75rem 0 0; line-height:1.5; }
+
+  /* ---- Trial strip ---- */
+  .trialbar {
+    display:none; align-items:center; gap:.75rem; flex-wrap:wrap;
+    background:var(--accent-soft); border-bottom:1px solid var(--accent);
+    padding:.625rem 1.5rem; font-size:var(--f-sm); color:var(--ink);
+  }
+  .trialbar.on { display:flex; }
+  .trialbar .in { max-width:78rem; margin:0 auto; width:100%;
+                  display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
+  .trialbar strong { font-weight:600; }
+  .trialbar .cta { margin-left:auto; }
+  .trialbar .cta a {
+    color:var(--accent-ink); font-weight:600; text-decoration:none;
+    border-bottom:1px solid currentColor;
+  }
+  .trialbar .cta a:hover { color:var(--ink); }
+  .trialbar.urgent { background:var(--accent); border-bottom-color:var(--accent-ink); }
+  .trialbar.urgent, .trialbar.urgent strong { color:var(--on-accent); }
+  .trialbar.urgent .cta a { color:var(--on-accent); }
+
+  /* ---- Expired lock ---- */
+  .locked .studio { filter:blur(5px) saturate(.55); pointer-events:none; user-select:none; }
+  .paywall {
+    display:none; position:fixed; inset:0; z-index:20;
+    background:color-mix(in srgb, var(--ground) 82%, transparent);
+    backdrop-filter:blur(2px);
+    align-items:center; justify-content:center; padding:1.5rem;
+  }
+  .paywall.on { display:flex; }
+  .paywall-card {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    max-width:30rem; width:100%; padding:2rem; text-align:center;
+  }
+  .paywall-card .lamp {
+    width:11px; height:15px; margin:0 auto 1.5rem; border-radius:50% 50% 45% 45%;
+    background:radial-gradient(ellipse at 50% 70%, var(--accent-ink), var(--accent) 60%, transparent 72%);
+    box-shadow:0 0 16px 6px var(--glow);
+  }
+  .paywall-card h2 {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:500;
+    margin:0 0 .75rem; letter-spacing:-.015em; text-wrap:balance;
+  }
+  .paywall-card p { color:var(--ink-2); margin:0 0 1.5rem; text-wrap:balance; }
+  .paywall-card .price {
+    font-family:var(--serif); font-size:2.25rem; font-weight:600;
+    color:var(--ink); letter-spacing:-.02em; line-height:1;
+  }
+  .paywall-card .per { font-size:var(--f-sm); color:var(--ink-3); margin:.375rem 0 1.5rem; }
+  .paywall-card .btn { width:100%; margin-bottom:.5rem; display:block;
+                       text-align:center; text-decoration:none; }
+  .paywall-card .fineprint { margin-top:1rem; }
+
+  .toast {
+    position:fixed; left:50%; bottom:1.5rem; transform:translateX(-50%);
+    background:var(--ink); color:var(--ground);
+    padding:.625rem 1.125rem; border-radius:999px; font-size:var(--f-sm);
+    box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s;
+    z-index:10; max-width:90vw; text-align:center;
+  }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="trialbar" id="trialbar">
+  <div class="in">
+    <span id="trialText"></span>
+    <span class="cta"><a href="../pricing.html" id="trialCta">See plans</a></span>
+  </div>
+</div>
+
+<main class="studio">
+  <div class="stage-col">
+    <div class="stage" id="stage"></div>
+    <div class="stage-meta">
+      <span class="spec" id="specLine"></span>
+      <span class="spacer"></span>
+      <span id="dimLine"></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="group">
+      <h2>Form</h2>
+      <div class="choices" id="formChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>Material</h2>
+      <div class="choices" id="stoneChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>Inscription</h2>
+      <div class="field">
+        <label for="f-name">Name</label>
+        <input type="text" id="f-name" autocomplete="off" maxlength="40">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="f-born">Born</label>
+          <input type="text" id="f-born" autocomplete="off" maxlength="12">
+        </div>
+        <div class="field">
+          <label for="f-died">Died</label>
+          <input type="text" id="f-died" autocomplete="off" maxlength="12">
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-epitaph">Epitaph</label>
+        <textarea id="f-epitaph" maxlength="160"></textarea>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>Lettering</h2>
+      <div class="choices" id="letterChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>Emblem</h2>
+      <div class="choices" id="emblemChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>When you're ready</h2>
+      <div class="actions">
+        <button class="btn btn-primary" id="sendBtn">Send this design to Healing&nbsp;Partners</button>
+        <button class="btn" id="linkBtn">Copy a link to this design</button>
+        <button class="btn" id="saveBtn">Keep it on this device</button>
+      </div>
+      <p class="fineprint">
+        Sending opens your email app with the design filled in — you press send. Nothing
+        is uploaded from this page and nobody is tracked.
+      </p>
+    </div>
+
+    <div class="group">
+      <h2>Kept on this device</h2>
+      <div class="saved-list" id="savedList"></div>
+    </div>
+  </div>
+</main>
+
+<div class="paywall" id="paywall" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+  <div class="paywall-card">
+    <div class="lamp" aria-hidden="true"></div>
+    <h2 id="pwTitle">Your trial has ended</h2>
+    <p>You had seven days with Remember Them. To keep designing for the families you serve, continue with a professional subscription.</p>
+    <div class="price">$150</div>
+    <div class="per">per month · cancel any time</div>
+    <a class="btn btn-primary" id="pwSubscribe" href="../pricing.html">Continue for $150/month</a>
+    <a class="btn" id="pwTalk" href="#">Talk to us first</a>
+    <p class="fineprint">Every design you made is still saved and will be waiting when you subscribe.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- CHANGE THESE TWO LINES IF NEEDED ---------- */
+  var ORDER_EMAIL = "bhomer@healingpartners.us";
+  var STORE_URL   = "https://healingpartners.us";
+  /* ------------------------------------------------------ */
+
+  /* ==========================================================================
+     ACCESS / TRIAL — the seam
+     --------------------------------------------------------------------------
+     Decides whether the designer is usable. Today it reads this browser's own
+     storage, so a determined visitor can bypass it by clearing their data or
+     opening a private window. That is fine for showing the product to a
+     prospect; it is NOT security.
+
+     When real billing exists, replace the body of Access.state() with a call
+     to your server:
+         var r = await fetch("/api/access", {credentials:"include"});
+         return await r.json();     // -> {mode:"trial", daysLeft:4}
+     Nothing else needs to change — the rest of the app only reads .mode.
+
+     Modes:
+       "open"        a family — unrestricted, no trial, never walled
+       "trial"       professional trial running, .daysLeft set
+       "expired"     professional trial finished — designer locked
+       "subscribed"  paying professional — unrestricted
+
+     Demo links, for showing a prospect the whole flow:
+       ?plan=pro          start a professional trial now
+       ?trial=reset       put the seven days back
+       ?trial=expired     jump straight to the lock screen
+       ?unlock=1          behave as a paying subscriber
+     ========================================================================== */
+  var Access = (function () {
+    var TRIAL_DAYS = 7;
+    var TKEY = "healing-partners.remember-them.access.v1";
+    var DAY  = 86400000;
+
+    function read() {
+      try { return JSON.parse(localStorage.getItem(TKEY)) || null; } catch (e) { return null; }
+    }
+    function write(o) {
+      try { localStorage.setItem(TKEY, JSON.stringify(o)); } catch (e) {}
+    }
+
+    function state() {
+      var q;
+      try { q = new URLSearchParams(location.search); }
+      catch (e) { q = { get: function () { return null; } }; }
+
+      if (q.get("trial") === "reset") {
+        try { localStorage.removeItem(TKEY); } catch (e) {}
+      }
+      if (q.get("trial") === "expired") {
+        write({ plan:"pro", started: Date.now() - (TRIAL_DAYS + 1) * DAY, subscribed:false });
+      }
+      if (q.get("unlock") === "1") {
+        var cur = read() || { plan:"pro", started: Date.now() };
+        cur.subscribed = true;
+        write(cur);
+      }
+
+      var rec = read();
+      if (!rec && q.get("plan") === "pro") {
+        rec = { plan:"pro", started: Date.now(), subscribed:false };
+        write(rec);
+      }
+      if (!rec) return { mode:"open" };
+      if (rec.subscribed) return { mode:"subscribed" };
+
+      var left = TRIAL_DAYS - Math.floor((Date.now() - rec.started) / DAY);
+      if (left <= 0) return { mode:"expired", daysLeft:0 };
+      return { mode:"trial", daysLeft:left };
+    }
+
+    return { state:state, TRIAL_DAYS:TRIAL_DAYS };
+  })();
+
+  var KEY = "healing-partners.remember-them.designs.v2";
+
+  var FORMS = [
+    { id:"upright",    label:"Upright",     dims:"24 × 30 × 4 in" },
+    { id:"serpentine", label:"Serpentine",  dims:"28 × 22 × 4 in" },
+    { id:"flat",       label:"Flat marker", dims:"24 × 12 × 4 in" },
+    { id:"plaque",     label:"Plaque",      dims:"18 × 12 in" },
+    { id:"heart",      label:"Heart",       dims:"26 × 22 × 4 in" },
+    { id:"cross",      label:"Cross",       dims:"22 × 34 × 4 in" }
+  ];
+
+  var STONES = [
+    { id:"black",  label:"Black granite", base:"#2A2A2E", hi:"#4A4A52", cut:"#0E0E11", lip:"#5A5A64" },
+    { id:"grey",   label:"Grey granite",  base:"#83878C", hi:"#A2A6AC", cut:"#4E5257", lip:"#B6BAC0" },
+    { id:"rose",   label:"Rose granite",  base:"#A2807B", hi:"#BE9B95", cut:"#6B504C", lip:"#CBAAA4" },
+    { id:"marble", label:"White marble",  base:"#DEDAD2", hi:"#F1EEE8", cut:"#A49F94", lip:"#FFFFFF" },
+    { id:"bronze", label:"Bronze",        base:"#6E5327", hi:"#9A7838", cut:"#3E2E13", lip:"#C9A24E" },
+    { id:"blue",   label:"Blue pearl",    base:"#3A4560", hi:"#556383", cut:"#1E2536", lip:"#6D7C9E" }
+  ];
+
+  var LETTERING = [
+    { id:"traditional", label:"Traditional", css:'ui-serif, "Iowan Old Style", Georgia, serif', weight:600, track:".02em" },
+    { id:"modern",      label:"Modern",      css:'system-ui, "Segoe UI", Helvetica, Arial, sans-serif', weight:500, track:".06em" },
+    { id:"script",      label:"Script",      css:'"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive', weight:500, track:".01em" }
+  ];
+
+  var EMBLEMS = {
+    none:  { label:"None", path:null },
+    cross: { label:"Cross", path:"M-4,-22 h8 v12 h12 v8 h-12 v24 h-8 v-24 h-12 v-8 h12 z" },
+    celtic:{ label:"Celtic", path:"M-3.5,-22 h7 v10 h11 v7 h-11 v27 h-7 v-27 h-11 v-7 h11 z M0,-11.5 m-13,0 a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0 M0,-11.5 m-9,0 a9,9 0 1,1 18,0 a9,9 0 1,1 -18,0" },
+    star:  { label:"Star", path:"M0,-22 L12.7,0 L-12.7,0 Z M0,22 L12.7,0 L-12.7,0 Z" },
+    heart: { label:"Heart", path:"M0,18 C-18,4 -18,-14 0,-6 C18,-14 18,4 0,18 Z" },
+    tree:  { label:"Tree", path:"M-2.5,20 h5 v-16 h-5 z M0,-20 m-14,6 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" },
+    dove:  { label:"Dove", path:"M-18,4 C-10,-6 4,-10 16,-8 C10,-2 12,4 18,6 C8,12 -6,12 -18,4 Z M6,-8 C8,-14 2,-16 -2,-12" },
+    rose:  { label:"Rose", path:"M0,-12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M0,-12 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0 M-1.5,-4 h3 v22 h-3 z M1.5,6 C8,4 11,-1 12,-5 C6,-5 2,-1 1.5,4 Z" },
+    hands: { label:"Hands", path:"M-3,20 C-9,12 -11,2 -10,-8 C-9.5,-14 -6,-16 -5,-11 L-3,2 Z M3,20 C9,12 11,2 10,-8 C9.5,-14 6,-16 5,-11 L3,2 Z" }
+  };
+  var EMBLEM_ORDER = ["none","cross","celtic","star","heart","tree","dove","rose","hands"];
+
+  var DEFAULTS = { form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
+                   name:"", born:"", died:"", epitaph:"" };
+  var d = JSON.parse(JSON.stringify(DEFAULTS));
+  var designs = [];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c];
+    });
+  }
+  function byId(arr, id) {
+    for (var i=0;i<arr.length;i++) if (arr[i].id===id) return arr[i];
+    return arr[0];
+  }
+  var toastTimer;
+  function toast(msg) {
+    var t=$("toast"); t.textContent=msg; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){ t.classList.remove("show"); }, 3200);
+  }
+
+  /* ---------------- geometry ---------------- */
+
+  function outline(form) {
+    switch (form) {
+      case "upright":    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
+      case "serpentine": return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
+      case "flat":       return "M20,215 L280,215 L280,340 L20,340 Z";
+      case "plaque":     return "M35,120 L265,120 L265,330 L35,330 Z";
+      case "heart":      return "M150,368 C40,285 18,175 62,128 C104,84 150,120 150,158 C150,120 196,84 238,128 C282,175 260,285 150,368 Z";
+      case "cross":      return "M118,372 L118,215 L28,215 L28,140 L118,140 L118,28 L182,28 L182,140 L272,140 L272,215 L182,215 L182,372 Z";
+    }
+    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
+  }
+
+  function metrics(form) {
+    switch (form) {
+      case "upright":    return { emblemY:118, nameY:190, dateY:228, epiY:266, scale:1,   w:200 };
+      case "serpentine": return { emblemY:138, nameY:206, dateY:242, epiY:278, scale:1,   w:210 };
+      case "flat":       return { emblemY:246, nameY:266, dateY:296, epiY:322, scale:.82, w:230 };
+      case "plaque":     return { emblemY:158, nameY:206, dateY:240, epiY:276, scale:.88, w:200 };
+      case "heart":      return { emblemY:168, nameY:224, dateY:258, epiY:292, scale:.86, w:170 };
+      case "cross":      return { emblemY:88,  nameY:186, dateY:250, epiY:288, scale:.78, w:130 };
+    }
+    return { emblemY:118, nameY:190, dateY:228, epiY:266, scale:1, w:200 };
+  }
+
+  function wrap(text, perLine) {
+    var words = String(text).split(/\s+/).filter(Boolean), lines=[], cur="";
+    for (var i=0;i<words.length;i++) {
+      var t = cur ? cur+" "+words[i] : words[i];
+      if (t.length > perLine && cur) { lines.push(cur); cur = words[i]; }
+      else cur = t;
+    }
+    if (cur) lines.push(cur);
+    return lines.slice(0,4);
+  }
+
+  /* ---------------- render ---------------- */
+
+  function engraved(txt, x, y, size, stone, font) {
+    if (!txt) return "";
+    var common = 'x="'+x+'" y="'+y+'" text-anchor="middle" ' +
+                 'font-family=\''+font.css+'\' font-size="'+size+'" ' +
+                 'font-weight="'+font.weight+'" letter-spacing="'+font.track+'"';
+    /* highlight sits just below the incision, dark cut on top → reads as carved */
+    return '<text '+common+' dy="1.1" fill="'+stone.lip+'" opacity=".65">'+esc(txt)+'</text>' +
+           '<text '+common+' fill="'+stone.cut+'">'+esc(txt)+'</text>';
+  }
+
+  function render() {
+    var stone = byId(STONES, d.stone);
+    var font  = byId(LETTERING, d.lettering);
+    var m     = metrics(d.form);
+    var em    = EMBLEMS[d.emblem] || EMBLEMS.none;
+
+    var dates = (d.born && d.died) ? (d.born + " – " + d.died) : (d.born || d.died || "");
+    var epiLines = d.epitaph ? wrap(d.epitaph, Math.round(m.w / 5.4)) : [];
+
+    var nm = d.name || "Their Name";
+    var nameSize = 30 * m.scale;
+    if (nm.length > 14) nameSize *= 14 / nm.length;
+    if (nameSize < 13) nameSize = 13;
+
+    var svg =
+      '<svg viewBox="0 0 300 400" role="img" aria-label="Preview of the memorial for ' + esc(nm) + '">' +
+      '<defs>' +
+        '<linearGradient id="face" x1="0" y1="0" x2="0.35" y2="1">' +
+          '<stop offset="0" stop-color="'+stone.hi+'"/>' +
+          '<stop offset="0.55" stop-color="'+stone.base+'"/>' +
+          '<stop offset="1" stop-color="'+stone.cut+'"/>' +
+        '</linearGradient>' +
+        '<filter id="grain" x="0" y="0" width="100%" height="100%">' +
+          '<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="7" result="n"/>' +
+          '<feColorMatrix in="n" type="saturate" values="0"/>' +
+          '<feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>' +
+        '</filter>' +
+        '<clipPath id="clip"><path d="'+outline(d.form)+'"/></clipPath>' +
+      '</defs>' +
+      '<path d="'+outline(d.form)+'" fill="url(#face)"/>' +
+      '<g clip-path="url(#clip)"><rect width="300" height="400" filter="url(#grain)" opacity=".55"/></g>' +
+      '<path d="'+outline(d.form)+'" fill="none" stroke="'+stone.lip+'" stroke-width="1.5" opacity=".5"/>' +
+      (em.path
+        ? '<g transform="translate(150,'+m.emblemY+') scale('+(0.9*m.scale)+')">' +
+          '<path d="'+em.path+'" fill="'+stone.lip+'" opacity=".55" transform="translate(0,1.2)"/>' +
+          '<path d="'+em.path+'" fill="'+stone.cut+'"/></g>'
+        : "") +
+      engraved(nm, 150, m.nameY, nameSize, stone, font) +
+      engraved(dates, 150, m.dateY, 15*m.scale, stone, font);
+
+    for (var i=0;i<epiLines.length;i++) {
+      svg += engraved(epiLines[i], 150, m.epiY + i*(17*m.scale), 12.5*m.scale, stone, font);
+    }
+    if (d.form!=="plaque" && d.form!=="flat") {
+      svg += '<ellipse cx="150" cy="374" rx="128" ry="9" fill="'+stone.cut+'" opacity=".18"/>';
+    }
+    svg += '</svg>';
+
+    $("stage").innerHTML = svg;
+
+    var f = byId(FORMS, d.form);
+    $("specLine").textContent = f.label + " · " + stone.label + " · " + font.label +
+      (em.path ? " · " + em.label + " emblem" : "");
+    $("dimLine").textContent = f.dims;
+  }
+
+  /* ---------------- choice UI ---------------- */
+
+  function thumb(formId) {
+    return '<span class="shape"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet">' +
+           '<path d="'+outline(formId)+'" fill="currentColor" opacity=".8"/></svg></span>';
+  }
+
+  function buildChoices() {
+    $("formChoices").innerHTML = FORMS.map(function (f) {
+      return '<button class="choice" data-k="form" data-v="'+f.id+'">'+thumb(f.id)+'<span>'+f.label+'</span></button>';
+    }).join("");
+
+    $("stoneChoices").innerHTML = STONES.map(function (s) {
+      return '<button class="choice" data-k="stone" data-v="'+s.id+'">' +
+             '<span class="dot" style="background:linear-gradient(140deg,'+s.hi+','+s.base+' 60%,'+s.cut+')"></span>' +
+             '<span>'+s.label.replace(" ","<br>")+'</span></button>';
+    }).join("");
+
+    $("letterChoices").innerHTML = LETTERING.map(function (l) {
+      return '<button class="choice" data-k="lettering" data-v="'+l.id+'">' +
+             '<span style="font-family:'+l.css+';font-size:1.25rem;line-height:1.75rem">Aa</span>' +
+             '<span>'+l.label+'</span></button>';
+    }).join("");
+
+    $("emblemChoices").innerHTML = EMBLEM_ORDER.map(function (k) {
+      var e = EMBLEMS[k];
+      return '<button class="choice" data-k="emblem" data-v="'+k+'">' +
+             '<span class="glyph">' + (e.path
+               ? '<svg viewBox="-24 -24 48 48"><path d="'+e.path+'"/></svg>'
+               : '<svg viewBox="-24 -24 48 48"><line x1="-13" y1="13" x2="13" y2="-13" stroke="currentColor" stroke-width="2.5"/></svg>') +
+             '</span><span>'+e.label+'</span></button>';
+    }).join("");
+  }
+
+  function syncPressed() {
+    var all = document.querySelectorAll(".choice");
+    for (var i=0;i<all.length;i++) {
+      var b = all[i];
+      b.setAttribute("aria-pressed", d[b.getAttribute("data-k")] === b.getAttribute("data-v") ? "true" : "false");
+    }
+  }
+  function syncInputs() {
+    ["name","born","died","epitaph"].forEach(function (k) { $("f-"+k).value = d[k] || ""; });
+  }
+
+  /* ---------------- persistence ---------------- */
+
+  function loadDesigns() {
+    try { designs = JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch (e) { designs = []; }
+  }
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(designs)); }
+    catch (e) { toast("Couldn't keep it — this browser's storage is full."); }
+  }
+  function renderSaved() {
+    if (!designs.length) {
+      $("savedList").innerHTML = '<span class="saved-empty">Nothing kept yet.</span>';
+      return;
+    }
+    $("savedList").innerHTML = designs.map(function (x, i) {
+      return '<button class="saved" data-load="'+i+'">' +
+             '<span><span class="nm">'+esc(x.name || "Untitled")+'</span><br>' +
+             '<span class="sub">'+esc(byId(FORMS,x.form).label+" · "+byId(STONES,x.stone).label)+'</span></span>' +
+             '<span class="btn-quiet danger rm" role="button" tabindex="0" data-del="'+i+'">Remove</span></button>';
+    }).join("");
+  }
+
+  /* ---------------- share link ---------------- */
+
+  function encodeDesign() {
+    try {
+      var json = JSON.stringify(d);
+      var b64 = btoa(unescape(encodeURIComponent(json)));
+      return b64.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    } catch (e) { return ""; }
+  }
+  function decodeDesign(s) {
+    try {
+      var b64 = s.replace(/-/g,"+").replace(/_/g,"/");
+      while (b64.length % 4) b64 += "=";
+      var obj = JSON.parse(decodeURIComponent(escape(atob(b64))));
+      if (obj && typeof obj === "object") return obj;
+    } catch (e) {}
+    return null;
+  }
+  function shareLink() {
+    return location.origin + location.pathname + "?d=" + encodeDesign();
+  }
+
+  function spec() {
+    var f=byId(FORMS,d.form), s=byId(STONES,d.stone), l=byId(LETTERING,d.lettering);
+    var em=EMBLEMS[d.emblem] || EMBLEMS.none;
+    return [
+      "REMEMBER THEM — memorial design",
+      "Healing Partners",
+      "",
+      "Form:       " + f.label + "  (" + f.dims + ")",
+      "Material:   " + s.label,
+      "Lettering:  " + l.label,
+      "Emblem:     " + (em.path ? em.label : "None"),
+      "",
+      "Name:       " + (d.name || "—"),
+      "Born:       " + (d.born || "—"),
+      "Died:       " + (d.died || "—"),
+      "Epitaph:    " + (d.epitaph || "—"),
+      "",
+      "See this exact design:",
+      shareLink()
+    ].join("\n");
+  }
+
+  function copyText(text, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { toast(okMsg); },
+        function () { toast("Couldn't copy — your browser blocked it."); }
+      );
+    } else {
+      toast("Copying isn't available in this browser.");
+    }
+  }
+
+  /* ---------------- wiring ---------------- */
+
+  ["name","born","died","epitaph"].forEach(function (k) {
+    $("f-"+k).addEventListener("input", function () { d[k]=this.value; render(); });
+  });
+
+  function removeAt(i) {
+    designs.splice(i,1); persist(); renderSaved(); toast("Removed.");
+  }
+
+  document.addEventListener("click", function (e) {
+    var del = e.target.closest("[data-del]");
+    if (del) { e.stopPropagation(); removeAt(+del.getAttribute("data-del")); return; }
+
+    var ld = e.target.closest("[data-load]");
+    if (ld) {
+      var x = designs[+ld.getAttribute("data-load")];
+      if (!x) return;
+      Object.keys(DEFAULTS).forEach(function (k) { d[k] = (k in x) ? x[k] : DEFAULTS[k]; });
+      syncInputs(); syncPressed(); render(); toast("Design opened.");
+      return;
+    }
+    var ch = e.target.closest(".choice");
+    if (ch) { d[ch.getAttribute("data-k")] = ch.getAttribute("data-v"); syncPressed(); render(); }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var del = e.target.closest("[data-del]");
+    if (del) { e.preventDefault(); e.stopPropagation(); removeAt(+del.getAttribute("data-del")); }
+  });
+
+  $("saveBtn").onclick = function () {
+    designs.unshift(JSON.parse(JSON.stringify(d)));
+    if (designs.length > 24) designs.length = 24;
+    persist(); renderSaved(); toast("Kept on this device.");
+  };
+
+  $("linkBtn").onclick = function () {
+    copyText(shareLink(), "Link copied — paste it anywhere to reopen this design.");
+  };
+
+  $("sendBtn").onclick = function () {
+    var who = d.name ? (" for " + d.name) : "";
+    var url = "mailto:" + encodeURIComponent(ORDER_EMAIL) +
+              "?subject=" + encodeURIComponent("Memorial design" + who + " — Remember Them") +
+              "&body=" + encodeURIComponent(
+                spec() + "\n\n— sent from Remember Them\n" + STORE_URL + "\n"
+              );
+    window.location.href = url;
+    toast("Opening your email app — press send there to finish.");
+  };
+
+  $("newBtn").onclick = function () {
+    d = JSON.parse(JSON.stringify(DEFAULTS));
+    syncInputs(); syncPressed(); render(); toast("Started a new design.");
+  };
+
+  /* ---------------- boot ---------------- */
+
+  /* ---------------- access gate ---------------- */
+
+  function applyAccess() {
+    var a = Access.state();
+    var bar = $("trialbar"), wall = $("paywall");
+
+    bar.classList.remove("on","urgent");
+    wall.classList.remove("on");
+    document.body.classList.remove("locked");
+
+    if (a.mode === "trial") {
+      var n = a.daysLeft;
+      bar.classList.add("on");
+      if (n <= 2) bar.classList.add("urgent");
+      $("trialText").innerHTML = "<strong>Professional trial</strong> — " +
+        (n === 1 ? "last day" : n + " days left") + ".";
+      $("trialCta").textContent = n <= 2 ? "Subscribe for $150/month" : "See plans";
+    } else if (a.mode === "expired") {
+      wall.classList.add("on");
+      document.body.classList.add("locked");
+      $("pwSubscribe").focus();
+    } else if (a.mode === "subscribed") {
+      bar.classList.add("on");
+      $("trialText").innerHTML = "<strong>Professional</strong> — subscription active.";
+      $("trialCta").textContent = "Manage";
+    }
+    /* mode "open" — a family. No bar, no wall, nothing in their way. */
+  }
+
+  $("pwTalk").onclick = function (e) {
+    e.preventDefault();
+    window.location.href = "mailto:" + encodeURIComponent(ORDER_EMAIL) +
+      "?subject=" + encodeURIComponent("Remember Them — question about the professional plan");
+  };
+
+  buildChoices();
+  loadDesigns();
+  renderSaved();
+  applyAccess();
+
+  var fromLink = null;
+  try {
+    var q = new URLSearchParams(location.search).get("d");
+    if (q) fromLink = decodeDesign(q);
+  } catch (e) {}
+  if (fromLink) {
+    Object.keys(DEFAULTS).forEach(function (k) {
+      d[k] = (k in fromLink) ? fromLink[k] : DEFAULTS[k];
+    });
+  }
+
+  syncInputs();
+  syncPressed();
+  render();
+  if (fromLink) toast("Design opened from a link.");
+})();
+</script>
+</body>
+</html>
