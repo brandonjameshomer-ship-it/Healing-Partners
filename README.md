@@ -1,6 +1,6 @@
 # Healing Partners
 
-Home of **Remember Them**.
+Healing Partners is the company. **Remember Them** is its memorial design app.
 
 - **Store:** https://healingpartners.us (Shopify)
 - **Live site:** https://brandonjameshomer-ship-it.github.io/Healing-Partners/

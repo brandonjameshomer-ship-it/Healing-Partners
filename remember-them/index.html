@@ -3,270 +3,193 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Remember Them — create a memorial for someone you have lost and gather the memories of them. Part of Healing Partners.">
+<meta name="description" content="Remember Them — design a memorial: choose the form, the stone, the lettering and the emblem, and see it before you order. From Healing Partners.">
 <title>Remember Them</title>
 <style>
-  /* ---- Tokens: light is the base, dark redefines only values ---- */
+  /* ============================================================
+     Remember Them — memorial designer
+     Healing Partners "blue hour" tokens. Light is the base;
+     dark redefines values only.
+     ============================================================ */
   :root {
-    --ground:      #F6F7FB;
-    --surface:     #FFFFFF;
-    --surface-2:   #EDF0F7;
-    --ink:         #191F33;
-    --ink-2:       #4A5473;
-    --ink-3:       #7C85A0;
-    --line:        #DEE3EF;
-    --line-strong: #C6CDDF;
-    --accent:      #A8761F;
-    --accent-ink:  #6F4C10;
-    --accent-soft: #F6EBD3;
-    --glow:        rgba(200,150,60,.30);
-    --danger:      #A3352F;
-    --shadow:      0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
-
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --glow:rgba(200,150,60,.30);
+    --danger:#A3352F;
+    --stage:#E4E8F1;
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
     --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-    --sans:  system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --f-xs:.75rem; --f-sm:.8125rem; --f-base:1rem; --f-lg:1.0625rem;
-    --f-xl:1.375rem; --f-2xl:2rem; --f-3xl:2.875rem;
-    --sp: .5rem;
-    --radius: 10px;
+    --f-xl:1.375rem; --f-2xl:1.875rem;
+    --radius:10px;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ground:      #101426;
-      --surface:     #181D34;
-      --surface-2:   #212740;
-      --ink:         #E8EBF6;
-      --ink-2:       #A6AECA;
-      --ink-3:       #79819F;
-      --line:        #2A3150;
-      --line-strong: #3A4266;
-      --accent:      #E0B166;
-      --accent-ink:  #F0CD93;
-      --accent-soft: #33291A;
-      --glow:        rgba(224,177,102,.28);
-      --danger:      #E08078;
-      --shadow:      0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06;
+      --glow:rgba(224,177,102,.28); --danger:#E08078;
+      --stage:#0A0D1B;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
     }
   }
   :root[data-theme="dark"] {
-    --ground:      #101426;
-    --surface:     #181D34;
-    --surface-2:   #212740;
-    --ink:         #E8EBF6;
-    --ink-2:       #A6AECA;
-    --ink-3:       #79819F;
-    --line:        #2A3150;
-    --line-strong: #3A4266;
-    --accent:      #E0B166;
-    --accent-ink:  #F0CD93;
-    --accent-soft: #33291A;
-    --glow:        rgba(224,177,102,.28);
-    --danger:      #E08078;
-    --shadow:      0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06;
+    --glow:rgba(224,177,102,.28); --danger:#E08078;
+    --stage:#0A0D1B;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
   }
 
-  * { box-sizing: border-box; }
-
+  * { box-sizing:border-box; }
   body {
-    margin: 0;
-    background: var(--ground);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: var(--f-base);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:var(--f-base); line-height:1.6;
+    -webkit-font-smoothing:antialiased;
   }
-
-  .wrap { max-width: 62rem; margin: 0 auto; padding: 0 1.5rem 6rem; }
 
   /* ---- Masthead ---- */
-  header.masthead {
-    border-bottom: 1px solid var(--line);
-    background: var(--surface);
-  }
+  header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
   .masthead-in {
-    max-width: 62rem; margin: 0 auto; padding: 1.125rem 1.5rem;
-    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    max-width:78rem; margin:0 auto; padding:1rem 1.5rem;
+    display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
   }
-  .brand { display: flex; align-items: baseline; gap: .625rem; margin-right: auto; }
+  .brand { display:flex; align-items:baseline; gap:.625rem; margin-right:auto; }
   .brand h1 {
-    font-family: var(--serif); font-size: var(--f-xl); font-weight: 600;
-    margin: 0; letter-spacing: -.01em;
+    font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+    margin:0; letter-spacing:-.01em;
   }
   .brand .parent {
-    font-size: var(--f-xs); text-transform: uppercase; letter-spacing: .12em;
-    color: var(--ink-3); border-left: 1px solid var(--line-strong); padding-left: .625rem;
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); border-left:1px solid var(--line-strong); padding-left:.625rem;
   }
 
   /* ---- Buttons ---- */
-  button { font: inherit; cursor: pointer; border-radius: var(--radius); transition: background-color .15s, border-color .15s, color .15s; }
-  .btn {
-    padding: .5rem .9rem; border: 1px solid var(--line-strong);
-    background: var(--surface); color: var(--ink);
-  }
-  .btn:hover { background: var(--surface-2); }
-  .btn-primary {
-    background: var(--accent); border-color: var(--accent);
-    color: #FFF9EC; font-weight: 550;
-  }
-  :root[data-theme="dark"] .btn-primary,
-  .btn-primary { color: #2A1E08; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-primary { color: #241A06; } }
-  .btn-primary:hover { filter: brightness(1.06); background: var(--accent); }
-  .btn-quiet {
-    background: none; border: none; color: var(--ink-3);
-    padding: .3rem .5rem; font-size: var(--f-sm);
-  }
-  .btn-quiet:hover { color: var(--ink); background: var(--surface-2); }
-  .btn-quiet.danger:hover { color: var(--danger); }
-  :is(button, input, textarea, a):focus-visible {
-    outline: 2px solid var(--accent); outline-offset: 2px;
+  button { font:inherit; cursor:pointer; border-radius:var(--radius);
+           transition:background-color .15s, border-color .15s, color .15s; }
+  .btn { padding:.5rem .9rem; border:1px solid var(--line-strong);
+         background:var(--surface); color:var(--ink); }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent);
+                 color:var(--on-accent); font-weight:550; }
+  .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
+  .btn-quiet { background:none; border:none; color:var(--ink-3);
+               padding:.35rem .5rem; font-size:var(--f-sm); }
+  .btn-quiet:hover { color:var(--ink); background:var(--surface-2); }
+  .btn-quiet.danger:hover { color:var(--danger); }
+  :is(button,input,textarea,select,a):focus-visible {
+    outline:2px solid var(--accent); outline-offset:2px;
   }
 
-  /* ---- Intro / empty state ---- */
-  .intro { padding: 4.5rem 0 2.5rem; max-width: 34rem; }
-  .intro h2 {
-    font-family: var(--serif); font-weight: 500; font-size: var(--f-3xl);
-    line-height: 1.12; letter-spacing: -.02em; margin: 0 0 1rem;
-    text-wrap: balance;
+  /* ---- Studio layout ---- */
+  .studio {
+    max-width:78rem; margin:0 auto; padding:2rem 1.5rem 5rem;
+    display:grid; grid-template-columns:minmax(0,1fr) 24rem; gap:2.5rem;
+    align-items:start;
   }
-  .intro p { color: var(--ink-2); font-size: var(--f-lg); margin: 0 0 1.75rem; }
+  @media (max-width:64rem) { .studio { grid-template-columns:1fr; gap:2rem; } }
 
-  /* ---- Memorial cards ---- */
-  .section-label {
-    font-size: var(--f-xs); text-transform: uppercase; letter-spacing: .12em;
-    color: var(--ink-3); margin: 2.5rem 0 1rem;
+  /* ---- Stage (the preview) ---- */
+  .stage-col { position:sticky; top:2rem; }
+  @media (max-width:64rem) { .stage-col { position:static; } }
+  .stage {
+    background:var(--stage); border:1px solid var(--line);
+    border-radius:var(--radius); padding:2rem 1.5rem;
+    display:flex; align-items:center; justify-content:center;
+    min-height:30rem; box-shadow:var(--shadow); overflow:hidden;
   }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; }
-  .card {
-    display: flex; flex-direction: column; gap: .5rem; text-align: left;
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 1.125rem; box-shadow: var(--shadow);
+  .stage svg { max-width:100%; height:auto; max-height:32rem;
+               filter:drop-shadow(0 14px 22px rgba(0,0,0,.28)); }
+  .stage-meta {
+    display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap;
+    margin-top:1rem; font-size:var(--f-sm); color:var(--ink-3);
   }
-  .card:hover { border-color: var(--accent); }
-  .card .portrait, .portrait-lg {
-    border-radius: 999px; object-fit: cover; background: var(--surface-2);
-    border: 1px solid var(--line);
-  }
-  .card .portrait { width: 3rem; height: 3rem; }
-  .card h3 { font-family: var(--serif); font-size: var(--f-lg); font-weight: 600; margin: 0; }
-  .card .dates { font-size: var(--f-sm); color: var(--ink-3); font-variant-numeric: tabular-nums; }
-  .card .count { font-size: var(--f-sm); color: var(--ink-2); margin-top: auto; padding-top: .5rem; }
+  .stage-meta .spec { color:var(--ink-2); }
+  .stage-meta .spacer { margin-left:auto; }
 
-  /* ---- Memorial detail ---- */
-  .memorial-head {
-    text-align: center; padding: 3.5rem 0 2rem;
-    border-bottom: 1px solid var(--line); margin-bottom: 2.5rem;
-  }
-  .portrait-lg { width: 7rem; height: 7rem; margin-bottom: 1.25rem; }
-  .memorial-head h2 {
-    font-family: var(--serif); font-weight: 500; font-size: var(--f-3xl);
-    letter-spacing: -.02em; margin: 0 0 .375rem; text-wrap: balance;
-  }
-  .memorial-head .dates {
-    font-size: var(--f-base); color: var(--ink-3);
-    font-variant-numeric: tabular-nums; letter-spacing: .04em;
-  }
-  .memorial-head .epitaph {
-    font-family: var(--serif); font-style: italic; font-size: var(--f-lg);
-    color: var(--ink-2); max-width: 34rem; margin: 1.25rem auto 0; text-wrap: balance;
-  }
-
-  /* ---- Candle: the one flourish ---- */
-  .candle-row { display: flex; align-items: center; justify-content: center; gap: .75rem; margin-top: 1.75rem; }
-  .flame {
-    width: 10px; height: 14px; border-radius: 50% 50% 45% 45%;
-    background: radial-gradient(ellipse at 50% 70%, var(--accent-ink), var(--accent) 60%, transparent 72%);
-    box-shadow: 0 0 14px 5px var(--glow); transform-origin: 50% 100%;
-    animation: flicker 3.4s ease-in-out infinite;
-  }
-  @keyframes flicker {
-    0%,100% { transform: scaleY(1)   translateX(0);    opacity: 1; }
-    28%     { transform: scaleY(1.1) translateX(.6px); opacity: .9; }
-    55%     { transform: scaleY(.94) translateX(-.5px);opacity: 1; }
-    78%     { transform: scaleY(1.05)translateX(.3px); opacity: .94; }
-  }
-  @media (prefers-reduced-motion: reduce) { .flame { animation: none; } }
-  .candle-count { font-size: var(--f-sm); color: var(--ink-2); font-variant-numeric: tabular-nums; }
-
-  /* ---- Memories thread ---- */
-  .thread { display: flex; flex-direction: column; gap: 1.25rem; max-width: 40rem; margin: 0 auto; }
-  .memory {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 1.25rem 1.375rem; box-shadow: var(--shadow);
-    position: relative;
-  }
-  .memory p {
-    margin: 0 0 .875rem; font-size: var(--f-lg); line-height: 1.7;
-    white-space: pre-wrap; overflow-wrap: anywhere;
-  }
-  .memory footer {
-    display: flex; align-items: baseline; gap: .5rem;
-    font-size: var(--f-sm); color: var(--ink-3);
-    border-top: 1px solid var(--line); padding-top: .75rem;
-  }
-  .memory footer .author { color: var(--ink-2); font-weight: 550; }
-  .memory footer .rm { margin-left: auto; }
-
-  .empty-thread {
-    text-align: center; color: var(--ink-3); font-family: var(--serif);
-    font-style: italic; font-size: var(--f-lg); padding: 3rem 1rem;
-    border: 1px dashed var(--line-strong); border-radius: var(--radius);
-  }
-
-  /* ---- Forms ---- */
+  /* ---- Control panel ---- */
   .panel {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow);
-    max-width: 40rem; margin: 0 auto;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
   }
-  .panel h3 {
-    font-family: var(--serif); font-size: var(--f-xl); font-weight: 600;
-    margin: 0 0 1.25rem;
+  .panel > .group { padding:1.25rem 1.25rem 1.375rem; border-bottom:1px solid var(--line); }
+  .panel > .group:last-child { border-bottom:none; }
+  .group > h2 {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin:0 0 .875rem; font-weight:600;
   }
-  .field { display: flex; flex-direction: column; gap: .375rem; margin-bottom: 1rem; }
-  .field label {
-    font-size: var(--f-xs); text-transform: uppercase; letter-spacing: .1em;
-    color: var(--ink-3);
-  }
-  .field .hint { font-size: var(--f-sm); color: var(--ink-3); }
-  input[type="text"], textarea {
-    font: inherit; color: var(--ink); background: var(--ground);
-    border: 1px solid var(--line-strong); border-radius: var(--radius);
-    padding: .625rem .75rem; width: 100%;
-  }
-  input[type="text"]:focus, textarea:focus {
-    outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent);
-  }
-  textarea { min-height: 8rem; resize: vertical; line-height: 1.65; font-size: var(--f-lg); }
-  .row { display: flex; gap: 1rem; }
-  .row > * { flex: 1; }
-  .actions { display: flex; gap: .625rem; align-items: center; margin-top: 1.25rem; }
-  .actions .spacer { margin-left: auto; }
-  .err { color: var(--danger); font-size: var(--f-sm); min-height: 1.2em; }
 
-  .backlink {
-    display: inline-flex; align-items: center; gap: .4rem;
-    background: none; border: none; color: var(--ink-3);
-    font-size: var(--f-sm); padding: 1.5rem 0 0;
+  .field { display:flex; flex-direction:column; gap:.375rem; margin-bottom:.875rem; }
+  .field:last-child { margin-bottom:0; }
+  .field label { font-size:var(--f-sm); color:var(--ink-2); }
+  input[type="text"], textarea, select {
+    font:inherit; color:var(--ink); background:var(--ground);
+    border:1px solid var(--line-strong); border-radius:var(--radius);
+    padding:.5rem .625rem; width:100%;
   }
-  .backlink:hover { color: var(--accent); }
+  textarea { min-height:4.5rem; resize:vertical; line-height:1.5; }
+  input:focus, textarea:focus, select:focus {
+    outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent);
+  }
+  .row { display:flex; gap:.75rem; }
+  .row > * { flex:1; min-width:0; }
+
+  /* ---- Swatch / choice grids ---- */
+  .choices { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; }
+  .choice {
+    display:flex; flex-direction:column; align-items:center; gap:.375rem;
+    padding:.625rem .25rem; background:var(--ground);
+    border:1px solid var(--line-strong); border-radius:var(--radius);
+    font-size:var(--f-xs); color:var(--ink-2); text-align:center; line-height:1.3;
+  }
+  .choice:hover { border-color:var(--accent); }
+  .choice[aria-pressed="true"] {
+    border-color:var(--accent); background:var(--accent-soft); color:var(--ink);
+    box-shadow:inset 0 0 0 1px var(--accent);
+  }
+  .choice .dot {
+    width:1.75rem; height:1.75rem; border-radius:999px;
+    border:1px solid rgba(0,0,0,.25);
+  }
+  .choice .glyph { width:1.75rem; height:1.75rem; display:block; }
+  .choice .glyph svg { width:100%; height:100%; fill:currentColor; }
+  .choice .shape { width:1.75rem; height:2rem; display:block; }
+  .choice .shape svg { width:100%; height:100%; }
+
+  /* ---- Saved designs ---- */
+  .saved-list { display:flex; flex-direction:column; gap:.5rem; }
+  .saved {
+    display:flex; align-items:center; gap:.625rem; text-align:left;
+    background:var(--ground); border:1px solid var(--line-strong);
+    border-radius:var(--radius); padding:.5rem .625rem; font-size:var(--f-sm);
+  }
+  .saved:hover { border-color:var(--accent); }
+  .saved .nm { font-weight:550; color:var(--ink); }
+  .saved .sub { color:var(--ink-3); font-size:var(--f-xs); }
+  .saved .rm { margin-left:auto; }
+  .saved-empty { font-size:var(--f-sm); color:var(--ink-3); font-style:italic; }
+
+  .actions { display:flex; flex-direction:column; gap:.5rem; }
+  .actions .btn { width:100%; }
+  .fineprint { font-size:var(--f-xs); color:var(--ink-3); margin:.75rem 0 0; }
 
   .toast {
-    position: fixed; left: 50%; bottom: 1.5rem; transform: translateX(-50%);
-    background: var(--ink); color: var(--ground);
-    padding: .625rem 1.125rem; border-radius: 999px; font-size: var(--f-sm);
-    box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: opacity .25s;
+    position:fixed; left:50%; bottom:1.5rem; transform:translateX(-50%);
+    background:var(--ink); color:var(--ground);
+    padding:.625rem 1.125rem; border-radius:999px; font-size:var(--f-sm);
+    box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s;
+    z-index:10;
   }
-  .toast.show { opacity: 1; }
-
-  .hidden { display: none !important; }
-
-  @media (max-width: 34rem) {
-    :root { --f-3xl: 2.125rem; }
-    .row { flex-direction: column; gap: 0; }
-  }
+  .toast.show { opacity:1; }
 </style>
 </head>
 <body>
@@ -276,93 +199,80 @@
       <h1>Remember Them</h1>
       <span class="parent">Healing Partners</span>
     </div>
-    <button class="btn" id="newBtn">Create a memorial</button>
+    <button class="btn" id="newBtn">Start over</button>
   </div>
 </header>
 
-<main class="wrap">
-  <!-- HOME -->
-  <section id="view-home">
-    <div class="intro" id="intro">
-      <h2>A place to keep someone.</h2>
-      <p>Create a page for a person you've lost, then gather the memories — yours, and the ones other people carry. Nothing here is lost when you close the window.</p>
-      <button class="btn btn-primary" id="startBtn">Create the first memorial</button>
+<main class="studio">
+  <!-- ============ STAGE ============ -->
+  <div class="stage-col">
+    <div class="stage" id="stage"></div>
+    <div class="stage-meta">
+      <span class="spec" id="specLine"></span>
+      <span class="spacer"></span>
+      <span id="dimLine"></span>
     </div>
-    <div id="listWrap" class="hidden">
-      <div class="section-label">Memorials</div>
-      <div class="grid" id="list"></div>
-    </div>
-  </section>
+  </div>
 
-  <!-- CREATE -->
-  <section id="view-create" class="hidden">
-    <div class="panel">
-      <h3>Create a memorial</h3>
+  <!-- ============ CONTROLS ============ -->
+  <div class="panel">
+    <div class="group">
+      <h2>Form</h2>
+      <div class="choices" id="formChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>Material</h2>
+      <div class="choices" id="stoneChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>Inscription</h2>
       <div class="field">
-        <label for="f-name">Their name</label>
-        <input type="text" id="f-name" placeholder="Eleanor Homer" autocomplete="off">
+        <label for="f-name">Name</label>
+        <input type="text" id="f-name" autocomplete="off" maxlength="40">
       </div>
       <div class="row">
         <div class="field">
           <label for="f-born">Born</label>
-          <input type="text" id="f-born" placeholder="1943" autocomplete="off">
+          <input type="text" id="f-born" autocomplete="off" maxlength="12">
         </div>
         <div class="field">
           <label for="f-died">Died</label>
-          <input type="text" id="f-died" placeholder="2024" autocomplete="off">
+          <input type="text" id="f-died" autocomplete="off" maxlength="12">
         </div>
       </div>
       <div class="field">
-        <label for="f-epitaph">A line about them</label>
-        <input type="text" id="f-epitaph" placeholder="She fed everyone who walked through the door." autocomplete="off">
+        <label for="f-epitaph">Epitaph</label>
+        <textarea id="f-epitaph" maxlength="160"></textarea>
       </div>
-      <div class="field">
-        <label for="f-photo">Photograph</label>
-        <input type="file" id="f-photo" accept="image/*">
-        <span class="hint">Optional. Stays on this device — it is never uploaded anywhere.</span>
-      </div>
-      <div class="err" id="createErr"></div>
+    </div>
+
+    <div class="group">
+      <h2>Lettering</h2>
+      <div class="choices" id="letterChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>Emblem</h2>
+      <div class="choices" id="emblemChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>This design</h2>
       <div class="actions">
-        <button class="btn btn-primary" id="saveMemorial">Create memorial</button>
-        <button class="btn-quiet" id="cancelCreate">Cancel</button>
+        <button class="btn btn-primary" id="orderBtn">Request this memorial</button>
+        <button class="btn" id="saveBtn">Save design</button>
+        <button class="btn" id="copyBtn">Copy specification</button>
       </div>
-    </div>
-  </section>
-
-  <!-- MEMORIAL -->
-  <section id="view-memorial" class="hidden">
-    <div class="memorial-head">
-      <img id="m-photo" class="portrait-lg hidden" alt="">
-      <h2 id="m-name"></h2>
-      <div class="dates" id="m-dates"></div>
-      <div class="epitaph" id="m-epitaph"></div>
-      <div class="candle-row">
-        <button class="btn" id="candleBtn"><span class="flame" aria-hidden="true"></span>&nbsp;&nbsp;Light a candle</button>
-        <span class="candle-count" id="candleCount"></span>
-      </div>
+      <p class="fineprint">Saved designs stay in this browser. Nothing is uploaded.</p>
     </div>
 
-    <div class="thread" id="thread"></div>
-
-    <div class="panel" id="addPanel" style="margin-top:2rem">
-      <h3>Share a memory</h3>
-      <div class="field">
-        <label for="f-author">Your name</label>
-        <input type="text" id="f-author" placeholder="Brandon" autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="f-memory">The memory</label>
-        <textarea id="f-memory" placeholder="Write it the way you'd tell it out loud."></textarea>
-      </div>
-      <div class="err" id="memErr"></div>
-      <div class="actions">
-        <button class="btn btn-primary" id="saveMemory">Add memory</button>
-        <button class="btn-quiet danger spacer" id="deleteMemorial">Delete this memorial</button>
-      </div>
+    <div class="group">
+      <h2>Saved designs</h2>
+      <div class="saved-list" id="savedList"></div>
     </div>
-
-    <button class="backlink" id="backBtn">&larr; All memorials</button>
-  </section>
+  </div>
 </main>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -371,238 +281,344 @@
 (function () {
   "use strict";
 
-  var KEY = "healing-partners.remember-them.v1";
-  var state = { memorials: [], openId: null };
-  var pendingPhoto = null;
+  var KEY = "healing-partners.remember-them.designs.v2";
+  var STORE_URL = "https://healingpartners.us";
 
-  /* ---------- storage ---------- */
-  function load() {
-    try {
-      var raw = localStorage.getItem(KEY);
-      if (raw) state.memorials = JSON.parse(raw) || [];
-    } catch (e) { state.memorials = []; }
-  }
-  function save() {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state.memorials));
-    } catch (e) {
-      toast("Couldn't save — this device's storage is full.");
-    }
-  }
-  function uid() {
-    return "m" + performance.now().toString(36).replace(".", "") + Math.floor(Math.random() * 1e6).toString(36);
-  }
+  /* ---------------- catalogue ---------------- */
 
-  /* ---------- helpers ---------- */
+  var FORMS = [
+    { id:"upright",  label:"Upright",   dims:"24 × 30 × 4 in" },
+    { id:"serpentine", label:"Serpentine", dims:"28 × 22 × 4 in" },
+    { id:"flat",     label:"Flat marker", dims:"24 × 12 × 4 in" },
+    { id:"plaque",   label:"Plaque",    dims:"18 × 12 in" },
+    { id:"heart",    label:"Heart",     dims:"26 × 22 × 4 in" },
+    { id:"cross",    label:"Cross",     dims:"22 × 34 × 4 in" }
+  ];
+
+  var STONES = [
+    { id:"black",  label:"Black granite", base:"#2A2A2E", hi:"#4A4A52", cut:"#0E0E11", lip:"#5A5A64" },
+    { id:"grey",   label:"Grey granite",  base:"#83878C", hi:"#A2A6AC", cut:"#4E5257", lip:"#B6BAC0" },
+    { id:"rose",   label:"Rose granite",  base:"#A2807B", hi:"#BE9B95", cut:"#6B504C", lip:"#CBAAA4" },
+    { id:"marble", label:"White marble",  base:"#DEDAD2", hi:"#F1EEE8", cut:"#A49F94", lip:"#FFFFFF" },
+    { id:"bronze", label:"Bronze",        base:"#6E5327", hi:"#9A7838", cut:"#3E2E13", lip:"#C9A24E" },
+    { id:"blue",   label:"Blue pearl",    base:"#3A4560", hi:"#556383", cut:"#1E2536", lip:"#6D7C9E" }
+  ];
+
+  var LETTERING = [
+    { id:"traditional", label:"Traditional", css:'ui-serif, "Iowan Old Style", Georgia, serif', weight:600, track:".02em" },
+    { id:"modern",      label:"Modern",      css:'system-ui, "Segoe UI", Helvetica, Arial, sans-serif', weight:500, track:".06em" },
+    { id:"script",      label:"Script",      css:'"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive', weight:500, track:".01em" }
+  ];
+
+  var EMBLEMS = {
+    none:  { label:"None", path:null },
+    cross: { label:"Cross", path:"M-4,-22 h8 v12 h12 v8 h-12 v24 h-8 v-24 h-12 v-8 h12 z" },
+    celtic:{ label:"Celtic", path:"M-3.5,-22 h7 v10 h11 v7 h-11 v27 h-7 v-27 h-11 v-7 h11 z M0,-11.5 m-13,0 a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0 M0,-11.5 m-9,0 a9,9 0 1,1 18,0 a9,9 0 1,1 -18,0" },
+    star:  { label:"Star", path:"M0,-22 L12.7,0 L-12.7,0 Z M0,22 L12.7,0 L-12.7,0 Z" },
+    heart: { label:"Heart", path:"M0,18 C-18,4 -18,-14 0,-6 C18,-14 18,4 0,18 Z" },
+    tree:  { label:"Tree", path:"M-2.5,20 h5 v-16 h-5 z M0,-20 m-14,6 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" },
+    dove:  { label:"Dove", path:"M-18,4 C-10,-6 4,-10 16,-8 C10,-2 12,4 18,6 C8,12 -6,12 -18,4 Z M6,-8 C8,-14 2,-16 -2,-12" },
+    rose:  { label:"Rose", path:"M0,-12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M0,-12 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0 M-1.5,-4 h3 v22 h-3 z M1.5,6 C8,4 11,-1 12,-5 C6,-5 2,-1 1.5,4 Z" },
+    hands: { label:"Hands", path:"M-3,20 C-9,12 -11,2 -10,-8 C-9.5,-14 -6,-16 -5,-11 L-3,2 Z M3,20 C9,12 11,2 10,-8 C9.5,-14 6,-16 5,-11 L3,2 Z" }
+  };
+  var EMBLEM_ORDER = ["none","cross","celtic","star","heart","tree","dove","rose","hands"];
+
+  /* ---------------- state ---------------- */
+
+  var d = {
+    form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
+    name:"", born:"", died:"", epitaph:""
+  };
+  var designs = [];
+
   function $(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c];
     });
+  }
+  function byId(arr, id) {
+    for (var i=0;i<arr.length;i++) if (arr[i].id===id) return arr[i];
+    return arr[0];
   }
   var toastTimer;
   function toast(msg) {
-    var t = $("toast");
-    t.textContent = msg;
-    t.classList.add("show");
+    var t=$("toast"); t.textContent=msg; t.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2600);
+    toastTimer=setTimeout(function(){ t.classList.remove("show"); },2600);
   }
-  function find(id) {
-    for (var i = 0; i < state.memorials.length; i++) {
-      if (state.memorials[i].id === id) return state.memorials[i];
+
+  /* ---------------- geometry ---------------- */
+  /* Every form draws inside a 300 × 380 box centred on x=150. */
+
+  function outline(form) {
+    switch (form) {
+      case "upright":
+        return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
+      case "serpentine":
+        return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
+      case "flat":
+        return "M20,215 L280,215 L280,340 L20,340 Z";
+      case "plaque":
+        return "M35,120 L265,120 L265,330 L35,330 Z";
+      case "heart":
+        return "M150,368 C40,285 18,175 62,128 C104,84 150,120 150,158 C150,120 196,84 238,128 C282,175 260,285 150,368 Z";
+      case "cross":
+        return "M118,372 L118,215 L28,215 L28,140 L118,140 L118,28 L182,28 L182,140 L272,140 L272,215 L182,215 L182,372 Z";
     }
-    return null;
-  }
-  function lifespan(m) {
-    if (m.born && m.died) return m.born + " – " + m.died;
-    return m.born || m.died || "";
+    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
   }
 
-  /* ---------- photo: downscale so localStorage survives ---------- */
-  function readPhoto(file, cb) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var img = new Image();
-      img.onload = function () {
-        var max = 520;
-        var scale = Math.min(1, max / Math.max(img.width, img.height));
-        var c = document.createElement("canvas");
-        c.width = Math.round(img.width * scale);
-        c.height = Math.round(img.height * scale);
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        cb(c.toDataURL("image/jpeg", 0.82));
-      };
-      img.onerror = function () { cb(null); };
-      img.src = e.target.result;
-    };
-    reader.onerror = function () { cb(null); };
-    reader.readAsDataURL(file);
+  /* where the inscription block sits, per form: {top, emblemY, scale, width} */
+  function metrics(form) {
+    switch (form) {
+      case "upright":    return { emblemY:118, nameY:190, dateY:228, epiY:266, scale:1,   w:200 };
+      case "serpentine": return { emblemY:138, nameY:206, dateY:242, epiY:278, scale:1,   w:210 };
+      case "flat":       return { emblemY:246, nameY:266, dateY:296, epiY:322, scale:.82, w:230 };
+      case "plaque":     return { emblemY:158, nameY:206, dateY:240, epiY:276, scale:.88, w:200 };
+      case "heart":      return { emblemY:168, nameY:224, dateY:258, epiY:292, scale:.86, w:170 };
+      case "cross":      return { emblemY:88,  nameY:186, dateY:250, epiY:288, scale:.78, w:130 };
+    }
+    return { emblemY:118, nameY:190, dateY:228, epiY:266, scale:1, w:200 };
   }
 
-  /* ---------- views ---------- */
-  function show(view) {
-    ["home", "create", "memorial"].forEach(function (v) {
-      $("view-" + v).classList.toggle("hidden", v !== view);
-    });
-    window.scrollTo(0, 0);
+  function wrap(text, perLine) {
+    var words = String(text).split(/\s+/).filter(Boolean), lines=[], cur="";
+    for (var i=0;i<words.length;i++) {
+      var t = cur ? cur+" "+words[i] : words[i];
+      if (t.length > perLine && cur) { lines.push(cur); cur = words[i]; }
+      else cur = t;
+    }
+    if (cur) lines.push(cur);
+    return lines.slice(0,4);
   }
 
-  function renderHome() {
-    var has = state.memorials.length > 0;
-    $("intro").classList.toggle("hidden", has);
-    $("listWrap").classList.toggle("hidden", !has);
+  /* ---------------- render ---------------- */
 
-    $("list").innerHTML = state.memorials.map(function (m) {
-      var n = m.memories.length;
-      return '<button class="card" data-open="' + m.id + '">' +
-        (m.photo ? '<img class="portrait" src="' + m.photo + '" alt="">' : "") +
-        "<h3>" + esc(m.name) + "</h3>" +
-        '<div class="dates">' + esc(lifespan(m)) + "</div>" +
-        '<div class="count">' + n + (n === 1 ? " memory" : " memories") + "</div>" +
-        "</button>";
+  function engraved(txt, x, y, size, stone, font, weight, track, anchor) {
+    if (!txt) return "";
+    var common = 'x="'+x+'" y="'+y+'" text-anchor="'+(anchor||"middle")+'" '+
+                 'font-family=\''+font.css+'\' font-size="'+size+'" '+
+                 'font-weight="'+font.weight+'" letter-spacing="'+font.track+'"';
+    /* lower highlight first, darker incision on top → reads as cut into the stone */
+    return '<text '+common+' dy="1.1" fill="'+stone.lip+'" opacity=".65">'+esc(txt)+'</text>' +
+           '<text '+common+' fill="'+stone.cut+'">'+esc(txt)+'</text>';
+  }
+
+  function render() {
+    var stone = byId(STONES, d.stone);
+    var font  = byId(LETTERING, d.lettering);
+    var m     = metrics(d.form);
+    var em    = EMBLEMS[d.emblem];
+
+    var dates = "";
+    if (d.born && d.died) dates = d.born + " – " + d.died;
+    else dates = d.born || d.died || "";
+
+    var epiLines = d.epitaph ? wrap(d.epitaph, Math.round(m.w / 5.4)) : [];
+
+    var nameSize = 30 * m.scale;
+    var nm = d.name || "Their Name";
+    if (nm.length > 14) nameSize *= 14 / nm.length;
+    if (nameSize < 13) nameSize = 13;
+
+    var svg =
+      '<svg viewBox="0 0 300 400" role="img" aria-label="Preview of the memorial">' +
+      '<defs>' +
+        '<linearGradient id="face" x1="0" y1="0" x2="0.35" y2="1">' +
+          '<stop offset="0" stop-color="'+stone.hi+'"/>' +
+          '<stop offset="0.55" stop-color="'+stone.base+'"/>' +
+          '<stop offset="1" stop-color="'+stone.cut+'"/>' +
+        '</linearGradient>' +
+        '<filter id="grain" x="0" y="0" width="100%" height="100%">' +
+          '<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="7" result="n"/>' +
+          '<feColorMatrix in="n" type="saturate" values="0"/>' +
+          '<feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>' +
+        '</filter>' +
+        '<clipPath id="clip"><path d="'+outline(d.form)+'"/></clipPath>' +
+      '</defs>' +
+
+      /* body */
+      '<path d="'+outline(d.form)+'" fill="url(#face)"/>' +
+      '<g clip-path="url(#clip)"><rect width="300" height="400" filter="url(#grain)" opacity=".55"/></g>' +
+      '<path d="'+outline(d.form)+'" fill="none" stroke="'+stone.lip+'" stroke-width="1.5" opacity=".5"/>' +
+
+      /* emblem */
+      (em && em.path
+        ? '<g transform="translate(150,'+m.emblemY+') scale('+(0.9*m.scale)+')">' +
+          '<path d="'+em.path+'" fill="'+stone.lip+'" opacity=".55" transform="translate(0,1.2)"/>' +
+          '<path d="'+em.path+'" fill="'+stone.cut+'"/></g>'
+        : "") +
+
+      /* inscription */
+      engraved(nm, 150, m.nameY, nameSize, stone, font) +
+      engraved(dates, 150, m.dateY, 15*m.scale, stone, font);
+
+    for (var i=0;i<epiLines.length;i++) {
+      svg += engraved(epiLines[i], 150, m.epiY + i*(17*m.scale), 12.5*m.scale, stone, font);
+    }
+
+    /* ground line, so it reads as standing */
+    if (d.form!=="plaque" && d.form!=="flat") {
+      svg += '<ellipse cx="150" cy="374" rx="128" ry="9" fill="'+stone.cut+'" opacity=".18"/>';
+    }
+    svg += '</svg>';
+
+    $("stage").innerHTML = svg;
+
+    var f = byId(FORMS, d.form);
+    $("specLine").textContent = f.label + " · " + stone.label + " · " + font.label +
+      (em && em.path ? " · " + em.label + " emblem" : "");
+    $("dimLine").textContent = f.dims;
+  }
+
+  /* ---------------- choice UIs ---------------- */
+
+  function thumb(formId) {
+    return '<span class="shape"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet">' +
+           '<path d="'+outline(formId)+'" fill="currentColor" opacity=".8"/></svg></span>';
+  }
+
+  function buildChoices() {
+    $("formChoices").innerHTML = FORMS.map(function (f) {
+      return '<button class="choice" data-k="form" data-v="'+f.id+'">'+thumb(f.id)+'<span>'+f.label+'</span></button>';
     }).join("");
-    show("home");
+
+    $("stoneChoices").innerHTML = STONES.map(function (s) {
+      return '<button class="choice" data-k="stone" data-v="'+s.id+'">' +
+             '<span class="dot" style="background:linear-gradient(140deg,'+s.hi+','+s.base+' 60%,'+s.cut+')"></span>' +
+             '<span>'+s.label.replace(" ","<br>")+'</span></button>';
+    }).join("");
+
+    $("letterChoices").innerHTML = LETTERING.map(function (l) {
+      return '<button class="choice" data-k="lettering" data-v="'+l.id+'">' +
+             '<span style="font-family:'+l.css+';font-size:1.25rem;line-height:1.75rem">Aa</span>' +
+             '<span>'+l.label+'</span></button>';
+    }).join("");
+
+    $("emblemChoices").innerHTML = EMBLEM_ORDER.map(function (k) {
+      var e = EMBLEMS[k];
+      return '<button class="choice" data-k="emblem" data-v="'+k+'">' +
+             '<span class="glyph">' + (e.path
+               ? '<svg viewBox="-24 -24 48 48"><path d="'+e.path+'"/></svg>'
+               : '<svg viewBox="-24 -24 48 48"><line x1="-13" y1="13" x2="13" y2="-13" stroke="currentColor" stroke-width="2.5"/></svg>') +
+             '</span><span>'+e.label+'</span></button>';
+    }).join("");
   }
 
-  function renderMemorial(id) {
-    var m = find(id);
-    if (!m) return renderHome();
-    state.openId = id;
-
-    $("m-name").textContent = m.name;
-    $("m-dates").textContent = lifespan(m);
-    $("m-epitaph").textContent = m.epitaph || "";
-    $("m-epitaph").classList.toggle("hidden", !m.epitaph);
-
-    var img = $("m-photo");
-    if (m.photo) { img.src = m.photo; img.alt = "Photograph of " + m.name; img.classList.remove("hidden"); }
-    else { img.classList.add("hidden"); img.removeAttribute("src"); }
-
-    $("candleCount").textContent = m.candles
-      ? m.candles + (m.candles === 1 ? " candle lit" : " candles lit")
-      : "";
-
-    if (!m.memories.length) {
-      $("thread").innerHTML = '<div class="empty-thread">No memories yet. Yours can be the first.</div>';
-    } else {
-      $("thread").innerHTML = m.memories.map(function (mem) {
-        return '<article class="memory">' +
-          "<p>" + esc(mem.text) + "</p>" +
-          "<footer>" +
-            '<span class="author">' + esc(mem.author) + "</span>" +
-            "<span>" + esc(mem.when) + "</span>" +
-            '<button class="btn-quiet danger rm" data-rm="' + mem.id + '">Remove</button>' +
-          "</footer></article>";
-      }).join("");
+  function syncPressed() {
+    var all = document.querySelectorAll(".choice");
+    for (var i=0;i<all.length;i++) {
+      var b = all[i];
+      b.setAttribute("aria-pressed", d[b.getAttribute("data-k")] === b.getAttribute("data-v") ? "true" : "false");
     }
-    show("memorial");
   }
 
-  /* ---------- actions ---------- */
-  function openCreate() {
-    ["f-name", "f-born", "f-died", "f-epitaph"].forEach(function (i) { $(i).value = ""; });
-    $("f-photo").value = "";
-    $("createErr").textContent = "";
-    pendingPhoto = null;
-    show("create");
-    $("f-name").focus();
+  /* ---------------- saved designs ---------------- */
+
+  function loadDesigns() {
+    try { designs = JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch (e) { designs = []; }
   }
-
-  $("newBtn").onclick = openCreate;
-  $("startBtn").onclick = openCreate;
-  $("cancelCreate").onclick = renderHome;
-  $("backBtn").onclick = renderHome;
-
-  $("f-photo").onchange = function () {
-    var f = this.files && this.files[0];
-    if (!f) { pendingPhoto = null; return; }
-    readPhoto(f, function (data) {
-      pendingPhoto = data;
-      if (!data) toast("That image couldn't be read.");
-    });
-  };
-
-  $("saveMemorial").onclick = function () {
-    var name = $("f-name").value.trim();
-    if (!name) {
-      $("createErr").textContent = "A name is needed to create the memorial.";
-      $("f-name").focus();
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(designs)); }
+    catch (e) { toast("Couldn't save — this browser's storage is full."); }
+  }
+  function renderSaved() {
+    if (!designs.length) {
+      $("savedList").innerHTML = '<span class="saved-empty">Nothing saved yet.</span>';
       return;
     }
-    state.memorials.unshift({
-      id: uid(),
-      name: name,
-      born: $("f-born").value.trim(),
-      died: $("f-died").value.trim(),
-      epitaph: $("f-epitaph").value.trim(),
-      photo: pendingPhoto,
-      candles: 0,
-      memories: []
-    });
-    save();
-    toast("Memorial created for " + name + ".");
-    renderMemorial(state.memorials[0].id);
-  };
+    $("savedList").innerHTML = designs.map(function (x, i) {
+      return '<button class="saved" data-load="'+i+'">' +
+             '<span><span class="nm">'+esc(x.name || "Untitled")+'</span><br>' +
+             '<span class="sub">'+esc(byId(FORMS,x.form).label+" · "+byId(STONES,x.stone).label)+'</span></span>' +
+             '<span class="btn-quiet danger rm" data-del="'+i+'">Remove</span></button>';
+    }).join("");
+  }
 
-  $("saveMemory").onclick = function () {
-    var m = find(state.openId);
-    if (!m) return;
-    var author = $("f-author").value.trim();
-    var text = $("f-memory").value.trim();
-    if (!text) {
-      $("memErr").textContent = "Write the memory before adding it.";
-      $("f-memory").focus();
-      return;
-    }
-    $("memErr").textContent = "";
-    m.memories.unshift({
-      id: uid(),
-      author: author || "Anonymous",
-      text: text,
-      when: new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
-    });
-    save();
-    $("f-memory").value = "";
-    renderMemorial(m.id);
-    toast("Memory added.");
-  };
+  function spec() {
+    var f=byId(FORMS,d.form), s=byId(STONES,d.stone), l=byId(LETTERING,d.lettering);
+    var em=EMBLEMS[d.emblem];
+    return [
+      "REMEMBER THEM — memorial specification",
+      "Healing Partners",
+      "",
+      "Form:       " + f.label + "  (" + f.dims + ")",
+      "Material:   " + s.label,
+      "Lettering:  " + l.label,
+      "Emblem:     " + (em.path ? em.label : "None"),
+      "",
+      "Name:       " + (d.name || "—"),
+      "Born:       " + (d.born || "—"),
+      "Died:       " + (d.died || "—"),
+      "Epitaph:    " + (d.epitaph || "—")
+    ].join("\n");
+  }
 
-  $("candleBtn").onclick = function () {
-    var m = find(state.openId);
-    if (!m) return;
-    m.candles = (m.candles || 0) + 1;
-    save();
-    $("candleCount").textContent = m.candles + (m.candles === 1 ? " candle lit" : " candles lit");
-  };
+  /* ---------------- wiring ---------------- */
 
-  $("deleteMemorial").onclick = function () {
-    var m = find(state.openId);
-    if (!m) return;
-    if (!confirm("Delete the memorial for " + m.name + "? Every memory on it is deleted too. This cannot be undone.")) return;
-    state.memorials = state.memorials.filter(function (x) { return x.id !== m.id; });
-    save();
-    toast("Memorial deleted.");
-    renderHome();
-  };
+  ["name","born","died","epitaph"].forEach(function (k) {
+    $("f-"+k).addEventListener("input", function () { d[k]=this.value; render(); });
+  });
 
   document.addEventListener("click", function (e) {
-    var card = e.target.closest("[data-open]");
-    if (card) return renderMemorial(card.getAttribute("data-open"));
-
-    var rm = e.target.closest("[data-rm]");
-    if (rm) {
-      var m = find(state.openId);
-      if (!m) return;
-      m.memories = m.memories.filter(function (x) { return x.id !== rm.getAttribute("data-rm"); });
-      save();
-      renderMemorial(m.id);
-      toast("Memory removed.");
+    var del = e.target.closest("[data-del]");
+    if (del) {
+      e.stopPropagation();
+      designs.splice(+del.getAttribute("data-del"),1);
+      persist(); renderSaved(); toast("Design removed.");
+      return;
+    }
+    var ld = e.target.closest("[data-load]");
+    if (ld) {
+      var x = designs[+ld.getAttribute("data-load")];
+      if (!x) return;
+      Object.keys(d).forEach(function (k) { if (k in x) d[k]=x[k]; });
+      ["name","born","died","epitaph"].forEach(function (k) { $("f-"+k).value = d[k]; });
+      syncPressed(); render(); toast("Design loaded.");
+      return;
+    }
+    var ch = e.target.closest(".choice");
+    if (ch) {
+      d[ch.getAttribute("data-k")] = ch.getAttribute("data-v");
+      syncPressed(); render();
     }
   });
 
-  load();
-  renderHome();
+  $("saveBtn").onclick = function () {
+    designs.unshift(JSON.parse(JSON.stringify(d)));
+    if (designs.length > 24) designs.length = 24;
+    persist(); renderSaved(); toast("Design saved.");
+  };
+
+  $("copyBtn").onclick = function () {
+    var text = spec();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { toast("Specification copied."); },
+        function () { toast("Couldn't copy — select the text instead."); }
+      );
+    } else { toast("Copying isn't available in this browser."); }
+  };
+
+  $("orderBtn").onclick = function () {
+    window.open(STORE_URL, "_blank", "noopener");
+    toast("Opening the Healing Partners store.");
+  };
+
+  $("newBtn").onclick = function () {
+    d = { form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
+          name:"", born:"", died:"", epitaph:"" };
+    ["name","born","died","epitaph"].forEach(function (k) { $("f-"+k).value=""; });
+    syncPressed(); render(); toast("Started a new design.");
+  };
+
+  buildChoices();
+  loadDesigns();
+  renderSaved();
+  syncPressed();
+  render();
 })();
 </script>
 </body>
