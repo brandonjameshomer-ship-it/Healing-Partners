@@ -1,0 +1,28 @@
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service-account*.json
+
+# Real people's data — keep out of a public repo
+/data/
+*.csv
+*.sqlite
+*.db
+
+# Dependencies & build output
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+build/
+
+# OS / editor
+.DS_Store
+*.swp
+.vscode/
+.idea/
