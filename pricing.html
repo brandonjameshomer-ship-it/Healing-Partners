@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Remember Them pricing — families design free and pay for the memorial; funeral homes and cemeteries subscribe for $150 a month after a 7-day trial.">
+<title>Remember Them Pricing</title>
+<style>
+  /* Healing Partners "blue hour" tokens — keep in step with index.html */
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --glow:rgba(200,150,60,.30);
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:1rem; --f-lg:1.125rem;
+    --f-xl:1.375rem; --f-2xl:1.875rem; --f-3xl:2.75rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:var(--f-base); line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:62rem; margin:0 auto; padding:0 1.5rem; }
+
+  header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
+  .masthead-in {
+    max-width:62rem; margin:0 auto; padding:1.125rem 1.5rem;
+    display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+  }
+  .brand {
+    font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+    letter-spacing:-.01em; margin-right:auto; text-decoration:none; color:inherit;
+  }
+  nav { display:flex; gap:1.5rem; align-items:center; }
+  nav a {
+    color:var(--ink-2); text-decoration:none; font-size:var(--f-sm);
+    border-bottom:1px solid transparent; padding-bottom:2px;
+  }
+  nav a:hover, nav a[aria-current] { color:var(--accent); border-bottom-color:var(--accent); }
+
+  .intro { padding:4rem 0 2.5rem; max-width:34rem; }
+  .intro h1 {
+    font-family:var(--serif); font-weight:500; font-size:var(--f-3xl);
+    line-height:1.12; letter-spacing:-.025em; margin:0 0 1rem; text-wrap:balance;
+  }
+  .intro p { font-size:var(--f-lg); color:var(--ink-2); margin:0; }
+
+  /* Two audiences, two models — the split is the point of this page */
+  .plans {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));
+    gap:1.25rem; padding-bottom:3rem; align-items:start;
+  }
+  .plan {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.75rem; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; height:100%;
+  }
+  .plan.featured { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--shadow); }
+  .plan .who {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin-bottom:.75rem;
+  }
+  .plan h2 {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+    margin:0 0 .5rem; letter-spacing:-.015em;
+  }
+  .plan .lede { color:var(--ink-2); margin:0 0 1.5rem; }
+  .plan .price {
+    font-family:var(--serif); font-size:2.5rem; font-weight:600;
+    letter-spacing:-.025em; line-height:1;
+  }
+  .plan .per { font-size:var(--f-sm); color:var(--ink-3); margin:.375rem 0 1.5rem; }
+  .plan ul { list-style:none; margin:0 0 1.75rem; padding:0;
+             display:flex; flex-direction:column; gap:.625rem; }
+  .plan li { display:flex; gap:.625rem; align-items:flex-start;
+             font-size:var(--f-sm); color:var(--ink-2); }
+  .plan li svg { flex:none; width:1rem; height:1rem; margin-top:.25rem; color:var(--accent); }
+  .plan .go { margin-top:auto; }
+  .btn {
+    display:block; width:100%; text-align:center; padding:.6875rem 1.125rem;
+    border-radius:var(--radius); text-decoration:none; font-size:var(--f-base);
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+    transition:background-color .15s, border-color .15s;
+  }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent);
+                 color:var(--on-accent); font-weight:550; }
+  .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
+  a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .plan .after { font-size:var(--f-xs); color:var(--ink-3); text-align:center; margin:.625rem 0 0; }
+
+  .faq { border-top:1px solid var(--line); padding:3rem 0 5rem; }
+  .faq h2 {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin:0 0 1.5rem; font-weight:600;
+  }
+  .qa { max-width:38rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .qa h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0 0 .375rem; }
+  .qa p { margin:0; color:var(--ink-2); }
+
+  footer.site {
+    border-top:1px solid var(--line); background:var(--surface);
+    padding:2rem 0; font-size:var(--f-sm); color:var(--ink-3);
+  }
+  footer.site .wrap { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+  footer.site a { color:var(--ink-2); text-decoration:none; }
+  footer.site a:hover { color:var(--accent); }
+  footer.site .spacer { margin-left:auto; }
+
+  @media (max-width:34rem) { :root { --f-3xl:2.125rem; } .intro { padding:2.5rem 0 2rem; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="brand" href="./">Healing Partners</a>
+    <nav>
+      <a href="./remember-them/">Remember Them</a>
+      <a href="./pricing.html" aria-current="page">Pricing</a>
+      <a href="https://healingpartners.us">Store</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>Two ways to use Remember Them.</h1>
+    <p>Families never pay to design — you pay for the memorial itself. Funeral homes and cemeteries who use it every week subscribe.</p>
+  </section>
+
+  <section class="plans">
+
+    <div class="plan">
+      <div class="who">For families</div>
+      <h2>Design freely</h2>
+      <p class="lede">Take all the time you need. There is no clock and no account.</p>
+      <div class="price">Free</div>
+      <div class="per">you pay only for the memorial you order</div>
+      <ul>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Every form, stone, lettering style and emblem</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Save designs and come back to them</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Share a link with family before deciding</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Send the finished design to us when you're ready</span></li>
+      </ul>
+      <div class="go">
+        <a class="btn" href="./remember-them/">Start designing</a>
+        <p class="after">No sign-up. Nothing to cancel.</p>
+      </div>
+    </div>
+
+    <div class="plan featured">
+      <div class="who">For funeral homes &amp; cemeteries</div>
+      <h2>Professional</h2>
+      <p class="lede">Sit with a family and design the memorial together, on any screen.</p>
+      <div class="price">$150</div>
+      <div class="per">per month · 7 days free first · cancel any time</div>
+      <ul>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Unlimited designs for the families you serve</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Send a design straight to a family by link</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Orders arrive with the full specification written out</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Works on the tablet in the arrangement room</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Talk to a person, not a help desk</span></li>
+      </ul>
+      <div class="go">
+        <a class="btn btn-primary" href="./remember-them/?plan=pro">Start the 7-day trial</a>
+        <p class="after">No card needed to start.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="faq">
+    <h2>Questions</h2>
+    <div class="qa">
+      <div>
+        <h3>Do families really pay nothing?</h3>
+        <p>Nothing to design. You pay for the memorial you order, the way you always would — the designer is just how you decide what you want before ordering it.</p>
+      </div>
+      <div>
+        <h3>What happens after the seven days?</h3>
+        <p>The designer locks, but nothing you made is deleted. Subscribe and every design is exactly where you left it.</p>
+      </div>
+      <div>
+        <h3>Can we cancel?</h3>
+        <p>Any time, and you keep access through the month you've paid for.</p>
+      </div>
+      <div>
+        <h3>Is our families' information stored anywhere?</h3>
+        <p>No. Designs stay in your own browser. Nothing is uploaded, and we hold no records about the people you serve.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>&copy; Healing Partners</span>
+    <a href="mailto:bhomer@healingpartners.us">bhomer@healingpartners.us</a>
+    <a class="spacer" href="https://healingpartners.us">healingpartners.us</a>
+  </div>
+</footer>
+
+</body>
+</html>

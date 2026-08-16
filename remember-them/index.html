@@ -173,6 +173,59 @@
   .actions .btn { width:100%; text-align:center; text-decoration:none; display:block; }
   .fineprint { font-size:var(--f-xs); color:var(--ink-3); margin:.75rem 0 0; line-height:1.5; }
 
+  /* ---- Trial strip ---- */
+  .trialbar {
+    display:none; align-items:center; gap:.75rem; flex-wrap:wrap;
+    background:var(--accent-soft); border-bottom:1px solid var(--accent);
+    padding:.625rem 1.5rem; font-size:var(--f-sm); color:var(--ink);
+  }
+  .trialbar.on { display:flex; }
+  .trialbar .in { max-width:78rem; margin:0 auto; width:100%;
+                  display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
+  .trialbar strong { font-weight:600; }
+  .trialbar .cta { margin-left:auto; }
+  .trialbar .cta a {
+    color:var(--accent-ink); font-weight:600; text-decoration:none;
+    border-bottom:1px solid currentColor;
+  }
+  .trialbar .cta a:hover { color:var(--ink); }
+  .trialbar.urgent { background:var(--accent); border-bottom-color:var(--accent-ink); }
+  .trialbar.urgent, .trialbar.urgent strong { color:var(--on-accent); }
+  .trialbar.urgent .cta a { color:var(--on-accent); }
+
+  /* ---- Expired lock ---- */
+  .locked .studio { filter:blur(5px) saturate(.55); pointer-events:none; user-select:none; }
+  .paywall {
+    display:none; position:fixed; inset:0; z-index:20;
+    background:color-mix(in srgb, var(--ground) 82%, transparent);
+    backdrop-filter:blur(2px);
+    align-items:center; justify-content:center; padding:1.5rem;
+  }
+  .paywall.on { display:flex; }
+  .paywall-card {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    max-width:30rem; width:100%; padding:2rem; text-align:center;
+  }
+  .paywall-card .lamp {
+    width:11px; height:15px; margin:0 auto 1.5rem; border-radius:50% 50% 45% 45%;
+    background:radial-gradient(ellipse at 50% 70%, var(--accent-ink), var(--accent) 60%, transparent 72%);
+    box-shadow:0 0 16px 6px var(--glow);
+  }
+  .paywall-card h2 {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:500;
+    margin:0 0 .75rem; letter-spacing:-.015em; text-wrap:balance;
+  }
+  .paywall-card p { color:var(--ink-2); margin:0 0 1.5rem; text-wrap:balance; }
+  .paywall-card .price {
+    font-family:var(--serif); font-size:2.25rem; font-weight:600;
+    color:var(--ink); letter-spacing:-.02em; line-height:1;
+  }
+  .paywall-card .per { font-size:var(--f-sm); color:var(--ink-3); margin:.375rem 0 1.5rem; }
+  .paywall-card .btn { width:100%; margin-bottom:.5rem; display:block;
+                       text-align:center; text-decoration:none; }
+  .paywall-card .fineprint { margin-top:1rem; }
+
   .toast {
     position:fixed; left:50%; bottom:1.5rem; transform:translateX(-50%);
     background:var(--ink); color:var(--ground);
@@ -184,15 +237,12 @@
 </style>
 </head>
 <body>
-<header class="masthead">
-  <div class="masthead-in">
-    <div class="brand">
-      <h1>Remember Them</h1>
-      <span class="parent">Healing Partners</span>
-    </div>
-    <button class="btn" id="newBtn">Start over</button>
+<div class="trialbar" id="trialbar">
+  <div class="in">
+    <span id="trialText"></span>
+    <span class="cta"><a href="../pricing.html" id="trialCta">See plans</a></span>
   </div>
-</header>
+</div>
 
 <main class="studio">
   <div class="stage-col">
@@ -267,6 +317,19 @@
   </div>
 </main>
 
+<div class="paywall" id="paywall" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+  <div class="paywall-card">
+    <div class="lamp" aria-hidden="true"></div>
+    <h2 id="pwTitle">Your trial has ended</h2>
+    <p>You had seven days with Remember Them. To keep designing for the families you serve, continue with a professional subscription.</p>
+    <div class="price">$150</div>
+    <div class="per">per month · cancel any time</div>
+    <a class="btn btn-primary" id="pwSubscribe" href="../pricing.html">Continue for $150/month</a>
+    <a class="btn" id="pwTalk" href="#">Talk to us first</a>
+    <p class="fineprint">Every design you made is still saved and will be waiting when you subscribe.</p>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -277,6 +340,77 @@
   var ORDER_EMAIL = "bhomer@healingpartners.us";
   var STORE_URL   = "https://healingpartners.us";
   /* ------------------------------------------------------ */
+
+  /* ==========================================================================
+     ACCESS / TRIAL — the seam
+     --------------------------------------------------------------------------
+     Decides whether the designer is usable. Today it reads this browser's own
+     storage, so a determined visitor can bypass it by clearing their data or
+     opening a private window. That is fine for showing the product to a
+     prospect; it is NOT security.
+
+     When real billing exists, replace the body of Access.state() with a call
+     to your server:
+         var r = await fetch("/api/access", {credentials:"include"});
+         return await r.json();     // -> {mode:"trial", daysLeft:4}
+     Nothing else needs to change — the rest of the app only reads .mode.
+
+     Modes:
+       "open"        a family — unrestricted, no trial, never walled
+       "trial"       professional trial running, .daysLeft set
+       "expired"     professional trial finished — designer locked
+       "subscribed"  paying professional — unrestricted
+
+     Demo links, for showing a prospect the whole flow:
+       ?plan=pro          start a professional trial now
+       ?trial=reset       put the seven days back
+       ?trial=expired     jump straight to the lock screen
+       ?unlock=1          behave as a paying subscriber
+     ========================================================================== */
+  var Access = (function () {
+    var TRIAL_DAYS = 7;
+    var TKEY = "healing-partners.remember-them.access.v1";
+    var DAY  = 86400000;
+
+    function read() {
+      try { return JSON.parse(localStorage.getItem(TKEY)) || null; } catch (e) { return null; }
+    }
+    function write(o) {
+      try { localStorage.setItem(TKEY, JSON.stringify(o)); } catch (e) {}
+    }
+
+    function state() {
+      var q;
+      try { q = new URLSearchParams(location.search); }
+      catch (e) { q = { get: function () { return null; } }; }
+
+      if (q.get("trial") === "reset") {
+        try { localStorage.removeItem(TKEY); } catch (e) {}
+      }
+      if (q.get("trial") === "expired") {
+        write({ plan:"pro", started: Date.now() - (TRIAL_DAYS + 1) * DAY, subscribed:false });
+      }
+      if (q.get("unlock") === "1") {
+        var cur = read() || { plan:"pro", started: Date.now() };
+        cur.subscribed = true;
+        write(cur);
+      }
+
+      var rec = read();
+      if (!rec && q.get("plan") === "pro") {
+        rec = { plan:"pro", started: Date.now(), subscribed:false };
+        write(rec);
+      }
+      if (!rec) return { mode:"open" };
+      if (rec.subscribed) return { mode:"subscribed" };
+
+      var left = TRIAL_DAYS - Math.floor((Date.now() - rec.started) / DAY);
+      if (left <= 0) return { mode:"expired", daysLeft:0 };
+      return { mode:"trial", daysLeft:left };
+    }
+
+    return { state:state, TRIAL_DAYS:TRIAL_DAYS };
+  })();
 
   var KEY = "healing-partners.remember-them.designs.v2";
 
@@ -627,9 +761,45 @@
 
   /* ---------------- boot ---------------- */
 
+  /* ---------------- access gate ---------------- */
+
+  function applyAccess() {
+    var a = Access.state();
+    var bar = $("trialbar"), wall = $("paywall");
+
+    bar.classList.remove("on","urgent");
+    wall.classList.remove("on");
+    document.body.classList.remove("locked");
+
+    if (a.mode === "trial") {
+      var n = a.daysLeft;
+      bar.classList.add("on");
+      if (n <= 2) bar.classList.add("urgent");
+      $("trialText").innerHTML = "<strong>Professional trial</strong> — " +
+        (n === 1 ? "last day" : n + " days left") + ".";
+      $("trialCta").textContent = n <= 2 ? "Subscribe for $150/month" : "See plans";
+    } else if (a.mode === "expired") {
+      wall.classList.add("on");
+      document.body.classList.add("locked");
+      $("pwSubscribe").focus();
+    } else if (a.mode === "subscribed") {
+      bar.classList.add("on");
+      $("trialText").innerHTML = "<strong>Professional</strong> — subscription active.";
+      $("trialCta").textContent = "Manage";
+    }
+    /* mode "open" — a family. No bar, no wall, nothing in their way. */
+  }
+
+  $("pwTalk").onclick = function (e) {
+    e.preventDefault();
+    window.location.href = "mailto:" + encodeURIComponent(ORDER_EMAIL) +
+      "?subject=" + encodeURIComponent("Remember Them — question about the professional plan");
+  };
+
   buildChoices();
   loadDesigns();
   renderSaved();
+  applyAccess();
 
   var fromLink = null;
   try {
