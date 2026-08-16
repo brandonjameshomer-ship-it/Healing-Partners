@@ -1,0 +1,300 @@
+<title>Memorial Design Brief</title>
+<style>
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08; --glow:rgba(200,150,60,.30);
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:1rem; --f-lg:1.125rem;
+    --f-xl:1.375rem; --f-2xl:1.75rem; --f-3xl:2.75rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:var(--f-base); line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:48rem; margin:0 auto; padding:0 1.5rem; }
+
+  .lead { padding:4rem 0 2rem; }
+  .eyebrow {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.14em;
+    color:var(--ink-3); margin-bottom:1rem;
+  }
+  h1 {
+    font-family:var(--serif); font-weight:500; font-size:var(--f-3xl);
+    line-height:1.1; letter-spacing:-.025em; margin:0 0 1.25rem; text-wrap:balance;
+  }
+  .lead p { font-size:var(--f-lg); color:var(--ink-2); margin:0 0 1rem; max-width:36rem; }
+  .lead p:last-child { margin-bottom:0; }
+
+  .callout {
+    background:var(--accent-soft); border-radius:var(--radius);
+    padding:1.25rem 1.375rem; margin:2rem 0 0; font-size:var(--f-sm);
+    color:var(--ink-2);
+  }
+  .callout strong { color:var(--ink); }
+
+  /* Priority is a real sequence: each band unblocks the next */
+  .band { padding:3rem 0 1rem; border-top:1px solid var(--line); margin-top:3rem; }
+  .band-head { display:flex; align-items:baseline; gap:.875rem; margin-bottom:.5rem; }
+  .band-n {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+    color:var(--accent); line-height:1; font-variant-numeric:tabular-nums;
+  }
+  .band h2 {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+    margin:0; letter-spacing:-.015em;
+  }
+  .band > p.why { color:var(--ink-2); margin:0 0 2rem; max-width:36rem; }
+
+  .q {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.375rem 1.5rem;
+    box-shadow:var(--shadow); margin-bottom:1rem;
+  }
+  .q h3 {
+    font-size:var(--f-base); font-weight:600; margin:0 0 .5rem;
+  }
+  .q p { color:var(--ink-2); font-size:var(--f-sm); margin:0 0 .75rem; }
+  .q p:last-child { margin-bottom:0; }
+  .q ul { margin:0; padding-left:1.125rem; color:var(--ink-2); font-size:var(--f-sm); }
+  .q li { margin-bottom:.3rem; }
+  .q li::marker { color:var(--accent); }
+  .eg {
+    font-family:var(--serif); font-style:italic; color:var(--ink-3);
+    font-size:var(--f-sm); display:block; margin-top:.625rem;
+  }
+  .tag {
+    display:inline-block; font-size:var(--f-xs); text-transform:uppercase;
+    letter-spacing:.1em; color:var(--accent-ink); background:var(--accent-soft);
+    padding:.2rem .5rem; border-radius:999px; margin-left:.5rem;
+    vertical-align:middle; font-weight:600;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .tag { color:var(--accent); }
+  }
+  :root[data-theme="dark"] .tag { color:var(--accent); }
+
+  .shortcut {
+    border-top:1px solid var(--line); margin-top:3rem; padding:3rem 0 5rem;
+  }
+  .shortcut h2 {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+    margin:0 0 .75rem; letter-spacing:-.015em;
+  }
+  .shortcut p { color:var(--ink-2); margin:0 0 1.5rem; max-width:36rem; }
+  .files { display:flex; flex-direction:column; gap:.75rem; }
+  .file {
+    display:flex; gap:.875rem; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1rem 1.125rem; box-shadow:var(--shadow);
+  }
+  .file .ico { flex:none; width:1.25rem; height:1.25rem; color:var(--accent); margin-top:.15rem; }
+  .file .ico svg { width:100%; height:100%; }
+  .file b { display:block; font-size:var(--f-sm); margin-bottom:.15rem; }
+  .file span { font-size:var(--f-sm); color:var(--ink-2); }
+</style>
+
+<main class="wrap">
+
+  <header class="lead">
+    <div class="eyebrow">Healing Partners · Remember Them</div>
+    <h1>What I need to design real memorials.</h1>
+    <p>Right now the designer draws six invented shapes in six invented stones, with dimensions I made up. It looks convincing, which is exactly the danger — a funeral director would spot it as fiction in about four seconds.</p>
+    <p>Below is what turns it into something you could put in front of a family. It's ordered so the first section unblocks the most, and you can stop at any point and I'll build with what I have.</p>
+    <div class="callout">
+      <strong>You don't have to write any of this out.</strong> Photographs of your samples, a vendor catalogue PDF, or your current price list will teach me more than typed answers — and I can read all three. Talking it through works too.
+    </div>
+  </header>
+
+  <!-- ================= 1 ================= -->
+  <section class="band">
+    <div class="band-head"><span class="band-n">1</span><h2>What you actually sell</h2></div>
+    <p class="why">This is the one that matters most. Every shape currently in the app is a guess.</p>
+
+    <div class="q">
+      <h3>Which forms do you offer?<span class="tag">Start here</span></h3>
+      <p>The industry has standard categories. Tell me which of these you sell, and which you don't:</p>
+      <ul>
+        <li>Upright monuments (die and base)</li>
+        <li>Slant markers</li>
+        <li>Bevel markers</li>
+        <li>Flat / grass markers</li>
+        <li>Ledgers</li>
+        <li>Benches</li>
+        <li>Columbarium and niche plaques</li>
+        <li>Companion versions of any of the above</li>
+      </ul>
+      <span class="eg">And the one that matters commercially: which is your best seller?</span>
+    </div>
+
+    <div class="q">
+      <h3>What sizes do they come in?</h3>
+      <p>Monuments are sold in fixed sizes, not arbitrary ones. I need the real list per form — width × height × thickness — including which is standard and which costs extra.</p>
+      <span class="eg">For example, if a flat marker is 24″ × 12″ × 4″ and that's the standard, say so — I'll make it the default.</span>
+    </div>
+
+    <div class="q">
+      <h3>What shape variations exist within a form?</h3>
+      <p>An upright can have a serpentine top, an oval top, a half-serp, a straight top, shoulders. Which tops do you actually cut, and are some priced differently?</p>
+    </div>
+  </section>
+
+  <!-- ================= 2 ================= -->
+  <section class="band">
+    <div class="band-head"><span class="band-n">2</span><h2>Stone</h2></div>
+    <p class="why">The six colours in the app are approximations I mixed by eye. Real granite has trade names, and directors and families know them.</p>
+
+    <div class="q">
+      <h3>Which granites do you stock or order?<span class="tag">Start here</span></h3>
+      <p>Trade names, please — they're what customers see in catalogues.</p>
+      <span class="eg">Barre Gray, Georgia Gray, Absolute / India Black, Dakota Mahogany, Missouri Red, Bahama Blue, Blue Pearl, and so on.</span>
+    </div>
+
+    <div class="q">
+      <h3>Can you photograph a sample of each?</h3>
+      <p>A phone photo of each sample in daylight is genuinely the best thing you could send me. I'll pull the real colour and grain out of it so the preview matches the stone the family will actually get.</p>
+    </div>
+
+    <div class="q">
+      <h3>Which finishes do you offer, and where?</h3>
+      <p>Polished, steeled, sawn, rock pitch, frosted — and typically which faces get which. A polished front with rock-pitch sides looks completely different from an all-polished die, and I should draw that difference.</p>
+    </div>
+
+    <div class="q">
+      <h3>Does stone colour change the price, or just the look?</h3>
+      <p>If black granite carries a premium over grey, I need the relationship, not the absolute numbers.</p>
+    </div>
+  </section>
+
+  <!-- ================= 3 ================= -->
+  <section class="band">
+    <div class="band-head"><span class="band-n">3</span><h2>Lettering and artwork</h2></div>
+    <p class="why">The app currently offers "Traditional / Modern / Script", which is not how this industry names anything.</p>
+
+    <div class="q">
+      <h3>Which alphabets do you cut?</h3>
+      <p>Roman, Modified Roman, Old English, Gothic, script faces — whatever your shop or vendor actually offers, by their real names.</p>
+    </div>
+
+    <div class="q">
+      <h3>How is the lettering cut?</h3>
+      <p>V-sunk, flat-sunk, raised, or laser-etched — they catch light completely differently, and right now I'm drawing one generic incision for everything.</p>
+    </div>
+
+    <div class="q">
+      <h3>What's in your emblem catalogue?</h3>
+      <p>I invented nine symbols. What do you really offer — and is there a vendor emblem book I can work from?</p>
+    </div>
+
+    <div class="q">
+      <h3>Do you do etching or portraits?</h3>
+      <p>Laser etching of photographs, scenes, or portraits is a significant upsell for a lot of shops. If you offer it, it should be in the designer.</p>
+    </div>
+  </section>
+
+  <!-- ================= 4 ================= -->
+  <section class="band">
+    <div class="band-head"><span class="band-n">4</span><h2>How it's priced</h2></div>
+    <p class="why">Your deck says designs update in real time by style, size <em>and cost</em>. Cost is the piece I have nothing for — and it's the feature that closes sales.</p>
+
+    <div class="q">
+      <h3>What drives the base price?<span class="tag">Start here</span></h3>
+      <p>Typically form + size + stone. If you can give me even a rough grid, the designer can show a live figure as the family builds.</p>
+    </div>
+
+    <div class="q">
+      <h3>What's included, and what's extra?</h3>
+      <ul>
+        <li>Is a set number of letters included, or is it charged per character or per line?</li>
+        <li>Emblems — included, flat fee, or per design?</li>
+        <li>Etching and portraits</li>
+        <li>Foundation and setting</li>
+        <li>Delivery, and does distance matter?</li>
+        <li>A second date added later, when the surviving spouse dies</li>
+      </ul>
+    </div>
+
+    <div class="q">
+      <h3>Should families see prices, or only funeral homes?</h3>
+      <p>This is a real decision and it changes the product. Some shops show families a figure immediately; others quote only through the director. I can build either, or show families a range and directors the exact number.</p>
+    </div>
+
+    <div class="q">
+      <h3>How does the 15 / 12 / 10% share get counted?</h3>
+      <p>Is the share on the marker sale price, or on your wholesale figure? And to bill it, the system has to count memorials — which is the first thing that genuinely needs a server rather than a browser.</p>
+    </div>
+  </section>
+
+  <!-- ================= 5 ================= -->
+  <section class="band">
+    <div class="band-head"><span class="band-n">5</span><h2>The rules that constrain a design</h2></div>
+    <p class="why">A designer that lets a family fall in love with something the cemetery won't permit is worse than no designer at all.</p>
+
+    <div class="q">
+      <h3>What do cemeteries restrict?</h3>
+      <p>Flat-only sections, maximum heights, thickness minimums, approved materials, single versus companion footprints. If the app knows the cemetery, it can stop a family designing something that will be refused.</p>
+    </div>
+
+    <div class="q">
+      <h3>Who checks that today?</h3>
+      <p>The director, the monument dealer, or the family? Whoever it is, that step could move into the software.</p>
+    </div>
+
+    <div class="q">
+      <h3>What's the approval process?</h3>
+      <p>Most shops send a proof for signature before cutting. If Remember Them produced that proof, it would slot straight into how the trade already works.</p>
+    </div>
+  </section>
+
+  <!-- ================= shortcut ================= -->
+  <section class="shortcut">
+    <h2>The fastest way to do this</h2>
+    <p>Skip the questions and send me source material. Any one of these moves the app further than a page of typed answers:</p>
+
+    <div class="files">
+      <div class="file">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 16l-5-5-4 4-2-2-7 7"/></svg></span>
+        <div><b>Photos of your stone samples</b><span>One per colour, in daylight. This alone fixes the whole material palette.</span></div>
+      </div>
+      <div class="file">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v5h5"/><path d="M19 8v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7z"/></svg></span>
+        <div><b>A vendor catalogue</b><span>PDF or scan. Shapes, sizes, emblems and alphabets, all in one document.</span></div>
+      </div>
+      <div class="file">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        <div><b>Your current price list</b><span>Even an old or internal one. I only need the structure, not exact figures.</span></div>
+      </div>
+      <div class="file">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <div><b>Photos of ten memorials you've made</b><span>Since 2008 you've built a body of work. Ten photographs of installed pieces would teach me your house style faster than any specification.</span></div>
+      </div>
+    </div>
+  </section>
+
+</main>
