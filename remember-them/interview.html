@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Remember Them — tell us about the person, and we'll narrow thousands of memorial options down to three. From Healing Partners.">
+<title>Remember Them</title>
+<style>
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08; --glow:rgba(200,150,60,.30);
+    --stage:#E4E8F1;
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:1rem; --f-lg:1.125rem;
+    --f-xl:1.375rem; --f-2xl:1.75rem; --f-3xl:2.5rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06; --glow:rgba(224,177,102,.28); --stage:#0A0D1B;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06; --glow:rgba(224,177,102,.28); --stage:#0A0D1B;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:var(--f-base); line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
+  .masthead-in {
+    max-width:52rem; margin:0 auto; padding:1rem 1.5rem;
+    display:flex; align-items:baseline; gap:.625rem; flex-wrap:wrap;
+  }
+  .masthead-in h1 {
+    font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+    margin:0; letter-spacing:-.01em;
+  }
+  .masthead-in .parent {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); border-left:1px solid var(--line-strong); padding-left:.625rem;
+  }
+  .masthead-in .skip { margin-left:auto; font-size:var(--f-sm); color:var(--ink-3);
+                       text-decoration:none; }
+  .masthead-in .skip:hover { color:var(--accent); }
+
+  /* progress — the steps are a real sequence */
+  .rail { max-width:52rem; margin:0 auto; padding:1.25rem 1.5rem 0;
+          display:flex; gap:.5rem; align-items:center; }
+  .rail .seg { flex:1; height:3px; border-radius:2px; background:var(--line-strong); }
+  .rail .seg.done { background:var(--accent); }
+  .rail .lbl { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.1em;
+               color:var(--ink-3); white-space:nowrap; }
+
+  main { max-width:52rem; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
+  .step { display:none; }
+  .step.on { display:block; animation:rise .35s ease both; }
+  @keyframes rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce) { .step.on { animation:none; } }
+
+  h2.q {
+    font-family:var(--serif); font-weight:500; font-size:var(--f-3xl);
+    line-height:1.15; letter-spacing:-.02em; margin:0 0 .875rem; text-wrap:balance;
+    max-width:30rem;
+  }
+  p.sub { color:var(--ink-2); font-size:var(--f-lg); margin:0 0 2rem; max-width:34rem; }
+
+  .field { display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.25rem; max-width:32rem; }
+  .field label { font-size:var(--f-sm); color:var(--ink-2); }
+  input[type="text"], textarea {
+    font:inherit; color:var(--ink); background:var(--surface);
+    border:1px solid var(--line-strong); border-radius:var(--radius);
+    padding:.75rem .875rem; width:100%;
+  }
+  textarea { min-height:11rem; resize:vertical; line-height:1.7; font-size:var(--f-lg); }
+  input:focus, textarea:focus { outline:2px solid var(--accent); outline-offset:-1px;
+                                border-color:var(--accent); }
+  .row { display:flex; gap:1rem; max-width:32rem; }
+  .row > * { flex:1; min-width:0; }
+
+  button { font:inherit; cursor:pointer; border-radius:var(--radius);
+           transition:background-color .15s,border-color .15s,color .15s; }
+  .btn { padding:.6875rem 1.25rem; border:1px solid var(--line-strong);
+         background:var(--surface); color:var(--ink); text-decoration:none;
+         display:inline-block; }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent);
+                 color:var(--on-accent); font-weight:550; }
+  .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
+  .btn-quiet { background:none; border:none; color:var(--ink-3); font-size:var(--f-sm);
+               padding:.5rem .25rem; }
+  .btn-quiet:hover { color:var(--ink); }
+  :is(button,input,textarea,a):focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .nav { display:flex; gap:.75rem; align-items:center; margin-top:2rem; }
+  .nav .back { margin-right:auto; }
+
+  /* bullet suggestions */
+  .bullets { display:grid; grid-template-columns:repeat(auto-fill,minmax(16rem,1fr));
+             gap:.75rem; margin-bottom:1rem; }
+  .bullet {
+    text-align:left; background:var(--surface); border:1px solid var(--line-strong);
+    border-radius:var(--radius); padding:1rem 1.125rem; display:flex; gap:.75rem;
+    align-items:flex-start;
+  }
+  .bullet:hover { border-color:var(--accent); }
+  .bullet[aria-pressed="true"] { border-color:var(--accent); background:var(--accent-soft);
+                                 box-shadow:inset 0 0 0 1px var(--accent); }
+  .bullet .tick {
+    flex:none; width:1.125rem; height:1.125rem; border-radius:4px; margin-top:.2rem;
+    border:1.5px solid var(--line-strong); display:grid; place-items:center;
+  }
+  .bullet[aria-pressed="true"] .tick { background:var(--accent); border-color:var(--accent); }
+  .bullet .tick svg { width:.75rem; height:.75rem; color:var(--on-accent);
+                      opacity:0; }
+  .bullet[aria-pressed="true"] .tick svg { opacity:1; }
+  .bullet b { display:block; font-size:var(--f-sm); font-weight:600; margin-bottom:.15rem; }
+  .bullet span { font-size:var(--f-sm); color:var(--ink-2); }
+  .count { font-size:var(--f-sm); color:var(--ink-3); margin:0 0 1rem; }
+  .count.over { color:var(--accent-ink); }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .count.over{color:var(--accent);} }
+  :root[data-theme="dark"] .count.over { color:var(--accent); }
+
+  /* pairwise */
+  .versus { display:grid; grid-template-columns:1fr auto 1fr; gap:1rem; align-items:center;
+            max-width:40rem; margin-bottom:1.5rem; }
+  .vs-card {
+    background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--radius);
+    padding:1.5rem; text-align:left; min-height:9rem; display:flex; flex-direction:column;
+    justify-content:center; gap:.375rem;
+  }
+  .vs-card:hover { border-color:var(--accent); background:var(--accent-soft); }
+  .vs-card b { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; }
+  .vs-card span { font-size:var(--f-sm); color:var(--ink-2); }
+  .vs-mid { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+            color:var(--ink-3); }
+  @media (max-width:34rem) { .versus { grid-template-columns:1fr; } }
+
+  /* proofs */
+  .proofs { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:1.25rem; }
+  .proof {
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden; text-align:left; display:flex;
+    flex-direction:column;
+  }
+  .proof:hover { border-color:var(--accent); }
+  .proof .canvas { background:var(--stage); padding:1.5rem; display:grid; place-items:center; }
+  .proof .canvas svg { width:100%; max-width:11rem; height:auto;
+                       filter:drop-shadow(0 10px 16px rgba(0,0,0,.25)); }
+  .proof .meta { padding:1.125rem 1.25rem 1.375rem; }
+  .proof h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0 0 .375rem; }
+  .proof p { font-size:var(--f-sm); color:var(--ink-2); margin:0 0 .75rem; }
+  .proof ul { margin:0; padding-left:1rem; font-size:var(--f-sm); color:var(--ink-2); }
+  .proof li { margin-bottom:.2rem; }
+  .proof li::marker { color:var(--accent); }
+
+  .aside {
+    background:var(--accent-soft); border-radius:var(--radius); padding:1.125rem 1.25rem;
+    font-size:var(--f-sm); color:var(--ink-2); max-width:34rem; margin:2rem 0 0;
+  }
+  .aside b { color:var(--ink); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <h1>Remember Them</h1>
+    <span class="parent">Healing Partners</span>
+    <a class="skip" href="./">Skip to the full catalogue</a>
+  </div>
+</header>
+
+<div class="rail">
+  <span class="lbl" id="railLbl">Their story</span>
+  <span class="seg done" id="s1"></span>
+  <span class="seg" id="s2"></span>
+  <span class="seg" id="s3"></span>
+  <span class="seg" id="s4"></span>
+</div>
+
+<main>
+
+  <!-- 1 — who ------------------------------------------------------------ -->
+  <section class="step on" id="step1">
+    <h2 class="q">Who are we remembering?</h2>
+    <p class="sub">We'll start with their name, then we'd like to hear about them.</p>
+    <div class="field">
+      <label for="f-name">Their name</label>
+      <input type="text" id="f-name" autocomplete="off" maxlength="40" placeholder="Eleanor Homer">
+    </div>
+    <div class="row">
+      <div class="field"><label for="f-born">Born</label>
+        <input type="text" id="f-born" autocomplete="off" maxlength="12" placeholder="1943"></div>
+      <div class="field"><label for="f-died">Died</label>
+        <input type="text" id="f-died" autocomplete="off" maxlength="12" placeholder="2024"></div>
+    </div>
+    <div class="nav"><button class="btn btn-primary" data-go="2">Continue</button></div>
+  </section>
+
+  <!-- 2 — the story ------------------------------------------------------ -->
+  <section class="step" id="step2">
+    <h2 class="q" id="q2">Tell us about them.</h2>
+    <p class="sub">However it comes out. A story, a list, the thing you'd say at the service. There's no wrong way, and you can't write too much.</p>
+    <div class="field" style="max-width:36rem">
+      <textarea id="f-story" placeholder="She fed everyone who walked through the door…"></textarea>
+    </div>
+    <div class="nav">
+      <button class="btn-quiet back" data-go="1">Back</button>
+      <button class="btn btn-primary" data-go="follow">Continue</button>
+    </div>
+  </section>
+
+  <!-- 3 — follow-ups ----------------------------------------------------- -->
+  <section class="step" id="step3">
+    <h2 class="q" id="q3">One more thing.</h2>
+    <p class="sub" id="sub3">These are the questions that tend to get at who someone really was.</p>
+    <div class="field" style="max-width:36rem">
+      <textarea id="f-follow" style="min-height:7rem"></textarea>
+    </div>
+    <div class="nav">
+      <button class="btn-quiet back" id="followBack">Back</button>
+      <button class="btn-quiet" id="followSkip">Skip this one</button>
+      <button class="btn btn-primary" id="followNext">Continue</button>
+    </div>
+  </section>
+
+  <!-- 4 — bullets -------------------------------------------------------- -->
+  <section class="step" id="step4">
+    <h2 class="q">From what you told us, these felt right.</h2>
+    <p class="sub">Choose the ones that matter most. If you pick more than five, we'll help you narrow them down.</p>
+    <p class="count" id="count"></p>
+    <div class="bullets" id="bullets"></div>
+    <div class="nav">
+      <button class="btn-quiet back" data-go="3">Back</button>
+      <button class="btn btn-primary" id="bulletsNext">Continue</button>
+    </div>
+  </section>
+
+  <!-- 5 — pairwise ------------------------------------------------------- -->
+  <section class="step" id="step5">
+    <h2 class="q">Which of these two matters more?</h2>
+    <p class="sub" id="vsProgress"></p>
+    <div class="versus" id="versus"></div>
+    <div class="nav"><button class="btn-quiet" id="vsRestart">Start the choosing again</button></div>
+  </section>
+
+  <!-- 6 — proofs --------------------------------------------------------- -->
+  <section class="step" id="step6">
+    <h2 class="q" id="q6">Three ways to remember them.</h2>
+    <p class="sub" id="sub6"></p>
+    <div class="proofs" id="proofs"></div>
+    <div class="nav">
+      <button class="btn-quiet back" id="proofBack">None of these feel right</button>
+    </div>
+    <div class="aside">
+      <b>Next, in the full version:</b> the proof you choose can be viewed at full size in VR on a Meta Quest 3, sent to the family for digital signature, and used to fill out the monument company's order form automatically.
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  var A = { name:"", born:"", died:"", story:"", follows:[] };
+  var chosen = [], pool = [], fi = 0, followQs = [];
+
+  /* ======================================================================
+     THE INTERVIEWER — the seam for the LLM
+     ----------------------------------------------------------------------
+     Brandon's brief: the app should hear the whole story, ask follow-ups,
+     and draw memories out the way a good interviewer or podcaster does —
+     so that a stranger walking past the finished memorial understands who
+     this person was.
+
+     Today the follow-ups are selected by keyword and the suggestions by
+     rules. That is deliberate for the demo: instant, free per use, works
+     on a tablet with no signal in an arrangement room, and it will never
+     say anything strange to a grieving family.
+
+     To put a real LLM behind it, replace readStory() and suggest() with a
+     server call returning the same shapes. Nothing else changes.
+     ====================================================================== */
+
+  /* Questions in the register a good interviewer uses: concrete, open,
+     and about behaviour rather than adjectives. */
+  var QUESTION_BANK = {
+    work:      ["What did their hands look like?",
+                "What did they make, build, or grow that's still standing?"],
+    family:    ["Who did they take care of?",
+                "What did the house sound like when everyone was there?"],
+    faith:     ["Where did they sit in church?",
+                "What did their faith actually look like on an ordinary Tuesday?"],
+    land:      ["Where were they happiest outdoors?",
+                "What did they know about that land that nobody else did?"],
+    music:     ["What would be playing?",
+                "What did they sing when they thought no one could hear?"],
+    service:   ["What did they never talk about?",
+                "Who still tells stories about them?"],
+    humour:    ["What did they always say?",
+                "What would make them laugh until they couldn't breathe?"],
+    general:   ["What would they be doing on an ordinary Saturday?",
+                "What did people come to them for?",
+                "What's the thing they always said?",
+                "What would embarrass them to hear us say about them?"]
+  };
+
+  var KEYS = {
+    work:    /\b(work|job|built|build|farm|shop|carpenter|mechanic|nurse|teacher|business|craft|hands)\b/i,
+    family:  /\b(mother|father|mom|dad|grandma|grandpa|family|children|kids|wife|husband|raised|home)\b/i,
+    faith:   /\b(church|faith|god|lord|pray|prayed|believ|congregat|parish|temple|synagogue)\b/i,
+    land:    /\b(garden|fish|hunt|outdoor|farm|mountain|lake|river|ranch|horse|land|woods|boat)\b/i,
+    music:   /\b(music|sang|sing|guitar|piano|band|choir|danc|song|fiddle)\b/i,
+    service: /\b(army|navy|marine|air force|veteran|served|service|war|corps|fire|police)\b/i,
+    humour:  /\b(laugh|joke|funny|humou?r|tease|grin|smil)\b/i
+  };
+
+  function readStory(text) {
+    var tags = [];
+    for (var k in KEYS) { if (KEYS[k].test(text)) tags.push(k); }
+    return tags;
+  }
+
+  function chooseFollowUps(tags) {
+    var qs = [];
+    for (var i = 0; i < tags.length && qs.length < 2; i++) {
+      qs.push(QUESTION_BANK[tags[i]][0]);
+    }
+    var gen = QUESTION_BANK.general;
+    for (var j = 0; qs.length < 3 && j < gen.length; j++) {
+      if (qs.indexOf(gen[j]) === -1) qs.push(gen[j]);
+    }
+    return qs;
+  }
+
+  /* ---- the catalogue of things that can go on a memorial -------------- */
+  var CATALOGUE = [
+    { id:"photo",  t:"A photograph, laser-etched",     d:"Their face in the stone, so a stranger knows them.", tags:["family","general"] },
+    { id:"words",  t:"Their own words",                d:"Something they always said, cut into the granite.",  tags:["humour","general"] },
+    { id:"cast",   t:"A cast glass panel",             d:"Light passes through it and changes all day.",       tags:["music","land"] },
+    { id:"glassart",t:"Glass art inset",               d:"Colour set into the stone — closer to stained glass.",tags:["faith","music"] },
+    { id:"stained",t:"A stained glass window",         d:"For a life that was lived partly in a church.",      tags:["faith"] },
+    { id:"ginlay", t:"Granite inlay",                  d:"A scene or emblem cut in contrasting stone.",        tags:["land","work"] },
+    { id:"binlay", t:"Bronze inlay",                   d:"Warm metal against the granite. Wears beautifully.", tags:["service","work"] },
+    { id:"glinlay",t:"Glass inlay",                    d:"Small, jewel-like, catches the eye at the graveside.",tags:["music","family"] },
+    { id:"bench",  t:"A granite bench",                d:"Somewhere for people to sit and stay a while.",      tags:["family","general"] },
+    { id:"scene",  t:"A scene from where they were happiest", d:"The lake, the ridge, the back field.",        tags:["land"] },
+    { id:"bronze", t:"A bronze memorial",              d:"Traditional, and the standard in many cemeteries.",  tags:["service","general"] },
+    { id:"custom", t:"Custom shape work",              d:"The stone itself cut to mean something.",            tags:["work","music"] },
+    { id:"pedestal",t:"A cremation pedestal",          d:"For ashes, with a place to gather around.",          tags:["family","faith"] },
+    { id:"statue", t:"Statuary",                       d:"A figure — an angel, a saint, an animal they loved.",tags:["faith","land"] }
+  ];
+
+  function suggest(tags) {
+    var scored = CATALOGUE.map(function (c) {
+      var s = 0;
+      for (var i = 0; i < c.tags.length; i++) if (tags.indexOf(c.tags[i]) !== -1) s += 2;
+      if (c.tags.indexOf("general") !== -1) s += 1;
+      return { c:c, s:s };
+    });
+    scored.sort(function (a, b) { return b.s - a.s; });
+    return scored.slice(0, 9).map(function (x) { return x.c; });
+  }
+
+  /* ---- memorial shapes for the proofs -------------------------------- */
+  function outline(form) {
+    if (form === "serpentine") return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
+    if (form === "bench")      return "M20,250 L280,250 L280,290 L20,290 Z M45,290 L85,290 L85,360 L45,360 Z M215,290 L255,290 L255,360 L215,360 Z";
+    if (form === "pedestal")   return "M95,360 L95,330 L75,330 L75,300 L110,300 L110,120 L190,120 L190,300 L225,300 L225,330 L205,330 L205,360 Z";
+    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
+  }
+
+  var STONES = {
+    grey:   { hi:"#A2A6AC", base:"#83878C", cut:"#4E5257", lip:"#B6BAC0", label:"Grey granite" },
+    black:  { hi:"#4A4A52", base:"#2A2A2E", cut:"#0E0E11", lip:"#5A5A64", label:"Black granite" },
+    rose:   { hi:"#BE9B95", base:"#A2807B", cut:"#6B504C", lip:"#CBAAA4", label:"Rose granite" }
+  };
+
+  function proofSvg(form, stoneKey, feats, name, dates) {
+    var s = STONES[stoneKey];
+    var g = '<svg viewBox="0 0 300 400" role="img" aria-label="Proof of the memorial">' +
+      '<defs><linearGradient id="f' + stoneKey + form + '" x1="0" y1="0" x2=".35" y2="1">' +
+      '<stop offset="0" stop-color="' + s.hi + '"/><stop offset=".55" stop-color="' + s.base + '"/>' +
+      '<stop offset="1" stop-color="' + s.cut + '"/></linearGradient>' +
+      '<filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="4" seed="5" result="n"/>' +
+      '<feColorMatrix in="n" type="saturate" values="0"/>' +
+      '<feComponentTransfer><feFuncA type="linear" slope=".14"/></feComponentTransfer></filter>' +
+      '<clipPath id="c' + stoneKey + form + '"><path d="' + outline(form) + '"/></clipPath></defs>' +
+      '<path d="' + outline(form) + '" fill="url(#f' + stoneKey + form + ')"/>' +
+      '<g clip-path="url(#c' + stoneKey + form + ')"><rect width="300" height="400" filter="url(#gr)" opacity=".5"/></g>';
+
+    var y = form === "bench" ? 272 : (form === "pedestal" ? 175 : 175);
+
+    /* features drawn where they'd actually sit */
+    if (feats.indexOf("photo") !== -1 && form !== "bench") {
+      g += '<ellipse cx="150" cy="' + (y - 45) + '" rx="34" ry="42" fill="' + s.cut + '" opacity=".55"/>' +
+           '<ellipse cx="150" cy="' + (y - 45) + '" rx="30" ry="38" fill="none" stroke="' + s.lip + '" stroke-width="1.5" opacity=".8"/>';
+      y += 22;
+    }
+    if ((feats.indexOf("cast") !== -1 || feats.indexOf("glassart") !== -1 ||
+         feats.indexOf("stained") !== -1 || feats.indexOf("glinlay") !== -1) && form !== "bench") {
+      g += '<rect x="112" y="' + (y - 78) + '" width="76" height="52" rx="4" fill="#7FA8C4" opacity=".55"/>' +
+           '<rect x="112" y="' + (y - 78) + '" width="76" height="52" rx="4" fill="none" stroke="' + s.lip + '" stroke-width="1.5"/>' +
+           '<path d="M112 ' + (y - 52) + ' H188 M150 ' + (y - 78) + ' V' + (y - 26) + '" stroke="' + s.lip + '" stroke-width="1" opacity=".7"/>';
+      y += 14;
+    }
+    if (feats.indexOf("binlay") !== -1 || feats.indexOf("ginlay") !== -1) {
+      g += '<rect x="95" y="' + (y + 62) + '" width="110" height="10" rx="2" fill="#B08A45" opacity=".75"/>';
+    }
+    if (feats.indexOf("statue") !== -1 && form !== "bench") {
+      g += '<g transform="translate(150,' + (y - 96) + ')" opacity=".85">' +
+           '<circle cx="0" cy="-16" r="7" fill="' + s.lip + '"/>' +
+           '<path d="M-11,10 C-11,-4 -6,-9 0,-9 C6,-9 11,-4 11,10 Z" fill="' + s.lip + '"/></g>';
+    }
+
+    var nm = name || "Their Name";
+    var size = nm.length > 14 ? Math.max(13, 26 * 14 / nm.length) : 26;
+    g += '<text x="150" y="' + y + '" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' ' +
+         'font-size="' + size + '" font-weight="600" dy="1" fill="' + s.lip + '" opacity=".6">' + esc(nm) + '</text>' +
+         '<text x="150" y="' + y + '" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' ' +
+         'font-size="' + size + '" font-weight="600" fill="' + s.cut + '">' + esc(nm) + '</text>';
+    if (dates) {
+      g += '<text x="150" y="' + (y + 26) + '" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' ' +
+           'font-size="13" fill="' + s.cut + '">' + esc(dates) + '</text>';
+    }
+    if (feats.indexOf("bench") !== -1 && form !== "bench") {
+      g += '<rect x="55" y="378" width="190" height="9" rx="2" fill="' + s.cut + '" opacity=".3"/>';
+    }
+    g += '</svg>';
+    return g;
+  }
+
+  /* ---- steps ---------------------------------------------------------- */
+  var LABELS = { 1:"Their story", 2:"Their story", 3:"Their story",
+                 4:"What matters", 5:"Narrowing", 6:"Three proofs" };
+
+  function show(n) {
+    for (var i = 1; i <= 6; i++) $("step" + i).classList.toggle("on", i === n);
+    $("railLbl").textContent = LABELS[n];
+    var done = n <= 3 ? 1 : (n === 4 ? 2 : (n === 5 ? 3 : 4));
+    for (var s = 1; s <= 4; s++) $("s" + s).classList.toggle("done", s <= done);
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function (e) {
+    var g = e.target.closest("[data-go]");
+    if (!g) return;
+    var v = g.getAttribute("data-go");
+    if (v === "follow") {
+      A.name = $("f-name").value.trim();
+      A.born = $("f-born").value.trim();
+      A.died = $("f-died").value.trim();
+      A.story = $("f-story").value.trim();
+      followQs = chooseFollowUps(readStory(A.story));
+      fi = 0; A.follows = [];
+      askFollow();
+      return;
+    }
+    show(+v);
+  });
+
+  function askFollow() {
+    if (fi >= followQs.length) { buildBullets(); return; }
+    $("q3").textContent = followQs[fi];
+    $("sub3").textContent = fi === 0
+      ? "These are the questions that tend to get at who someone really was."
+      : "Whatever comes to mind. A sentence is plenty.";
+    $("f-follow").value = "";
+    show(3);
+    $("f-follow").focus();
+  }
+
+  $("followNext").onclick = function () {
+    A.follows.push({ q: followQs[fi], a: $("f-follow").value.trim() });
+    fi++; askFollow();
+  };
+  $("followSkip").onclick = function () { fi++; askFollow(); };
+  $("followBack").onclick = function () {
+    if (fi === 0) { show(2); return; }
+    fi--; A.follows.pop(); askFollow();
+  };
+
+  /* ---- bullets -------------------------------------------------------- */
+  function allText() {
+    return A.story + " " + A.follows.map(function (f) { return f.a; }).join(" ");
+  }
+
+  function buildBullets() {
+    pool = suggest(readStory(allText()));
+    chosen = [];
+    $("bullets").innerHTML = pool.map(function (c) {
+      return '<button class="bullet" data-b="' + c.id + '" aria-pressed="false">' +
+             '<span class="tick"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="3"><path d="M3 8.5l3.5 3.5L13 5"/></svg></span>' +
+             '<span><b>' + esc(c.t) + '</b><span>' + esc(c.d) + '</span></span></button>';
+    }).join("");
+    updateCount();
+    show(4);
+  }
+
+  function updateCount() {
+    var n = chosen.length, el = $("count");
+    el.classList.toggle("over", n > 5);
+    el.textContent = n === 0 ? "Nothing chosen yet."
+      : n + (n === 1 ? " chosen." : " chosen.") +
+        (n > 5 ? " That's more than five — we'll help you narrow it down." : "");
+  }
+
+  $("bullets").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-b]");
+    if (!b) return;
+    var id = b.getAttribute("data-b"), i = chosen.indexOf(id);
+    if (i === -1) chosen.push(id); else chosen.splice(i, 1);
+    b.setAttribute("aria-pressed", i === -1 ? "true" : "false");
+    updateCount();
+  });
+
+  $("bulletsNext").onclick = function () {
+    if (!chosen.length) { chosen = pool.slice(0, 3).map(function (c) { return c.id; }); }
+    if (chosen.length > 5) startVersus(); else buildProofs();
+  };
+
+  /* ---- pairwise narrowing --------------------------------------------- */
+  var vsQueue = [], vsKeep = [];
+
+  function item(id) {
+    for (var i = 0; i < CATALOGUE.length; i++) if (CATALOGUE[i].id === id) return CATALOGUE[i];
+    return null;
+  }
+
+  function startVersus() {
+    vsQueue = chosen.slice();
+    vsKeep = [];
+    nextVersus();
+  }
+
+  function nextVersus() {
+    if (vsQueue.length <= 1) {
+      vsKeep = vsKeep.concat(vsQueue);
+      if (vsKeep.length > 5) { vsQueue = vsKeep; vsKeep = []; nextVersus(); return; }
+      chosen = vsKeep.slice(0, 5);
+      buildProofs();
+      return;
+    }
+    var a = item(vsQueue.shift()), b = item(vsQueue.shift());
+    $("vsProgress").textContent = "Keeping the " + (vsKeep.length + vsQueue.length + 2) +
+      " you chose down to five. This one decides between two of them.";
+    $("versus").innerHTML =
+      '<button class="vs-card" data-vs="' + a.id + '" data-other="' + b.id + '"><b>' + esc(a.t) + '</b><span>' + esc(a.d) + '</span></button>' +
+      '<span class="vs-mid">or</span>' +
+      '<button class="vs-card" data-vs="' + b.id + '" data-other="' + a.id + '"><b>' + esc(b.t) + '</b><span>' + esc(b.d) + '</span></button>';
+    show(5);
+  }
+
+  $("versus").addEventListener("click", function (e) {
+    var c = e.target.closest("[data-vs]");
+    if (!c) return;
+    vsKeep.push(c.getAttribute("data-vs"));
+    nextVersus();
+  });
+  $("vsRestart").onclick = function () { show(4); };
+
+  /* ---- proofs --------------------------------------------------------- */
+  var PROOF_SETS = [
+    { form:"upright",    stone:"grey",  title:"The traditional one",
+      why:"A form that reads as permanent, with what mattered marked plainly. This is what most families choose, and it is never wrong." },
+    { form:"serpentine", stone:"rose",  title:"The personal one",
+      why:"Warmer stone and a softer shape, so it looks less like a standard marker and more like a person." },
+    { form:"upright",    stone:"black", title:"The understated one",
+      why:"Darker, quieter, and carrying only what's needed — which is often exactly right." }
+  ];
+
+  function buildProofs() {
+    var dates = (A.born && A.died) ? (A.born + " – " + A.died) : (A.born || A.died || "");
+    var nm = A.name || "Their Name";
+    var feats = chosen.slice();
+
+    /* if they chose a bench or pedestal, one proof should actually be one */
+    var sets = PROOF_SETS.map(function (p) { return { form:p.form, stone:p.stone, title:p.title, why:p.why }; });
+    if (feats.indexOf("bench") !== -1)    sets[1].form = "bench";
+    if (feats.indexOf("pedestal") !== -1) sets[2].form = "pedestal";
+
+    $("q6").textContent = "Three ways to remember " + nm.split(" ")[0] + ".";
+    $("sub6").textContent = "Built from what you told us and the " + feats.length +
+      (feats.length === 1 ? " thing" : " things") + " you chose. Pick one to take further, or ask for three more.";
+
+    $("proofs").innerHTML = sets.map(function (p, i) {
+      var names = feats.map(function (f) { var it = item(f); return it ? it.t : ""; })
+                       .filter(Boolean).slice(0, 5);
+      return '<div class="proof">' +
+        '<div class="canvas">' + proofSvg(p.form, p.stone, feats, nm, dates) + '</div>' +
+        '<div class="meta"><h3>' + esc(p.title) + '</h3><p>' + esc(p.why) + '</p>' +
+        '<ul>' + names.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join("") + '</ul>' +
+        '</div></div>';
+    }).join("");
+    show(6);
+  }
+
+  $("proofBack").onclick = function () { show(4); };
+
+  show(1);
+  $("f-name").focus();
+})();
+</script>
+</body>
+</html>
