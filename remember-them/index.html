@@ -8,8 +8,8 @@
 <style>
   /* ============================================================
      Remember Them — memorial designer
-     Healing Partners "blue hour" tokens. Light is the base;
-     dark redefines values only.
+     Healing Partners "blue hour" tokens.
+     Light is the base; dark redefines values only.
      ============================================================ */
   :root {
     --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
@@ -57,7 +57,6 @@
     -webkit-font-smoothing:antialiased;
   }
 
-  /* ---- Masthead ---- */
   header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
   .masthead-in {
     max-width:78rem; margin:0 auto; padding:1rem 1.5rem;
@@ -73,7 +72,6 @@
     color:var(--ink-3); border-left:1px solid var(--line-strong); padding-left:.625rem;
   }
 
-  /* ---- Buttons ---- */
   button { font:inherit; cursor:pointer; border-radius:var(--radius);
            transition:background-color .15s, border-color .15s, color .15s; }
   .btn { padding:.5rem .9rem; border:1px solid var(--line-strong);
@@ -83,14 +81,13 @@
                  color:var(--on-accent); font-weight:550; }
   .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
   .btn-quiet { background:none; border:none; color:var(--ink-3);
-               padding:.35rem .5rem; font-size:var(--f-sm); }
+               padding:.35rem .5rem; font-size:var(--f-sm); cursor:pointer; }
   .btn-quiet:hover { color:var(--ink); background:var(--surface-2); }
   .btn-quiet.danger:hover { color:var(--danger); }
-  :is(button,input,textarea,select,a):focus-visible {
+  :is(button,input,textarea,select,a,[role="button"]):focus-visible {
     outline:2px solid var(--accent); outline-offset:2px;
   }
 
-  /* ---- Studio layout ---- */
   .studio {
     max-width:78rem; margin:0 auto; padding:2rem 1.5rem 5rem;
     display:grid; grid-template-columns:minmax(0,1fr) 24rem; gap:2.5rem;
@@ -98,7 +95,6 @@
   }
   @media (max-width:64rem) { .studio { grid-template-columns:1fr; gap:2rem; } }
 
-  /* ---- Stage (the preview) ---- */
   .stage-col { position:sticky; top:2rem; }
   @media (max-width:64rem) { .stage-col { position:static; } }
   .stage {
@@ -116,7 +112,6 @@
   .stage-meta .spec { color:var(--ink-2); }
   .stage-meta .spacer { margin-left:auto; }
 
-  /* ---- Control panel ---- */
   .panel {
     background:var(--surface); border:1px solid var(--line);
     border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
@@ -131,19 +126,18 @@
   .field { display:flex; flex-direction:column; gap:.375rem; margin-bottom:.875rem; }
   .field:last-child { margin-bottom:0; }
   .field label { font-size:var(--f-sm); color:var(--ink-2); }
-  input[type="text"], textarea, select {
+  input[type="text"], textarea {
     font:inherit; color:var(--ink); background:var(--ground);
     border:1px solid var(--line-strong); border-radius:var(--radius);
     padding:.5rem .625rem; width:100%;
   }
   textarea { min-height:4.5rem; resize:vertical; line-height:1.5; }
-  input:focus, textarea:focus, select:focus {
+  input:focus, textarea:focus {
     outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent);
   }
   .row { display:flex; gap:.75rem; }
   .row > * { flex:1; min-width:0; }
 
-  /* ---- Swatch / choice grids ---- */
   .choices { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; }
   .choice {
     display:flex; flex-direction:column; align-items:center; gap:.375rem;
@@ -156,38 +150,35 @@
     border-color:var(--accent); background:var(--accent-soft); color:var(--ink);
     box-shadow:inset 0 0 0 1px var(--accent);
   }
-  .choice .dot {
-    width:1.75rem; height:1.75rem; border-radius:999px;
-    border:1px solid rgba(0,0,0,.25);
-  }
+  .choice .dot { width:1.75rem; height:1.75rem; border-radius:999px;
+                 border:1px solid rgba(0,0,0,.25); }
   .choice .glyph { width:1.75rem; height:1.75rem; display:block; }
   .choice .glyph svg { width:100%; height:100%; fill:currentColor; }
   .choice .shape { width:1.75rem; height:2rem; display:block; }
   .choice .shape svg { width:100%; height:100%; }
 
-  /* ---- Saved designs ---- */
   .saved-list { display:flex; flex-direction:column; gap:.5rem; }
   .saved {
-    display:flex; align-items:center; gap:.625rem; text-align:left;
+    display:flex; align-items:center; gap:.625rem; text-align:left; width:100%;
     background:var(--ground); border:1px solid var(--line-strong);
     border-radius:var(--radius); padding:.5rem .625rem; font-size:var(--f-sm);
   }
   .saved:hover { border-color:var(--accent); }
   .saved .nm { font-weight:550; color:var(--ink); }
   .saved .sub { color:var(--ink-3); font-size:var(--f-xs); }
-  .saved .rm { margin-left:auto; }
+  .saved .rm { margin-left:auto; flex:none; }
   .saved-empty { font-size:var(--f-sm); color:var(--ink-3); font-style:italic; }
 
   .actions { display:flex; flex-direction:column; gap:.5rem; }
-  .actions .btn { width:100%; }
-  .fineprint { font-size:var(--f-xs); color:var(--ink-3); margin:.75rem 0 0; }
+  .actions .btn { width:100%; text-align:center; text-decoration:none; display:block; }
+  .fineprint { font-size:var(--f-xs); color:var(--ink-3); margin:.75rem 0 0; line-height:1.5; }
 
   .toast {
     position:fixed; left:50%; bottom:1.5rem; transform:translateX(-50%);
     background:var(--ink); color:var(--ground);
     padding:.625rem 1.125rem; border-radius:999px; font-size:var(--f-sm);
     box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s;
-    z-index:10;
+    z-index:10; max-width:90vw; text-align:center;
   }
   .toast.show { opacity:1; }
 </style>
@@ -204,7 +195,6 @@
 </header>
 
 <main class="studio">
-  <!-- ============ STAGE ============ -->
   <div class="stage-col">
     <div class="stage" id="stage"></div>
     <div class="stage-meta">
@@ -214,7 +204,6 @@
     </div>
   </div>
 
-  <!-- ============ CONTROLS ============ -->
   <div class="panel">
     <div class="group">
       <h2>Form</h2>
@@ -259,17 +248,20 @@
     </div>
 
     <div class="group">
-      <h2>This design</h2>
+      <h2>When you're ready</h2>
       <div class="actions">
-        <button class="btn btn-primary" id="orderBtn">Request this memorial</button>
-        <button class="btn" id="saveBtn">Save design</button>
-        <button class="btn" id="copyBtn">Copy specification</button>
+        <button class="btn btn-primary" id="sendBtn">Send this design to Healing&nbsp;Partners</button>
+        <button class="btn" id="linkBtn">Copy a link to this design</button>
+        <button class="btn" id="saveBtn">Keep it on this device</button>
       </div>
-      <p class="fineprint">Saved designs stay in this browser. Nothing is uploaded.</p>
+      <p class="fineprint">
+        Sending opens your email app with the design filled in — you press send. Nothing
+        is uploaded from this page and nobody is tracked.
+      </p>
     </div>
 
     <div class="group">
-      <h2>Saved designs</h2>
+      <h2>Kept on this device</h2>
       <div class="saved-list" id="savedList"></div>
     </div>
   </div>
@@ -281,18 +273,20 @@
 (function () {
   "use strict";
 
-  var KEY = "healing-partners.remember-them.designs.v2";
-  var STORE_URL = "https://healingpartners.us";
+  /* ---------- CHANGE THESE TWO LINES IF NEEDED ---------- */
+  var ORDER_EMAIL = "brandonjameshomer@gmail.com";
+  var STORE_URL   = "https://healingpartners.us";
+  /* ------------------------------------------------------ */
 
-  /* ---------------- catalogue ---------------- */
+  var KEY = "healing-partners.remember-them.designs.v2";
 
   var FORMS = [
-    { id:"upright",  label:"Upright",   dims:"24 × 30 × 4 in" },
-    { id:"serpentine", label:"Serpentine", dims:"28 × 22 × 4 in" },
-    { id:"flat",     label:"Flat marker", dims:"24 × 12 × 4 in" },
-    { id:"plaque",   label:"Plaque",    dims:"18 × 12 in" },
-    { id:"heart",    label:"Heart",     dims:"26 × 22 × 4 in" },
-    { id:"cross",    label:"Cross",     dims:"22 × 34 × 4 in" }
+    { id:"upright",    label:"Upright",     dims:"24 × 30 × 4 in" },
+    { id:"serpentine", label:"Serpentine",  dims:"28 × 22 × 4 in" },
+    { id:"flat",       label:"Flat marker", dims:"24 × 12 × 4 in" },
+    { id:"plaque",     label:"Plaque",      dims:"18 × 12 in" },
+    { id:"heart",      label:"Heart",       dims:"26 × 22 × 4 in" },
+    { id:"cross",      label:"Cross",       dims:"22 × 34 × 4 in" }
   ];
 
   var STONES = [
@@ -323,12 +317,9 @@
   };
   var EMBLEM_ORDER = ["none","cross","celtic","star","heart","tree","dove","rose","hands"];
 
-  /* ---------------- state ---------------- */
-
-  var d = {
-    form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
-    name:"", born:"", died:"", epitaph:""
-  };
+  var DEFAULTS = { form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
+                   name:"", born:"", died:"", epitaph:"" };
+  var d = JSON.parse(JSON.stringify(DEFAULTS));
   var designs = [];
 
   function $(id) { return document.getElementById(id); }
@@ -345,31 +336,23 @@
   function toast(msg) {
     var t=$("toast"); t.textContent=msg; t.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer=setTimeout(function(){ t.classList.remove("show"); },2600);
+    toastTimer=setTimeout(function(){ t.classList.remove("show"); }, 3200);
   }
 
   /* ---------------- geometry ---------------- */
-  /* Every form draws inside a 300 × 380 box centred on x=150. */
 
   function outline(form) {
     switch (form) {
-      case "upright":
-        return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
-      case "serpentine":
-        return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
-      case "flat":
-        return "M20,215 L280,215 L280,340 L20,340 Z";
-      case "plaque":
-        return "M35,120 L265,120 L265,330 L35,330 Z";
-      case "heart":
-        return "M150,368 C40,285 18,175 62,128 C104,84 150,120 150,158 C150,120 196,84 238,128 C282,175 260,285 150,368 Z";
-      case "cross":
-        return "M118,372 L118,215 L28,215 L28,140 L118,140 L118,28 L182,28 L182,140 L272,140 L272,215 L182,215 L182,372 Z";
+      case "upright":    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
+      case "serpentine": return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
+      case "flat":       return "M20,215 L280,215 L280,340 L20,340 Z";
+      case "plaque":     return "M35,120 L265,120 L265,330 L35,330 Z";
+      case "heart":      return "M150,368 C40,285 18,175 62,128 C104,84 150,120 150,158 C150,120 196,84 238,128 C282,175 260,285 150,368 Z";
+      case "cross":      return "M118,372 L118,215 L28,215 L28,140 L118,140 L118,28 L182,28 L182,140 L272,140 L272,215 L182,215 L182,372 Z";
     }
     return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
   }
 
-  /* where the inscription block sits, per form: {top, emblemY, scale, width} */
   function metrics(form) {
     switch (form) {
       case "upright":    return { emblemY:118, nameY:190, dateY:228, epiY:266, scale:1,   w:200 };
@@ -395,12 +378,12 @@
 
   /* ---------------- render ---------------- */
 
-  function engraved(txt, x, y, size, stone, font, weight, track, anchor) {
+  function engraved(txt, x, y, size, stone, font) {
     if (!txt) return "";
-    var common = 'x="'+x+'" y="'+y+'" text-anchor="'+(anchor||"middle")+'" '+
-                 'font-family=\''+font.css+'\' font-size="'+size+'" '+
+    var common = 'x="'+x+'" y="'+y+'" text-anchor="middle" ' +
+                 'font-family=\''+font.css+'\' font-size="'+size+'" ' +
                  'font-weight="'+font.weight+'" letter-spacing="'+font.track+'"';
-    /* lower highlight first, darker incision on top → reads as cut into the stone */
+    /* highlight sits just below the incision, dark cut on top → reads as carved */
     return '<text '+common+' dy="1.1" fill="'+stone.lip+'" opacity=".65">'+esc(txt)+'</text>' +
            '<text '+common+' fill="'+stone.cut+'">'+esc(txt)+'</text>';
   }
@@ -409,21 +392,18 @@
     var stone = byId(STONES, d.stone);
     var font  = byId(LETTERING, d.lettering);
     var m     = metrics(d.form);
-    var em    = EMBLEMS[d.emblem];
+    var em    = EMBLEMS[d.emblem] || EMBLEMS.none;
 
-    var dates = "";
-    if (d.born && d.died) dates = d.born + " – " + d.died;
-    else dates = d.born || d.died || "";
-
+    var dates = (d.born && d.died) ? (d.born + " – " + d.died) : (d.born || d.died || "");
     var epiLines = d.epitaph ? wrap(d.epitaph, Math.round(m.w / 5.4)) : [];
 
-    var nameSize = 30 * m.scale;
     var nm = d.name || "Their Name";
+    var nameSize = 30 * m.scale;
     if (nm.length > 14) nameSize *= 14 / nm.length;
     if (nameSize < 13) nameSize = 13;
 
     var svg =
-      '<svg viewBox="0 0 300 400" role="img" aria-label="Preview of the memorial">' +
+      '<svg viewBox="0 0 300 400" role="img" aria-label="Preview of the memorial for ' + esc(nm) + '">' +
       '<defs>' +
         '<linearGradient id="face" x1="0" y1="0" x2="0.35" y2="1">' +
           '<stop offset="0" stop-color="'+stone.hi+'"/>' +
@@ -437,28 +417,20 @@
         '</filter>' +
         '<clipPath id="clip"><path d="'+outline(d.form)+'"/></clipPath>' +
       '</defs>' +
-
-      /* body */
       '<path d="'+outline(d.form)+'" fill="url(#face)"/>' +
       '<g clip-path="url(#clip)"><rect width="300" height="400" filter="url(#grain)" opacity=".55"/></g>' +
       '<path d="'+outline(d.form)+'" fill="none" stroke="'+stone.lip+'" stroke-width="1.5" opacity=".5"/>' +
-
-      /* emblem */
-      (em && em.path
+      (em.path
         ? '<g transform="translate(150,'+m.emblemY+') scale('+(0.9*m.scale)+')">' +
           '<path d="'+em.path+'" fill="'+stone.lip+'" opacity=".55" transform="translate(0,1.2)"/>' +
           '<path d="'+em.path+'" fill="'+stone.cut+'"/></g>'
         : "") +
-
-      /* inscription */
       engraved(nm, 150, m.nameY, nameSize, stone, font) +
       engraved(dates, 150, m.dateY, 15*m.scale, stone, font);
 
     for (var i=0;i<epiLines.length;i++) {
       svg += engraved(epiLines[i], 150, m.epiY + i*(17*m.scale), 12.5*m.scale, stone, font);
     }
-
-    /* ground line, so it reads as standing */
     if (d.form!=="plaque" && d.form!=="flat") {
       svg += '<ellipse cx="150" cy="374" rx="128" ry="9" fill="'+stone.cut+'" opacity=".18"/>';
     }
@@ -468,11 +440,11 @@
 
     var f = byId(FORMS, d.form);
     $("specLine").textContent = f.label + " · " + stone.label + " · " + font.label +
-      (em && em.path ? " · " + em.label + " emblem" : "");
+      (em.path ? " · " + em.label + " emblem" : "");
     $("dimLine").textContent = f.dims;
   }
 
-  /* ---------------- choice UIs ---------------- */
+  /* ---------------- choice UI ---------------- */
 
   function thumb(formId) {
     return '<span class="shape"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet">' +
@@ -513,8 +485,11 @@
       b.setAttribute("aria-pressed", d[b.getAttribute("data-k")] === b.getAttribute("data-v") ? "true" : "false");
     }
   }
+  function syncInputs() {
+    ["name","born","died","epitaph"].forEach(function (k) { $("f-"+k).value = d[k] || ""; });
+  }
 
-  /* ---------------- saved designs ---------------- */
+  /* ---------------- persistence ---------------- */
 
   function loadDesigns() {
     try { designs = JSON.parse(localStorage.getItem(KEY)) || []; }
@@ -522,26 +497,48 @@
   }
   function persist() {
     try { localStorage.setItem(KEY, JSON.stringify(designs)); }
-    catch (e) { toast("Couldn't save — this browser's storage is full."); }
+    catch (e) { toast("Couldn't keep it — this browser's storage is full."); }
   }
   function renderSaved() {
     if (!designs.length) {
-      $("savedList").innerHTML = '<span class="saved-empty">Nothing saved yet.</span>';
+      $("savedList").innerHTML = '<span class="saved-empty">Nothing kept yet.</span>';
       return;
     }
     $("savedList").innerHTML = designs.map(function (x, i) {
       return '<button class="saved" data-load="'+i+'">' +
              '<span><span class="nm">'+esc(x.name || "Untitled")+'</span><br>' +
              '<span class="sub">'+esc(byId(FORMS,x.form).label+" · "+byId(STONES,x.stone).label)+'</span></span>' +
-             '<span class="btn-quiet danger rm" data-del="'+i+'">Remove</span></button>';
+             '<span class="btn-quiet danger rm" role="button" tabindex="0" data-del="'+i+'">Remove</span></button>';
     }).join("");
+  }
+
+  /* ---------------- share link ---------------- */
+
+  function encodeDesign() {
+    try {
+      var json = JSON.stringify(d);
+      var b64 = btoa(unescape(encodeURIComponent(json)));
+      return b64.replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    } catch (e) { return ""; }
+  }
+  function decodeDesign(s) {
+    try {
+      var b64 = s.replace(/-/g,"+").replace(/_/g,"/");
+      while (b64.length % 4) b64 += "=";
+      var obj = JSON.parse(decodeURIComponent(escape(atob(b64))));
+      if (obj && typeof obj === "object") return obj;
+    } catch (e) {}
+    return null;
+  }
+  function shareLink() {
+    return location.origin + location.pathname + "?d=" + encodeDesign();
   }
 
   function spec() {
     var f=byId(FORMS,d.form), s=byId(STONES,d.stone), l=byId(LETTERING,d.lettering);
-    var em=EMBLEMS[d.emblem];
+    var em=EMBLEMS[d.emblem] || EMBLEMS.none;
     return [
-      "REMEMBER THEM — memorial specification",
+      "REMEMBER THEM — memorial design",
       "Healing Partners",
       "",
       "Form:       " + f.label + "  (" + f.dims + ")",
@@ -552,8 +549,22 @@
       "Name:       " + (d.name || "—"),
       "Born:       " + (d.born || "—"),
       "Died:       " + (d.died || "—"),
-      "Epitaph:    " + (d.epitaph || "—")
+      "Epitaph:    " + (d.epitaph || "—"),
+      "",
+      "See this exact design:",
+      shareLink()
     ].join("\n");
+  }
+
+  function copyText(text, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { toast(okMsg); },
+        function () { toast("Couldn't copy — your browser blocked it."); }
+      );
+    } else {
+      toast("Copying isn't available in this browser.");
+    }
   }
 
   /* ---------------- wiring ---------------- */
@@ -562,63 +573,79 @@
     $("f-"+k).addEventListener("input", function () { d[k]=this.value; render(); });
   });
 
+  function removeAt(i) {
+    designs.splice(i,1); persist(); renderSaved(); toast("Removed.");
+  }
+
   document.addEventListener("click", function (e) {
     var del = e.target.closest("[data-del]");
-    if (del) {
-      e.stopPropagation();
-      designs.splice(+del.getAttribute("data-del"),1);
-      persist(); renderSaved(); toast("Design removed.");
-      return;
-    }
+    if (del) { e.stopPropagation(); removeAt(+del.getAttribute("data-del")); return; }
+
     var ld = e.target.closest("[data-load]");
     if (ld) {
       var x = designs[+ld.getAttribute("data-load")];
       if (!x) return;
-      Object.keys(d).forEach(function (k) { if (k in x) d[k]=x[k]; });
-      ["name","born","died","epitaph"].forEach(function (k) { $("f-"+k).value = d[k]; });
-      syncPressed(); render(); toast("Design loaded.");
+      Object.keys(DEFAULTS).forEach(function (k) { d[k] = (k in x) ? x[k] : DEFAULTS[k]; });
+      syncInputs(); syncPressed(); render(); toast("Design opened.");
       return;
     }
     var ch = e.target.closest(".choice");
-    if (ch) {
-      d[ch.getAttribute("data-k")] = ch.getAttribute("data-v");
-      syncPressed(); render();
-    }
+    if (ch) { d[ch.getAttribute("data-k")] = ch.getAttribute("data-v"); syncPressed(); render(); }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var del = e.target.closest("[data-del]");
+    if (del) { e.preventDefault(); e.stopPropagation(); removeAt(+del.getAttribute("data-del")); }
   });
 
   $("saveBtn").onclick = function () {
     designs.unshift(JSON.parse(JSON.stringify(d)));
     if (designs.length > 24) designs.length = 24;
-    persist(); renderSaved(); toast("Design saved.");
+    persist(); renderSaved(); toast("Kept on this device.");
   };
 
-  $("copyBtn").onclick = function () {
-    var text = spec();
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(
-        function () { toast("Specification copied."); },
-        function () { toast("Couldn't copy — select the text instead."); }
-      );
-    } else { toast("Copying isn't available in this browser."); }
+  $("linkBtn").onclick = function () {
+    copyText(shareLink(), "Link copied — paste it anywhere to reopen this design.");
   };
 
-  $("orderBtn").onclick = function () {
-    window.open(STORE_URL, "_blank", "noopener");
-    toast("Opening the Healing Partners store.");
+  $("sendBtn").onclick = function () {
+    var who = d.name ? (" for " + d.name) : "";
+    var url = "mailto:" + encodeURIComponent(ORDER_EMAIL) +
+              "?subject=" + encodeURIComponent("Memorial design" + who + " — Remember Them") +
+              "&body=" + encodeURIComponent(
+                spec() + "\n\n— sent from Remember Them\n" + STORE_URL + "\n"
+              );
+    window.location.href = url;
+    toast("Opening your email app — press send there to finish.");
   };
 
   $("newBtn").onclick = function () {
-    d = { form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
-          name:"", born:"", died:"", epitaph:"" };
-    ["name","born","died","epitaph"].forEach(function (k) { $("f-"+k).value=""; });
-    syncPressed(); render(); toast("Started a new design.");
+    d = JSON.parse(JSON.stringify(DEFAULTS));
+    syncInputs(); syncPressed(); render(); toast("Started a new design.");
   };
+
+  /* ---------------- boot ---------------- */
 
   buildChoices();
   loadDesigns();
   renderSaved();
+
+  var fromLink = null;
+  try {
+    var q = new URLSearchParams(location.search).get("d");
+    if (q) fromLink = decodeDesign(q);
+  } catch (e) {}
+  if (fromLink) {
+    Object.keys(DEFAULTS).forEach(function (k) {
+      d[k] = (k in fromLink) ? fromLink[k] : DEFAULTS[k];
+    });
+  }
+
+  syncInputs();
   syncPressed();
   render();
+  if (fromLink) toast("Design opened from a link.");
 })();
 </script>
 </body>
