@@ -126,6 +126,28 @@
     max-width:34rem;
   }
 
+  /* ---- The problem, stated once and plainly ---- */
+  section.problem { padding:3rem 0; border-top:1px solid var(--line); }
+  .pull {
+    font-family:var(--serif); font-weight:500; font-size:1.75rem;
+    line-height:1.25; letter-spacing:-.015em; margin:0 0 1.5rem;
+    max-width:30rem; text-wrap:balance;
+    border-left:2px solid var(--accent); padding-left:1.5rem;
+  }
+  .problem p { color:var(--ink-2); max-width:34rem; margin:0; }
+
+  /* ---- What it becomes ---- */
+  section.roadmap { padding:3rem 0; border-top:1px solid var(--line); }
+  .steps { list-style:none; margin:0; padding:0; display:grid;
+           grid-template-columns:repeat(auto-fit,minmax(13rem,1fr)); gap:1.5rem; }
+  .steps li { display:flex; flex-direction:column; gap:.375rem; }
+  .steps .n {
+    font-size:var(--f-xs); letter-spacing:.12em; color:var(--accent);
+    font-variant-numeric:tabular-nums; font-weight:600;
+  }
+  .steps h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0; }
+  .steps p { color:var(--ink-2); font-size:var(--f-sm); margin:0; }
+
   footer.site {
     border-top:1px solid var(--line); background:var(--surface);
     padding:2rem 0; font-size:var(--f-sm); color:var(--ink-3);
@@ -154,14 +176,44 @@
 <main class="wrap">
   <section class="hero">
     <div class="lamp" aria-hidden="true"></div>
-    <!-- ▼▼ YOUR WORDS GO HERE — replace the headline and paragraph below ▼▼ -->
-    <h1>For the people who are carrying something heavy.</h1>
-    <p>Healing Partners is opening soon. In the meantime, our first product is already here.</p>
-    <!-- ▲▲ ------------------------------------------------------------- ▲▲ -->
+    <h1>When families see more clearly, they choose more confidently.</h1>
+    <p>Healing Partners is building the visual decision platform for memorials — helping funeral homes modernize service, and helping families make meaningful choices at the hardest moment.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="./remember-them/">Open Remember Them</a>
-      <a class="btn" href="https://healingpartners.us">Visit the store</a>
+      <a class="btn" href="./pricing.html">For funeral homes</a>
     </div>
+  </section>
+
+  <section class="problem">
+    <div class="section-label">The problem</div>
+    <p class="pull">Grief, permanence, and too many choices add up to decision paralysis.</p>
+    <p>Families are asked to make permanent decisions at their worst moment. The options are hard to understand and harder to compare, and a brochure has never helped anyone picture a headstone standing in a cemetery. Funeral homes lose the chance to serve those families well.</p>
+  </section>
+
+  <section class="roadmap">
+    <div class="section-label">Where this goes</div>
+    <ol class="steps">
+      <li>
+        <span class="n">NOW</span>
+        <h3>Design and pricing</h3>
+        <p>Choose the form, stone, lettering and emblem, and see the memorial as you build it.</p>
+      </li>
+      <li>
+        <span class="n">NEXT</span>
+        <h3>Explore in VR and AR</h3>
+        <p>Walk around headstones, monuments and niches at full size instead of pointing at a catalogue.</p>
+      </li>
+      <li>
+        <span class="n">NEXT</span>
+        <h3>Guided by voice</h3>
+        <p>A voice-guided decision tree narrows thousands of options down to the few that fit.</p>
+      </li>
+      <li>
+        <span class="n">THEN</span>
+        <h3>Grave site and niche selection</h3>
+        <p>The same clarity extended to choosing where someone rests, not only what marks it.</p>
+      </li>
+    </ol>
   </section>
 
   <section class="products">

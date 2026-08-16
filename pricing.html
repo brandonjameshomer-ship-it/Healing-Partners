@@ -101,6 +101,27 @@
   .plan li { display:flex; gap:.625rem; align-items:flex-start;
              font-size:var(--f-sm); color:var(--ink-2); }
   .plan li svg { flex:none; width:1rem; height:1rem; margin-top:.25rem; color:var(--accent); }
+  .plan .tiers {
+    background:var(--accent-soft); border-radius:var(--radius);
+    padding:.875rem; margin:0 0 1.5rem;
+  }
+  .plan .tiers-head { font-size:var(--f-sm); color:var(--ink-2); margin-bottom:.625rem; }
+  .plan .tiers table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
+  .plan .tiers th {
+    text-align:left; font-size:var(--f-xs); text-transform:uppercase;
+    letter-spacing:.1em; color:var(--ink-3); font-weight:600;
+    padding-bottom:.375rem; border-bottom:1px solid var(--line-strong);
+  }
+  .plan .tiers th:last-child, .plan .tiers td:last-child { text-align:right; }
+  .plan .tiers td {
+    padding:.375rem 0; color:var(--ink-2);
+    font-variant-numeric:tabular-nums;
+    border-bottom:1px solid color-mix(in srgb, var(--line-strong) 45%, transparent);
+  }
+  .plan .tiers tr:last-child td { border-bottom:none; }
+  .plan .tiers td:last-child {
+    font-family:var(--serif); font-size:var(--f-lg); font-weight:600; color:var(--ink);
+  }
   .plan .go { margin-top:auto; }
   .btn {
     display:block; width:100%; text-align:center; padding:.6875rem 1.125rem;
@@ -152,7 +173,7 @@
 <main class="wrap">
   <section class="intro">
     <h1>Two ways to use Remember Them.</h1>
-    <p>Families never pay to design — you pay for the memorial itself. Funeral homes and cemeteries who use it every week subscribe.</p>
+    <p>Families never pay to design — they pay for the memorial itself. Independent funeral homes who use it with every family they serve subscribe.</p>
   </section>
 
   <section class="plans">
@@ -176,17 +197,31 @@
     </div>
 
     <div class="plan featured">
-      <div class="who">For funeral homes &amp; cemeteries</div>
+      <div class="who">For independent funeral homes</div>
       <h2>Professional</h2>
-      <p class="lede">Sit with a family and design the memorial together, on any screen.</p>
+      <p class="lede">Built for homes with one to three locations — the ones who want to serve families better without an enterprise budget.</p>
       <div class="price">$150</div>
-      <div class="per">per month · 7 days free first · cancel any time</div>
+      <div class="per">per month, per funeral home · 7 days free first</div>
+      <div class="tiers">
+        <div class="tiers-head">plus a share of marker sales — it drops as you do more</div>
+        <table>
+          <thead>
+            <tr><th scope="col">Memorials created</th><th scope="col">Share</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1–6</td><td>15%</td></tr>
+            <tr><td>6–20</td><td>12%</td></tr>
+            <tr><td>20+</td><td>10%</td></tr>
+          </tbody>
+        </table>
+      </div>
       <ul>
         <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Unlimited designs for the families you serve</span></li>
-        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Send a design straight to a family by link</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Sit with a family and design it together, on the tablet in the arrangement room</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Send a design home by link so the family can decide together</span></li>
         <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Orders arrive with the full specification written out</span></li>
-        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Works on the tablet in the arrangement room</span></li>
-        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Talk to a person, not a help desk</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>VR and AR walkthroughs as they arrive, at no extra cost</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Talk to someone who has designed memorials since 2008</span></li>
       </ul>
       <div class="go">
         <a class="btn btn-primary" href="./remember-them/?plan=pro">Start the 7-day trial</a>
@@ -206,6 +241,10 @@
       <div>
         <h3>What happens after the seven days?</h3>
         <p>The designer locks, but nothing you made is deleted. Subscribe and every design is exactly where you left it.</p>
+      </div>
+      <div>
+        <h3>Why a revenue share on top of the subscription?</h3>
+        <p>Because it keeps us honest. The $150 is deliberately low so cost isn't a barrier to trying this. The share means we only do well when you sell more markers — so our work goes into helping families decide with confidence, not into selling you features. And it falls as your volume rises: the more you use it, the less each sale costs you.</p>
       </div>
       <div>
         <h3>Can we cancel?</h3>
