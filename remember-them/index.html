@@ -180,6 +180,45 @@
   .aside { background:var(--accent-soft); border-radius:var(--radius);
            padding:1.125rem 1.25rem; font-size:var(--f-sm); color:var(--ink-2); margin:2rem 0 0; }
   .aside b { color:var(--ink); }
+
+  .choose { padding:0 1.25rem 1.25rem; }
+  .choose .btn { width:100%; }
+
+  /* ---- chosen + VR upgrade ---- */
+  .chosen { display:grid; grid-template-columns:minmax(0,14rem) 1fr; gap:1.75rem;
+            align-items:start; margin-bottom:2rem; }
+  @media (max-width:38rem){ .chosen{grid-template-columns:1fr;} }
+  .chosen .canvas { background:var(--stage); border:1px solid var(--line);
+                    border-radius:var(--radius); padding:1.75rem; display:grid;
+                    place-items:center; }
+  .chosen .canvas svg { width:100%; max-width:11rem; height:auto;
+                        filter:drop-shadow(0 12px 20px rgba(0,0,0,.28)); }
+  .chosen h3 { font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+               margin:0 0 .25rem; }
+  .chosen .stone { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.08em;
+                   color:var(--ink-3); margin:0 0 1rem; }
+  .chosen .total { font-family:var(--serif); font-size:var(--f-3xl); font-weight:600;
+                   letter-spacing:-.025em; margin:0; font-variant-numeric:tabular-nums; }
+  .chosen .est { font-size:var(--f-xs); color:var(--ink-3); margin:.125rem 0 1rem; }
+  .chosen ul { margin:0; padding-left:1.125rem; font-size:var(--f-sm); color:var(--ink-2); }
+  .chosen li::marker { color:var(--accent); }
+
+  .vr { background:var(--surface); border:1px solid var(--accent); border-radius:var(--radius);
+        box-shadow:var(--shadow); padding:1.5rem 1.625rem; margin-bottom:1.25rem; }
+  .vr .tag { display:inline-block; font-size:var(--f-xs); text-transform:uppercase;
+             letter-spacing:.1em; font-weight:600; color:var(--accent-ink);
+             background:var(--accent-soft); border-radius:999px; padding:.25rem .625rem;
+             margin-bottom:.75rem; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .vr .tag{color:var(--accent);} }
+  :root[data-theme="dark"] .vr .tag { color:var(--accent); }
+  .vr h3 { font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+           margin:0 0 .5rem; letter-spacing:-.015em; text-wrap:balance; }
+  .vr p { color:var(--ink-2); margin:0 0 1rem; }
+  .vr .price { font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+               color:var(--ink); margin:0 0 1rem; }
+  .vr .btn { width:100%; }
+  .vr.added { border-color:var(--yes); background:var(--yes-soft); }
+  .vr.added .tag { background:var(--surface); color:var(--yes); }
   .vh { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);
         white-space:nowrap; }
 </style>
@@ -284,6 +323,29 @@
       changing your mind.
     </div>
   </section>
+
+  <!-- 7 — chosen, plus the VR upgrade -->
+  <section class="step" id="step7">
+    <h2 class="q" id="q7"></h2>
+    <p class="sub">Nothing is ordered yet. You can change any of this.</p>
+    <div class="chosen" id="chosen"></div>
+
+    <div class="vr" id="vrCard">
+      <span class="tag" id="vrTag">Optional</span>
+      <h3>See it at full size, before it's cut</h3>
+      <p>We build your memorial as a 3D model you can walk around on a Meta&nbsp;Quest&nbsp;3 &mdash;
+         standing at full height, in daylight, from every side. Families tell us the scale is the
+         thing photographs never get right, and it's easier to be sure before the granite is cut
+         than after.</p>
+      <p class="price" id="vrPrice"></p>
+      <button class="btn btn-primary" id="vrBtn">Add the 3D model</button>
+    </div>
+
+    <div class="nav">
+      <button class="btn-quiet back" id="chosenBack">Choose a different one</button>
+      <button class="btn" id="shareBtn">Send this to my family</button>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -303,6 +365,11 @@
      Wholesale from the AFM 2025 guide. Family price = wholesale x 2.5.
      The one exception is bench installation, which carries no markup at all. */
   var MARKUP = 2.5;
+  /* The 3D/VR model is a Healing Partners service, not a supplier line item, so
+     it is not on any wholesale sheet. Set the price here once it is decided.
+     Left null, the page says "ask your funeral director" rather than showing a
+     number nobody has agreed to. */
+  var VR_UPGRADE = { price: null };
   var BASES = {
     upright: { label:"Upright monument", stone:"Georgia Gray", cat:"Cat 1",
                parts:[["Die, 24×6×24",1145],["Base, 30×12×6",480],["Setting",620]] },
@@ -417,10 +484,10 @@
   }
 
   var LABELS={1:"Their story",2:"Their story",3:"Their story",4:"What matters",
-              5:"Narrowing",6:"Three ideas"};
+              5:"Narrowing",6:"Three ideas",7:"Chosen"};
   function show(n){
     step=n;
-    for(var i=1;i<=6;i++) $("step"+i).classList.toggle("on", i===n);
+    for(var i=1;i<=7;i++) $("step"+i).classList.toggle("on", i===n);
     $("railLbl").textContent=LABELS[n];
     var d = n<=3?1:(n===4?2:(n===5?3:4));
     for(var s=1;s<=4;s++) $("s"+s).classList.toggle("done", s<=d);
@@ -579,26 +646,81 @@
       var rows=pr.lines.map(function(l){return "<tr><td>"+esc(l[0])+"</td><td>"+esc(l[1])+"</td></tr>";}).join("");
       var q=pr.quotes.length
         ? '<tr><td colspan="2" class="quote">'+esc(pr.quotes.join(", "))+" &mdash; priced by the monument company</td></tr>" : "";
-      return '<button class="proof" data-proof="'+p.key+'" aria-expanded="false">'+
-        '<span class="canvas">'+svgFor(p.key,p.form,feats,nm,dates)+
-          '<span class="tapme">Tap for price</span></span>'+
-        '<span class="meta"><h3>'+esc(p.title)+"</h3>"+
+      return '<div class="proof" data-proof="'+p.key+'">'+
+        '<div class="canvas">'+svgFor(p.key,p.form,feats,nm,dates)+
+          '<span class="tapme">Tap for price</span></div>'+
+        '<div class="meta"><h3>'+esc(p.title)+"</h3>"+
           '<p class="stone">'+esc(b.stone)+" &middot; "+esc(b.cat)+"</p>"+
           '<p class="why">'+esc(p.why)+"</p><ul>"+
-          names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+"</ul></span>"+
-        '<span class="price"><span class="price-in">'+
+          names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+"</ul></div>"+
+        '<div class="price"><div class="price-in">'+
           '<p class="price-total">'+money(pr.total)+"</p>"+
           '<p class="price-est">Estimated, including setting</p>'+
-          "<table><tbody>"+rows+q+"</tbody></table></span></span></button>";
+          "<table><tbody>"+rows+q+"</tbody></table></div></div>"+
+        '<div class="choose"><button class="btn btn-primary" data-choose="'+p.key+'">'+
+          "Choose this one</button></div></div>";
     }).join("");
+    chosenFeats = feats.slice();
     show(6);
   }
   $("proofs").addEventListener("click", function(e){
+    var c=e.target.closest("[data-choose]");
+    if (c){ chooseProof(c.getAttribute("data-choose")); return; }
     var p=e.target.closest("[data-proof]"); if(!p) return;
-    var open=p.classList.toggle("open");
-    p.setAttribute("aria-expanded", open?"true":"false");
+    p.classList.toggle("open");
   });
   $("proofBack").onclick=function(){ startCards(); };
+
+  /* ---- step 7: the chosen design, and the VR upgrade ----
+     The ten-click budget ends when a design is chosen. Everything here is
+     optional and sits after that, so it never stands between a family and a
+     finished design. */
+  var chosenKey=null, chosenFeats=[], vrAdded=false;
+  function chooseProof(key){
+    chosenKey=key; vrAdded=false;
+    renderChosen(); show(7);
+  }
+  function renderChosen(){
+    var p=null;
+    for (var i=0;i<SETS.length;i++) if (SETS[i].key===chosenKey) p=SETS[i];
+    if (!p) return;
+    var form=p.form;
+    if (chosenFeats.indexOf("bench")!==-1 && p.key==="slant") form="bench";
+    var b=BASES[chosenKey], pr=priceFor(chosenKey, chosenFeats);
+    var dates=(A.born&&A.died)?(A.born+" – "+A.died):(A.born||A.died||"");
+    var nm=A.name||"Their Name";
+    var names=chosenFeats.map(function(f){var it=item(f);return it?it.t:"";}).filter(Boolean);
+    var total=pr.total + (vrAdded && VR_UPGRADE.price ? VR_UPGRADE.price : 0);
+
+    $("q7").textContent="This is "+nm.split(" ")[0]+"'s memorial.";
+    $("chosen").innerHTML=
+      '<div class="canvas">'+svgFor(chosenKey,form,chosenFeats,nm,dates)+"</div>"+
+      "<div><h3>"+esc(p.title)+"</h3>"+
+        '<p class="stone">'+esc(b.stone)+" &middot; "+esc(b.cat)+"</p>"+
+        '<p class="total">'+money(total)+"</p>"+
+        '<p class="est">Estimated'+(vrAdded?", including the 3D model":"")+
+          ", including setting</p><ul>"+
+        names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+
+        (vrAdded?"<li>3D model for Meta Quest 3</li>":"")+"</ul></div>";
+
+    $("vrCard").classList.toggle("added", vrAdded);
+    $("vrTag").textContent = vrAdded ? "Added" : "Optional";
+    $("vrPrice").textContent = VR_UPGRADE.price
+      ? money(VR_UPGRADE.price) + " — added to the memorial above"
+      : "Ask your funeral director what this costs.";
+    $("vrBtn").textContent = vrAdded ? "Remove the 3D model" : "Add the 3D model";
+  }
+  $("vrBtn").onclick=function(){ vrAdded=!vrAdded; renderChosen(); };
+  $("chosenBack").onclick=function(){ show(6); };
+  $("shareBtn").onclick=function(){
+    var nm=A.name||"this memorial";
+    var msg="I've been looking at memorials for "+nm+". Have a look and tell me what you think:\n\n"+
+            location.href;
+    if (navigator.share){ navigator.share({ title:"Remember Them", text:msg }).catch(function(){}); }
+    else if (navigator.clipboard){ navigator.clipboard.writeText(msg).then(function(){
+      announce("Link copied. Paste it to your family."); alert("Link copied — paste it to your family."); }); }
+    else { alert(msg); }
+  };
 
   show(1); $("f-name").focus();
 })();
