@@ -19,6 +19,25 @@ Never show a family a wholesale figure. Never apply 2.5 to bench installation.
 
 ---
 
+## Finish codes
+
+Confirmed by Brandon. The number counts polished faces — it is not a quality grade.
+
+| Code | Meaning |
+|---|---|
+| **P2** | Polish **front and back** of the tablet |
+| **P3** | Polish **back, front, and top** |
+| **P5** | **All polish** — every face |
+
+On the AFM sheet, dies are quoted **P2 as standard** (polish front and back, rock top and sides),
+with P3 or P5 as a priced upgrade. Bases are **polished top with rock sides**, with a P1 polished
+margin or P5 as the upgrade. Bevels are quoted "Pol Top, BRP" — polished top, the balance rock
+pitched. Slants are polished face, sawn back, 2" rock nosing.
+
+**Every code above is AFM's vocabulary.** Other manufacturers number their finishes differently.
+Record the finish in plain words in the design, then translate to each supplier's code on their
+order form.
+
 ## Granite colour categories
 
 | Cat | Colours |
