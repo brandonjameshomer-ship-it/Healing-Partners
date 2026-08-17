@@ -30,12 +30,16 @@ comment on column user_profiles.funeral_home_id is
 
 -- New sign-ups become 'family' with no funeral home. Staff are promoted
 -- deliberately — nobody grants themselves access by registering.
+-- Anonymous QR users have no email, so coalesce it. They still get a real
+-- auth.users row and a 'family' profile, which is what the policies key off.
 create or replace function handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
   insert into user_profiles (id, email, full_name, role)
-  values (new.id, new.email, new.raw_user_meta_data->>'full_name',
-          case when lower(new.email) = 'bhomer@healingpartners.us'
+  values (new.id,
+          coalesce(new.email, 'anon-' || left(new.id::text, 8)),
+          new.raw_user_meta_data->>'full_name',
+          case when lower(coalesce(new.email,'')) = 'bhomer@healingpartners.us'
                then 'founder' else 'family' end)
   on conflict (id) do nothing;
   return new;
@@ -157,11 +161,19 @@ create policy up_owner  on user_profiles for select to authenticated
   using (my_role() = 'owner' and funeral_home_id = my_home());
 create policy up_founder on user_profiles for all to authenticated
   using (is_founder()) with check (is_founder());
--- An owner adds and removes their own staff, but cannot mint a founder.
-create policy up_owner_manage on user_profiles for all to authenticated
+-- TIER 2 adds and removes TIER 3, and cannot mint a founder.
+create policy up_owner_add on user_profiles for insert to authenticated
+  with check (my_role() = 'owner' and funeral_home_id = my_home()
+              and role in ('owner','counselor'));
+create policy up_owner_edit on user_profiles for update to authenticated
   using  (my_role() = 'owner' and funeral_home_id = my_home() and role <> 'founder')
   with check (my_role() = 'owner' and funeral_home_id = my_home()
               and role in ('owner','counselor'));
+-- Deleting a person is really deactivating them, so the orders they created
+-- keep their author. Hard delete stays with the founder.
+create policy up_owner_remove on user_profiles for delete to authenticated
+  using (my_role() = 'owner' and funeral_home_id = my_home()
+         and role = 'counselor');
 
 -- ---- funeral_homes ----
 create policy fh_founder on funeral_homes for all to authenticated
@@ -189,25 +201,62 @@ create policy mem_insert on memorials for insert to authenticated
 create policy mem_update on memorials for update to authenticated
   using (can_see_memorial(id)) with check (can_see_memorial(id));
 
--- ---- memorial_access ---- how a relative joins
+-- ---- memorial_access ----
+-- TIER 3 assigns and removes TIER 4 for memorials at their own funeral home.
+-- A family member can also add themselves via a QR code or share link, and can
+-- always remove themselves.
 create policy ma_read on memorial_access for select to authenticated
   using (user_id = auth.uid() or can_see_memorial(memorial_id));
 create policy ma_insert on memorial_access for insert to authenticated
   with check (user_id = auth.uid() or can_see_memorial(memorial_id));
 create policy ma_delete on memorial_access for delete to authenticated
-  using (user_id = auth.uid() or is_founder()
-         or (my_role() = 'owner' and can_see_memorial(memorial_id)));
+  using (user_id = auth.uid()                       -- remove yourself
+         or is_founder()
+         or (my_role() in ('owner','counselor')     -- tiers 2 and 3
+             and exists (select 1 from memorials m
+                         where m.id = memorial_id and m.funeral_home_id = my_home())));
 
--- Join with a share token, without needing an invitation.
+-- ============================================================
+-- QR codes and share links
+-- ============================================================
+-- Anyone holding the link can design. Print the QR on the arrangement-room
+-- handout so relatives who are not in the room can join from anywhere.
+--
+-- The token grants access to exactly ONE memorial. It is not a login, and it
+-- reaches nothing else — no orders, no other families, no commission.
+--
+-- Front end: sign in anonymously (supabase.auth.signInAnonymously), then call
+-- join_memorial(token). The relative can attach an email later to keep it.
+
 create or replace function join_memorial(token text) returns uuid
 language plpgsql security definer set search_path = public as $$
 declare m_id uuid;
 begin
+  if auth.uid() is null then
+    raise exception 'Start a session before joining';
+  end if;
   select id into m_id from memorials where share_token = token;
-  if m_id is null then raise exception 'No memorial for that link'; end if;
+  if m_id is null then
+    raise exception 'That link is not valid';
+  end if;
   insert into memorial_access (memorial_id, user_id)
   values (m_id, auth.uid()) on conflict do nothing;
   return m_id;
+end; $$;
+
+-- Retire a link without touching who already joined.
+create or replace function rotate_share_token(m_id uuid) returns text
+language plpgsql security definer set search_path = public as $$
+declare t text;
+begin
+  if not (is_founder() or (my_role() in ('owner','counselor')
+          and exists (select 1 from memorials m
+                      where m.id = m_id and m.funeral_home_id = my_home()))) then
+    raise exception 'Not allowed';
+  end if;
+  t := encode(gen_random_bytes(12),'hex');
+  update memorials set share_token = t where id = m_id;
+  return t;
 end; $$;
 
 -- ---- designs ---- families create and compare versions
@@ -271,11 +320,16 @@ order by c.month desc, f.name;
 -- ============================================================
 -- Who sees what
 -- ============================================================
---                     founder   owner        counselor      family
---  all funeral homes    yes      own only     own only        no
---  all orders           yes      own home     own orders      no
---  commission           yes      own home     NO              NO
---  suppliers            edit     read         read            no
---  memorials            yes      own home     own home        own only
---  designs              yes      own home     own home        own only
---  manage staff         yes      own home     no              no
+--                        founder    owner       counselor    family
+--  funeral homes         add/delete  own only    own only     no
+--  orders                all         own home    own orders   no
+--  commission            all         own home    NO           NO
+--  suppliers             edit        read        read         no
+--  memorials & designs   all         own home    own home     own only
+--  add/remove tier 2     yes         no          no           no
+--  add/remove tier 3     yes         YES         no           no
+--  assign/remove tier 4  yes         yes         YES          self only
+--  make a design         yes         yes         yes          YES
+--
+-- Tier 4 is reached two ways: a counselor assigns them, or they scan the QR
+-- code / open the share link. Either way it grants exactly one memorial.
