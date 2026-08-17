@@ -218,6 +218,10 @@
                color:var(--ink); margin:0 0 1rem; }
   .vr .btn { width:100%; }
   .vr.added { border-color:var(--yes); background:var(--yes-soft); }
+  .vr .testflag { display:block; background:#8A1C13; color:#FFF3F1; border-radius:8px;
+                  padding:.625rem .875rem; font-size:var(--f-sm); font-weight:600;
+                  margin-bottom:1rem; }
+  .vr .testflag span { font-weight:400; opacity:.9; display:block; margin-top:.125rem; }
   .vr.added .tag { background:var(--surface); color:var(--yes); }
   .vh { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);
         white-space:nowrap; }
@@ -332,6 +336,8 @@
 
     <div class="vr" id="vrCard">
       <span class="tag" id="vrTag">Optional</span>
+      <span class="testflag" id="vrTest" hidden>Stripe sandbox — no card is charged
+        <span>Test card 4242 4242 4242 4242, any future expiry, any CVC.</span></span>
       <h3>See it at full size, before it's cut</h3>
       <p>We build your memorial as a 3D model you can walk around on a Meta&nbsp;Quest&nbsp;3 &mdash;
          standing at full height, in daylight, from every side. Families tell us the scale is the
@@ -382,6 +388,9 @@
     paymentLink: ""     // Stripe Payment Link — see dashboard/PAYMENTS.md
   };
   function vrPayable(){ return VR_UPGRADE.billing === "family" && !!VR_UPGRADE.paymentLink; }
+  /* Stripe sandbox links contain "test_". Surface that loudly — nobody should
+     ever finish a demo believing a card was actually charged. */
+  function vrIsTest(){ return /(^|\/)test_|[?&]test=1/.test(VR_UPGRADE.paymentLink||""); }
   var BASES = {
     upright: { label:"Upright monument", stone:"Georgia Gray", cat:"Cat 1",
                parts:[["Die, 24×6×24",1145],["Base, 30×12×6",480],["Setting",620]] },
@@ -723,6 +732,7 @@
 
     $("vrCard").classList.toggle("added", vrAdded);
     $("vrTag").textContent = vrAdded ? "Added" : "Optional";
+    $("vrTest").hidden = !(vrPayable() && vrIsTest());
 
     if (!VR_UPGRADE.price){
       $("vrPrice").textContent = "Ask your funeral director what this costs.";

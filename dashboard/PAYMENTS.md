@@ -23,7 +23,34 @@ $5 item it would be brutal.
 
 ---
 
-## Setup — about an hour, all in the browser
+## Start in the sandbox
+
+**Test mode needs no bank account, no EIN, and no identity verification.** Sign up, switch the
+toggle to test mode, and you can have a working checkout in about ten minutes. Real money and bank
+details can wait until you've seen it work.
+
+The page detects a sandbox link automatically — any link containing `test_` — and shows a red
+banner reading **"Stripe sandbox — no card is charged"** with the test card number on it. Nobody
+can finish a demo believing a real payment went through.
+
+### Ten-minute version
+
+1. **stripe.com** → sign up. Skip every "complete your account" prompt.
+2. Toggle to **Test mode**, top right.
+3. **Product catalogue → Add product** → `Remember Them — 3D model`, `50.00 USD`, one time.
+4. **Create payment link.** Under *After payment*, redirect to
+   `https://brandonjameshomer-ship-it.github.io/Healing-Partners/remember-them/thank-you.html`
+5. Copy the link — it will look like `https://buy.stripe.com/test_...`
+6. In `remember-them/index.html`, set `billing: "family"` and paste it into `paymentLink`.
+   Commit and push.
+7. Walk the flow and pay with **4242 4242 4242 4242**, any future expiry, any CVC.
+
+Apple Pay and Google Pay appear in the sandbox too, on a device that supports them — so you can see
+the real experience without taking a cent.
+
+---
+
+## Going live later — about an hour
 
 ### 1. Create a Stripe account
 
