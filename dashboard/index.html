@@ -198,6 +198,7 @@
           <th>Funeral home</th><th class="num">Orders</th><th class="num">Rate</th>
           <th class="num">Retail</th><th class="num">Commission</th>
           <th class="num">Subscription</th><th class="num">Total owed</th>
+          <th class="num">3D upgrades</th>
         </tr></thead>
         <tbody id="rollupBody"></tbody>
         <tfoot id="rollupFoot"></tfoot>
@@ -305,6 +306,9 @@
   };
 
   var SUBSCRIPTION = 150;
+  /* 3D/VR upgrades are a Healing Partners service and carry NO commission.
+     Tracked separately so the two can never be conflated. */
+  var VR_PRICE = 50;
   function rateFor(count){ return count >= 20 ? 0.10 : count >= 6 ? 0.12 : 0.15; }
   var STATUS = { started:"Started", submitted:"Submitted", proof:"Proof sent",
                  approved:"Approved", production:"In production", set:"Set / installed" };
@@ -327,11 +331,14 @@
     mk("Riverside Family Funeral Home","Whitmore","Companion upright, Barre Gray",12570,"approved",18);
     mk("Riverside Family Funeral Home","Nguyen","Bevel, Academy Black, 24×12",2275,"submitted",9);
     mk("Riverside Family Funeral Home","Okafor","Slant, Colonial Rose, 24×16",4000,"proof",6);
+    rows[rows.length-1].vr = true;
     mk("Riverside Family Funeral Home","Bell","Flat, Georgia Gray, 24×12",1363,"started",11);
     mk("Cedar Hill Memorial Chapel","Ramirez","Upright, Academy Black, 36×6×24",5188,"set",26);
+    rows[rows.length-1].vr = true;
     mk("Cedar Hill Memorial Chapel","Kowalski","Bevel, Barre Gray, 36×12",3250,"production",15);
     mk("Cedar Hill Memorial Chapel","Duarte","Flat, Sierra White, 20×10",1063,"started",3);
     mk("Millbrook Funeral Home","Petrov","Upright, Jet Mist, 24×6×30",4188,"submitted",4);
+    rows[rows.length-1].vr = true;
     return rows;
   }
 
@@ -348,26 +355,29 @@
     /* per-home rollup — rate depends on that home's own volume */
     var homes = {};
     month.forEach(function(r){
-      var h = homes[r.home] || (homes[r.home] = { orders:0, retail:0 });
+      var h = homes[r.home] || (homes[r.home] = { orders:0, retail:0, vr:0 });
       if (COUNTED.indexOf(r.status)!==-1){ h.orders++; h.retail += Number(r.retail)||0; }
+      if (r.vr) h.vr++;
     });
     var names = Object.keys(homes).sort();
-    var totRetail=0, totComm=0, totSubs=0, totOrders=0;
+    var totRetail=0, totComm=0, totSubs=0, totOrders=0, totVr=0;
     $("rollupBody").innerHTML = names.map(function(n){
       var h=homes[n], rate=rateFor(h.orders), comm=h.retail*rate;
-      totRetail+=h.retail; totComm+=comm; totSubs+=SUBSCRIPTION; totOrders+=h.orders;
+      totRetail+=h.retail; totComm+=comm; totSubs+=SUBSCRIPTION; totOrders+=h.orders; totVr+=h.vr;
       return "<tr><td class='name'>"+esc(n)+"</td>"+
         "<td class='num'>"+h.orders+"</td>"+
         "<td class='num'>"+Math.round(rate*100)+"%</td>"+
         "<td class='num'>"+money(h.retail)+"</td>"+
         "<td class='num'>"+money(comm)+"</td>"+
         "<td class='num'>"+money(SUBSCRIPTION)+"</td>"+
-        "<td class='num'>"+money(comm+SUBSCRIPTION)+"</td></tr>";
+        "<td class='num'>"+money(comm+SUBSCRIPTION)+"</td>"+
+        "<td class='num'>"+(h.vr||"—")+"</td></tr>";
     }).join("") || "<tr><td colspan='7' style='text-align:center;padding:2rem'>No orders yet this month.</td></tr>";
     $("rollupFoot").innerHTML = names.length
       ? "<tr><td>Total</td><td class='num'>"+totOrders+"</td><td class='num'>&mdash;</td>"+
         "<td class='num'>"+money(totRetail)+"</td><td class='num'>"+money(totComm)+"</td>"+
-        "<td class='num'>"+money(totSubs)+"</td><td class='num'>"+money(totComm+totSubs)+"</td></tr>" : "";
+        "<td class='num'>"+money(totSubs)+"</td><td class='num'>"+money(totComm+totSubs)+"</td>"+
+        "<td class='num'>"+(totVr||"—")+"</td></tr>" : "";
 
     /* tiles */
     var owed = totComm + totSubs;
@@ -377,6 +387,7 @@
       tile("Commission owed", money(totComm), "on retail, per home tier", "good") +
       tile("Plus subscriptions", money(totSubs), names.length+" × $150") +
       tile("Total owed to you", money(owed), "this month", "good") +
+      tile("3D upgrades", totVr, money(totVr*VR_PRICE)+" — yours, no commission", totVr?"good":"") +
       tile("Started, not submitted", started.length,
            stale.length ? stale.length+" older than a week" : "none stale",
            stale.length ? "flag" : "");

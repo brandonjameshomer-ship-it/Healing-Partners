@@ -369,7 +369,19 @@
      it is not on any wholesale sheet. Set the price here once it is decided.
      Left null, the page says "ask your funeral director" rather than showing a
      number nobody has agreed to. */
-  var VR_UPGRADE = { price: null };
+  /* The 3D/VR model is a Healing Partners service, not a supplier line item, so
+     it appears on no wholesale sheet and carries no commission — the whole $50
+     is Healing Partners'.
+       billing "home"   -> added to the funeral home's monthly invoice
+       billing "family" -> the family pays here, by card / Apple Pay / Google Pay
+     Set per funeral home. With no paymentLink yet, "family" falls back to
+     "home" wording rather than showing a button that goes nowhere. */
+  var VR_UPGRADE = {
+    price: 50,
+    billing: "home",
+    paymentLink: ""     // Stripe Payment Link — see dashboard/PAYMENTS.md
+  };
+  function vrPayable(){ return VR_UPGRADE.billing === "family" && !!VR_UPGRADE.paymentLink; }
   var BASES = {
     upright: { label:"Upright monument", stone:"Georgia Gray", cat:"Cat 1",
                parts:[["Die, 24×6×24",1145],["Base, 30×12×6",480],["Setting",620]] },
@@ -690,7 +702,12 @@
     var dates=(A.born&&A.died)?(A.born+" – "+A.died):(A.born||A.died||"");
     var nm=A.name||"Their Name";
     var names=chosenFeats.map(function(f){var it=item(f);return it?it.t:"";}).filter(Boolean);
-    var total=pr.total + (vrAdded && VR_UPGRADE.price ? VR_UPGRADE.price : 0);
+    /* Only fold the upgrade into the memorial total when the funeral home is
+       billing it. If the family pays Stripe directly it is a separate
+       transaction, and showing it inside the memorial price would misstate
+       what the funeral director is going to invoice them. */
+    var vrInTotal = vrAdded && VR_UPGRADE.price && !vrPayable();
+    var total = pr.total + (vrInTotal ? VR_UPGRADE.price : 0);
 
     $("q7").textContent="This is "+nm.split(" ")[0]+"'s memorial.";
     $("chosen").innerHTML=
@@ -698,19 +715,45 @@
       "<div><h3>"+esc(p.title)+"</h3>"+
         '<p class="stone">'+esc(b.stone)+" &middot; "+esc(b.cat)+"</p>"+
         '<p class="total">'+money(total)+"</p>"+
-        '<p class="est">Estimated'+(vrAdded?", including the 3D model":"")+
+        '<p class="est">Estimated'+(vrInTotal?", including the 3D model":"")+
           ", including setting</p><ul>"+
         names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+
-        (vrAdded?"<li>3D model for Meta Quest 3</li>":"")+"</ul></div>";
+        (vrAdded?"<li>3D model for Meta Quest 3"+
+          (vrInTotal?"":" <em>(paid separately)</em>")+"</li>":"")+"</ul></div>";
 
     $("vrCard").classList.toggle("added", vrAdded);
     $("vrTag").textContent = vrAdded ? "Added" : "Optional";
-    $("vrPrice").textContent = VR_UPGRADE.price
-      ? money(VR_UPGRADE.price) + " — added to the memorial above"
-      : "Ask your funeral director what this costs.";
-    $("vrBtn").textContent = vrAdded ? "Remove the 3D model" : "Add the 3D model";
+
+    if (!VR_UPGRADE.price){
+      $("vrPrice").textContent = "Ask your funeral director what this costs.";
+      $("vrBtn").textContent = vrAdded ? "Remove the 3D model" : "Add the 3D model";
+    } else if (vrPayable()){
+      $("vrPrice").textContent = vrAdded
+        ? money(VR_UPGRADE.price) + " — paid separately, not part of the memorial cost"
+        : money(VR_UPGRADE.price) + " — pay by card, Apple Pay or Google Pay";
+      $("vrBtn").textContent = vrAdded
+        ? "Remove the 3D model"
+        : "Add the 3D model — " + money(VR_UPGRADE.price);
+    } else {
+      $("vrPrice").textContent = vrAdded
+        ? money(VR_UPGRADE.price) + " — your funeral director will add this to your bill"
+        : money(VR_UPGRADE.price) + " — added to your funeral home's invoice";
+      $("vrBtn").textContent = vrAdded ? "Remove the 3D model" : "Add the 3D model";
+    }
   }
-  $("vrBtn").onclick=function(){ vrAdded=!vrAdded; renderChosen(); };
+
+  $("vrBtn").onclick=function(){
+    /* Paying families go to Stripe. The reference travels with the payment so
+       the upgrade can be matched back to this memorial. */
+    if (!vrAdded && vrPayable()){
+      var ref = (A.name||"memorial").replace(/\s+/g,"-").toLowerCase() + "-" + Date.now();
+      var url = VR_UPGRADE.paymentLink +
+        (VR_UPGRADE.paymentLink.indexOf("?")===-1 ? "?" : "&") +
+        "client_reference_id=" + encodeURIComponent(ref);
+      window.open(url, "_blank", "noopener");
+    }
+    vrAdded = !vrAdded; renderChosen();
+  };
   $("chosenBack").onclick=function(){ show(6); };
   $("shareBtn").onclick=function(){
     var nm=A.name||"this memorial";

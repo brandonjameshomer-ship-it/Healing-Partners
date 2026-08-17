@@ -109,7 +109,14 @@ create table if not exists designs (
   spec        jsonb not null default '{}'::jsonb,   -- supplier-neutral
   retail      numeric check (retail >= 0),
   created_by  uuid references auth.users(id),
-  created_at  timestamptz not null default now()
+  created_at  timestamptz not null default now(),
+
+  -- 3D/VR upgrade. vr_price is captured at purchase rather than looked up
+  -- later, so a future price change cannot silently re-price old records.
+  vr_upgrade     boolean not null default false,
+  vr_price       numeric,
+  vr_paid_at     timestamptz,
+  vr_payment_ref text            -- Stripe checkout session or payment intent
 );
 
 create index if not exists designs_memorial_idx on designs (memorial_id, version);
@@ -293,6 +300,10 @@ create policy ord_counselor_update on orders for update to authenticated
 -- ============================================================
 -- Commission is never stored on a row; it is computed here. Counselors and
 -- families therefore cannot reach it even by querying the orders table.
+--
+-- NOTE: this view sums orders.retail only. 3D/VR upgrades live on `designs`
+-- and are deliberately NOT included — the upgrade is a Healing Partners
+-- service and carries no commission. See monthly_vr_revenue below.
 
 drop view if exists monthly_commission;
 create view monthly_commission
@@ -333,3 +344,24 @@ order by c.month desc, f.name;
 --
 -- Tier 4 is reached two ways: a counselor assigns them, or they scan the QR
 -- code / open the share link. Either way it grants exactly one memorial.
+
+-- ============================================================
+-- 3D/VR upgrade revenue — founder only
+-- ============================================================
+-- Not commissionable. The whole amount is Healing Partners'. Kept in its own
+-- view so it can never be mistaken for something a funeral home is owed.
+
+create or replace view monthly_vr_revenue
+with (security_invoker = true) as
+select date_trunc('month', d.vr_paid_at) as month,
+       coalesce(f.name, 'Direct')        as funeral_home,
+       count(*)                          as upgrades,
+       sum(d.vr_price)                   as gross
+from designs d
+join memorials m on m.id = d.memorial_id
+left join funeral_homes f on f.id = m.funeral_home_id
+where d.vr_upgrade
+  and d.vr_paid_at is not null
+  and is_founder()
+group by 1, 2
+order by 1 desc, 2;

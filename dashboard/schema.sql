@@ -17,6 +17,9 @@ create table if not exists funeral_homes (
   optional_3    text,
   optional_4    text,
   subscription  numeric not null default 150,
+  -- Who pays for a 3D/VR upgrade at this home: they bill it, or the family pays
+  -- Healing Partners direct.
+  vr_billing    text not null default 'home' check (vr_billing in ('home','family')),
   active        boolean not null default true,
   created_at    timestamptz not null default now()
 );

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="Your 3D memorial model is being built. From Healing Partners.">
+<title>Thank You</title>
+<style>
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08; --glow:rgba(200,150,60,.30);
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-xs:.8125rem; --f-sm:.875rem; --f-base:1.0625rem; --f-lg:1.1875rem;
+    --f-xl:1.375rem; --f-3xl:2.375rem;
+    --radius:12px; --tap:3.5rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink);
+         font-family:var(--sans); font-size:var(--f-base); line-height:1.65;
+         -webkit-font-smoothing:antialiased; }
+
+  header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
+  .masthead-in { max-width:38rem; margin:0 auto; padding:1rem 1.25rem;
+                 display:flex; align-items:baseline; gap:.625rem; flex-wrap:wrap; }
+  .masthead-in h1 { font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+                    margin:0; letter-spacing:-.01em; }
+  .masthead-in .parent { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+                         color:var(--ink-3); border-left:1px solid var(--line-strong);
+                         padding-left:.625rem; }
+
+  main { max-width:38rem; margin:0 auto; padding:4rem 1.25rem 5rem; }
+
+  .lamp { width:12px; height:16px; border-radius:50% 50% 45% 45%; margin-bottom:2rem;
+          background:radial-gradient(ellipse at 50% 70%, var(--accent-ink), var(--accent) 60%, transparent 72%);
+          box-shadow:0 0 18px 7px var(--glow); transform-origin:50% 100%;
+          animation:flicker 3.6s ease-in-out infinite; }
+  @keyframes flicker {
+    0%,100%{ transform:scaleY(1) translateX(0); opacity:1; }
+    30%{ transform:scaleY(1.1) translateX(.6px); opacity:.9; }
+    60%{ transform:scaleY(.94) translateX(-.5px); opacity:1; }
+    82%{ transform:scaleY(1.05) translateX(.3px); opacity:.94; }
+  }
+  @media (prefers-reduced-motion: reduce){ .lamp{animation:none;} }
+
+  h2 { font-family:var(--serif); font-weight:500; font-size:var(--f-3xl);
+       line-height:1.15; letter-spacing:-.02em; margin:0 0 1rem; text-wrap:balance; }
+  p.lede { font-size:var(--f-lg); color:var(--ink-2); margin:0 0 2rem; }
+
+  .steps { list-style:none; margin:0 0 2rem; padding:0;
+           display:flex; flex-direction:column; gap:1.25rem; }
+  .steps li { display:flex; gap:1rem; align-items:flex-start; }
+  .steps .n { flex:none; width:1.75rem; height:1.75rem; border-radius:999px;
+              background:var(--accent-soft); color:var(--accent-ink); display:grid;
+              place-items:center; font-size:var(--f-sm); font-weight:700;
+              font-variant-numeric:tabular-nums; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .steps .n{color:var(--accent);} }
+  :root[data-theme="dark"] .steps .n { color:var(--accent); }
+  .steps b { display:block; margin-bottom:.125rem; }
+  .steps span { color:var(--ink-2); font-size:var(--f-sm); }
+
+  .aside { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+           box-shadow:var(--shadow); padding:1.25rem 1.375rem; font-size:var(--f-sm);
+           color:var(--ink-2); margin-bottom:2rem; }
+  .aside b { color:var(--ink); }
+
+  .btn { display:inline-block; padding:.875rem 1.5rem; min-height:var(--tap);
+         border-radius:var(--radius); text-decoration:none; border:1px solid var(--line-strong);
+         background:var(--surface); color:var(--ink); }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  a:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <h1>Remember Them</h1>
+    <span class="parent">Healing Partners</span>
+  </div>
+</header>
+
+<main>
+  <div class="lamp" aria-hidden="true"></div>
+  <h2 id="head">Thank you.</h2>
+  <p class="lede" id="lede">We're building the model now. There's nothing else you need to do.</p>
+
+  <ol class="steps">
+    <li><span class="n">1</span>
+      <div><b>We build the model</b>
+        <span>Your memorial, at full size, from the design you chose. Usually two to three working days.</span></div></li>
+    <li><span class="n">2</span>
+      <div><b>We email you a link</b>
+        <span>Open it on a Meta Quest 3 and you'll be standing next to it. You can share the same link with family.</span></div></li>
+    <li><span class="n">3</span>
+      <div><b>Change anything you want</b>
+        <span>Seeing it at full size sometimes changes people's minds. Nothing is cut yet, and changes cost nothing.</span></div></li>
+  </ol>
+
+  <div class="aside">
+    <b>Don't have a headset?</b> Most families don't. Ask your funeral director &mdash; many have one
+    in the arrangement room, and we can send a version you can turn around on a phone instead.
+  </div>
+
+  <a class="btn" href="./">Back to the design</a>
+</main>
+
+<script>
+  /* Stripe returns here with the reference we sent. Use the name if we have it,
+     so the page speaks about a person rather than a transaction. */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      var ref = q.get("memorial") || q.get("client_reference_id") || "";
+      var name = ref.split("-").slice(0, -1).join(" ").trim();
+      if (name) {
+        name = name.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+        document.getElementById("head").textContent = "Thank you.";
+        document.getElementById("lede").textContent =
+          "We're building " + name + "'s memorial now. There's nothing else you need to do.";
+        document.title = name + " — Remember Them";
+      }
+    } catch (e) {}
+  })();
+</script>
+</body>
+</html>
