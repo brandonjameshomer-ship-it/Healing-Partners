@@ -19,8 +19,7 @@
     --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --f-xs:.8125rem; --f-sm:.875rem; --f-base:1.0625rem; --f-lg:1.1875rem;
     --f-xl:1.375rem; --f-2xl:1.75rem; --f-3xl:2.375rem;
-    --radius:12px;
-    --tap:3.5rem;
+    --radius:12px; --tap:3.5rem;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -29,8 +28,7 @@
       --line:#2A3150; --line-strong:#3A4266;
       --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
       --on-accent:#241A06; --glow:rgba(224,177,102,.28);
-      --yes:#7EC49E; --yes-soft:#1D3329;
-      --stage:#0A0D1B;
+      --yes:#7EC49E; --yes-soft:#1D3329; --stage:#0A0D1B;
       --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
     }
   }
@@ -40,49 +38,42 @@
     --line:#2A3150; --line-strong:#3A4266;
     --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
     --on-accent:#241A06; --glow:rgba(224,177,102,.28);
-    --yes:#7EC49E; --yes-soft:#1D3329;
-    --stage:#0A0D1B;
+    --yes:#7EC49E; --yes-soft:#1D3329; --stage:#0A0D1B;
     --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
   }
 
   * { box-sizing:border-box; }
-  body {
-    margin:0; background:var(--ground); color:var(--ink);
-    font-family:var(--sans); font-size:var(--f-base); line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
+  body { margin:0; background:var(--ground); color:var(--ink);
+         font-family:var(--sans); font-size:var(--f-base); line-height:1.6;
+         -webkit-font-smoothing:antialiased; }
 
   header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
-  .masthead-in {
-    max-width:44rem; margin:0 auto; padding:1rem 1.25rem;
-    display:flex; align-items:baseline; gap:.625rem; flex-wrap:wrap;
-  }
-  .masthead-in h1 {
-    font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
-    margin:0; letter-spacing:-.01em;
-  }
-  .masthead-in .parent {
-    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
-    color:var(--ink-3); border-left:1px solid var(--line-strong); padding-left:.625rem;
-  }
+  .masthead-in { max-width:46rem; margin:0 auto; padding:1rem 1.25rem;
+                 display:flex; align-items:baseline; gap:.625rem; flex-wrap:wrap; }
+  .masthead-in h1 { font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+                    margin:0; letter-spacing:-.01em; }
+  .masthead-in .parent { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+                         color:var(--ink-3); border-left:1px solid var(--line-strong);
+                         padding-left:.625rem; }
+  .masthead-in .skip { margin-left:auto; font-size:var(--f-sm); color:var(--ink-3);
+                       text-decoration:none; }
+  .masthead-in .skip:hover { color:var(--accent); }
 
-  .rail { max-width:44rem; margin:0 auto; padding:1rem 1.25rem 0;
-          display:flex; gap:.375rem; align-items:center; }
+  .rail { max-width:46rem; margin:0 auto; padding:1rem 1.25rem 0;
+          display:flex; gap:.5rem; align-items:center; }
   .rail .seg { flex:1; height:4px; border-radius:2px; background:var(--line-strong); }
   .rail .seg.done { background:var(--accent); }
   .rail .lbl { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.1em;
                color:var(--ink-3); white-space:nowrap; }
 
-  main { max-width:44rem; margin:0 auto; padding:2rem 1.25rem 5rem; }
+  main { max-width:46rem; margin:0 auto; padding:2rem 1.25rem 5rem; }
   .step { display:none; }
   .step.on { display:block; animation:rise .3s ease both; }
-  @keyframes rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
-  @media (prefers-reduced-motion: reduce) { .step.on { animation:none; } }
+  @keyframes rise { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+  @media (prefers-reduced-motion: reduce){ .step.on{animation:none;} }
 
-  h2.q {
-    font-family:var(--serif); font-weight:500; font-size:var(--f-3xl);
-    line-height:1.18; letter-spacing:-.02em; margin:0 0 .75rem; text-wrap:balance;
-  }
+  h2.q { font-family:var(--serif); font-weight:500; font-size:var(--f-3xl);
+         line-height:1.18; letter-spacing:-.02em; margin:0 0 .75rem; text-wrap:balance; }
   p.sub { color:var(--ink-2); margin:0 0 1.75rem; max-width:34rem; }
 
   .field { display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.25rem; }
@@ -90,22 +81,17 @@
   input[type="text"], textarea {
     font:inherit; color:var(--ink); background:var(--surface);
     border:1px solid var(--line-strong); border-radius:var(--radius);
-    padding:.875rem 1rem; width:100%; min-height:var(--tap);
-  }
+    padding:.875rem 1rem; width:100%; min-height:var(--tap); }
   textarea { min-height:10rem; resize:vertical; line-height:1.7; }
   input:focus, textarea:focus { outline:3px solid var(--accent); outline-offset:-1px;
                                 border-color:var(--accent); }
-  .row { display:flex; gap:1rem; }
-  .row > * { flex:1; min-width:0; }
+  .row { display:flex; gap:1rem; } .row>*{flex:1;min-width:0;}
   @media (max-width:30rem){ .row{flex-direction:column;gap:0;} }
 
-  /* starter chips — break the blank-page problem */
   .chips { display:flex; flex-wrap:wrap; gap:.5rem; margin:-.5rem 0 1.25rem; }
-  .chip {
-    font:inherit; font-size:var(--f-sm); cursor:pointer;
-    background:var(--surface-2); border:1px solid var(--line-strong);
-    color:var(--ink-2); border-radius:999px; padding:.5rem .875rem;
-  }
+  .chip { font:inherit; font-size:var(--f-sm); cursor:pointer; background:var(--surface-2);
+          border:1px solid var(--line-strong); color:var(--ink-2);
+          border-radius:999px; padding:.5rem .875rem; }
   .chip:hover { border-color:var(--accent); color:var(--ink); }
 
   button { font:inherit; cursor:pointer; border-radius:var(--radius);
@@ -119,39 +105,31 @@
   .btn-quiet { background:none; border:none; color:var(--ink-3);
                padding:.75rem .5rem; min-height:var(--tap); }
   .btn-quiet:hover { color:var(--ink); text-decoration:underline; }
-  :is(button,input,textarea,a):focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+  :is(button,input,textarea,a,[tabindex]):focus-visible { outline:3px solid var(--accent);
+                                                          outline-offset:2px; }
   .nav { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; margin-top:2rem; }
   .nav .back { margin-right:auto; }
 
-  /* ONE suggestion at a time — the core of the easy tree */
-  .card {
-    background:var(--surface); border:1px solid var(--line);
-    border-radius:var(--radius); box-shadow:var(--shadow);
-    padding:1.75rem; margin-bottom:1.5rem;
-  }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+          box-shadow:var(--shadow); padding:1.75rem; margin-bottom:1.5rem; }
   .card h3 { font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
              margin:0 0 .5rem; letter-spacing:-.015em; text-wrap:balance; }
   .card .what { color:var(--ink-2); margin:0 0 1rem; }
-  .card .why {
-    font-size:var(--f-sm); color:var(--ink-2); background:var(--accent-soft);
-    border-radius:8px; padding:.75rem .875rem; margin:0;
-  }
+  .card .why { font-size:var(--f-sm); color:var(--ink-2); background:var(--accent-soft);
+               border-radius:8px; padding:.75rem .875rem; margin:0; }
   .card .why b { color:var(--ink); }
 
   .answers { display:flex; flex-direction:column; gap:.625rem; }
   .answers .btn { width:100%; text-align:left; padding:1rem 1.25rem; }
-  .btn-yes { background:var(--yes-soft); border-color:var(--yes); color:var(--ink); font-weight:600; }
+  .btn-yes { background:var(--yes-soft); border-color:var(--yes); color:var(--ink);
+             font-weight:600; }
   .btn-yes:hover { background:var(--yes-soft); border-color:var(--yes); filter:brightness(1.04); }
-
   .counter { font-size:var(--f-sm); color:var(--ink-3); margin:0 0 1.25rem; }
   .kept { color:var(--yes); font-weight:600; }
 
-  /* pairwise */
   .versus { display:flex; flex-direction:column; gap:.75rem; margin-bottom:1.5rem; }
-  .vs-card {
-    background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--radius);
-    padding:1.5rem; text-align:left; min-height:var(--tap);
-  }
+  .vs-card { background:var(--surface); border:1px solid var(--line-strong);
+             border-radius:var(--radius); padding:1.5rem; text-align:left; min-height:var(--tap); }
   .vs-card:hover { border-color:var(--accent); background:var(--accent-soft); }
   .vs-card b { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; display:block;
                margin-bottom:.25rem; }
@@ -159,24 +137,51 @@
   .vs-mid { text-align:center; font-size:var(--f-xs); text-transform:uppercase;
             letter-spacing:.12em; color:var(--ink-3); }
 
-  /* proofs */
-  .proofs { display:grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr)); gap:1.25rem; }
+  /* ---- proofs, with price revealed on hover or tap ---- */
+  .proofs { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:1.25rem; }
   .proof { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-           box-shadow:var(--shadow); overflow:hidden; text-align:left; }
-  .proof:hover { border-color:var(--accent); }
-  .proof .canvas { background:var(--stage); padding:1.5rem; display:grid; place-items:center; }
+           box-shadow:var(--shadow); overflow:hidden; text-align:left; padding:0;
+           display:flex; flex-direction:column; width:100%; }
+  .proof:hover, .proof.open { border-color:var(--accent); }
+  .proof .canvas { background:var(--stage); padding:1.5rem; display:grid; place-items:center;
+                   position:relative; }
   .proof .canvas svg { width:100%; max-width:10rem; height:auto;
                        filter:drop-shadow(0 10px 16px rgba(0,0,0,.25)); }
+  .proof .tapme { position:absolute; right:.625rem; bottom:.625rem; font-size:var(--f-xs);
+                  color:var(--ink-3); background:var(--surface); border-radius:999px;
+                  padding:.25rem .625rem; border:1px solid var(--line); }
+  .proof:hover .tapme, .proof.open .tapme { opacity:0; }
   .proof .meta { padding:1.125rem 1.25rem 1.375rem; }
-  .proof h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0 0 .375rem; }
-  .proof p { font-size:var(--f-sm); color:var(--ink-2); margin:0 0 .75rem; }
+  .proof h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0 0 .25rem; }
+  .proof .stone { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.08em;
+                  color:var(--ink-3); margin:0 0 .625rem; }
+  .proof p.why { font-size:var(--f-sm); color:var(--ink-2); margin:0 0 .75rem; }
   .proof ul { margin:0; padding-left:1.125rem; font-size:var(--f-sm); color:var(--ink-2); }
-  .proof li { margin-bottom:.2rem; }
-  .proof li::marker { color:var(--accent); }
+  .proof li { margin-bottom:.2rem; } .proof li::marker { color:var(--accent); }
+
+  .price {
+    max-height:0; overflow:hidden; transition:max-height .28s ease;
+    border-top:1px solid transparent;
+  }
+  .proof:hover .price, .proof.open .price { max-height:22rem; border-top-color:var(--line); }
+  @media (prefers-reduced-motion: reduce){ .price{transition:none;} }
+  .price-in { padding:1rem 1.25rem 1.25rem; background:var(--surface-2); }
+  .price-total { font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+                 letter-spacing:-.02em; margin:0; font-variant-numeric:tabular-nums; }
+  .price-est { font-size:var(--f-xs); color:var(--ink-3); margin:.125rem 0 .75rem; }
+  .price table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
+  .price td { padding:.3rem 0; color:var(--ink-2); vertical-align:top; }
+  .price td:last-child { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;
+                         padding-left:.75rem; }
+  .price .quote { color:var(--accent-ink); font-size:var(--f-xs); }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .price .quote{color:var(--accent);} }
+  :root[data-theme="dark"] .price .quote { color:var(--accent); }
 
   .aside { background:var(--accent-soft); border-radius:var(--radius);
            padding:1.125rem 1.25rem; font-size:var(--f-sm); color:var(--ink-2); margin:2rem 0 0; }
   .aside b { color:var(--ink); }
+  .vh { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);
+        white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -185,6 +190,7 @@
   <div class="masthead-in">
     <h1>Remember Them</h1>
     <span class="parent">Healing Partners</span>
+    <a class="skip" href="./designer.html">Skip to the full catalogue</a>
   </div>
 </header>
 
@@ -194,11 +200,12 @@
   <span class="seg" id="s2"></span>
   <span class="seg" id="s3"></span>
   <span class="seg" id="s4"></span>
+  <span class="lbl" id="budget"></span>
 </div>
 
 <main>
+  <p class="vh" role="status" aria-live="polite" id="live"></p>
 
-  <!-- 1 — who -->
   <section class="step on" id="step1">
     <h2 class="q">Who are we remembering?</h2>
     <p class="sub">Just their name and years to start. We'll get to who they were next.</p>
@@ -215,12 +222,12 @@
     <div class="nav"><button class="btn btn-primary" data-go="2">Continue</button></div>
   </section>
 
-  <!-- 2 — story -->
   <section class="step" id="step2">
     <h2 class="q">Tell us about them.</h2>
-    <p class="sub">However it comes out. There's no wrong way, and you can't tell us too much. If you're not sure where to start, pick one of these.</p>
+    <p class="sub">However it comes out. There's no wrong way, and you can't tell us too much. If you're not sure where to start, tap one of these.</p>
     <div class="chips" id="chips"></div>
     <div class="field">
+      <label class="vh" for="f-story">About them</label>
       <textarea id="f-story" placeholder="She fed everyone who walked through the door&hellip;"></textarea>
     </div>
     <div class="nav">
@@ -229,11 +236,11 @@
     </div>
   </section>
 
-  <!-- 3 — follow-ups -->
   <section class="step" id="step3">
     <h2 class="q" id="q3"></h2>
     <p class="sub" id="sub3"></p>
     <div class="field">
+      <label class="vh" for="f-follow">Your answer</label>
       <textarea id="f-follow" style="min-height:7rem"></textarea>
     </div>
     <div class="nav">
@@ -243,7 +250,6 @@
     </div>
   </section>
 
-  <!-- 4 — one suggestion at a time -->
   <section class="step" id="step4">
     <h2 class="q">Does this feel like them?</h2>
     <p class="counter" id="counter"></p>
@@ -256,7 +262,6 @@
     <div class="nav"><button class="btn-quiet back" id="cardBack">Back</button></div>
   </section>
 
-  <!-- 5 — pairwise -->
   <section class="step" id="step5">
     <h2 class="q">Which of these two matters more?</h2>
     <p class="sub" id="vsProgress"></p>
@@ -266,7 +271,6 @@
     </div>
   </section>
 
-  <!-- 6 — proofs -->
   <section class="step" id="step6">
     <h2 class="q" id="q6"></h2>
     <p class="sub" id="sub6"></p>
@@ -275,10 +279,11 @@
       <button class="btn-quiet back" id="proofBack">None of these feel right</button>
     </div>
     <div class="aside">
-      <b>Next:</b> the one you choose can be viewed at full size in VR, sent to your family to look at together, and used to fill out the order form automatically.
+      <b>Every price is an estimate</b> until the monument company confirms it. Lettering, standard
+      artwork, and as many proofs as you need are already included &mdash; there's no charge for
+      changing your mind.
     </div>
   </section>
-
 </main>
 
 <script>
@@ -286,27 +291,68 @@
   "use strict";
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+
+  /* ================= CLICK BUDGET =================
+     1 name  +  1 story  +  2 follow-ups  +  5 suggestions  +  1 proof  =  10.
+     Because at most 5 suggestions can be kept, the pairwise round can never be
+     needed on top of that. Going back is always free and never counted. */
+  var MAX_FOLLOWUPS = 2, MAX_SUGGESTIONS = 5;
+
+  /* ================= PRICING =================
+     Wholesale from the AFM 2025 guide. Family price = wholesale x 2.5.
+     The one exception is bench installation, which carries no markup at all. */
+  var MARKUP = 2.5;
+  var BASES = {
+    upright: { label:"Upright monument", stone:"Georgia Gray", cat:"Cat 1",
+               parts:[["Die, 24×6×24",1145],["Base, 30×12×6",480],["Setting",620]] },
+    slant:   { label:"Slant marker", stone:"Colonial Rose", cat:"Cat 2",
+               parts:[["Slant, 24×16",1230],["Setting",370]] },
+    black:   { label:"Upright monument", stone:"Academy Black", cat:"Cat 2",
+               parts:[["Die, 24×6×24",1365],["Base, 30×12×6",585],["Setting",620]] }
+  };
+  /* add-on wholesale; null = no published price, must be quoted */
+  var ADDON = {
+    photo:{ w:305, label:"Porcelain portrait, 5×7 oval" },
+    words:{ w:25,  label:"Their words, custom cut" },
+    scene:{ w:25,  label:"A place they loved, custom art" },
+    work: { w:25,  label:"The work of their hands, custom art" },
+    music:{ w:25,  label:"Music, custom art" },
+    symbol:{ w:0,  label:"Faith emblem (standard art, included)" },
+    glass:{ w:null,label:"Coloured glass panel" },
+    bronze:{w:null,label:"Bronze" },
+    bench:{ w:2310, install:450, label:"Traditional bench, gray" }
+  };
+  function priceFor(baseKey, feats){
+    var b = BASES[baseKey], lines = [], total = 0;
+    b.parts.forEach(function(p){ var r=p[1]*MARKUP; total+=r; lines.push([p[0], money(r)]); });
+    var quotes = [];
+    feats.forEach(function(f){
+      var a = ADDON[f]; if (!a) return;
+      if (a.w === null){ quotes.push(a.label); return; }
+      if (f === "bench"){                      // bench install carries NO markup
+        var r = a.w*MARKUP + a.install; total += r; lines.push([a.label, money(r)]); return;
+      }
+      if (a.w === 0){ lines.push([a.label, "included"]); return; }
+      var rr = a.w*MARKUP; total += rr; lines.push([a.label, money(rr)]);
+    });
+    return { total: total, lines: lines, quotes: quotes };
+  }
 
   var A = { name:"", born:"", died:"", story:"", follows:[] };
-  var yes = [], maybe = [], queue = [], qi = 0, fi = 0, followQs = [];
+  var yes = [], maybe = [], queue = [], qi = 0, fi = 0, followQs = [], step = 1;
 
-  /* ---- starter prompts: a menu beats a blank page when you're grieving ---- */
-  var STARTERS = [
-    "They always said…", "On a Saturday they'd…", "People came to them for…",
-    "Their hands…", "They were happiest…", "What made them laugh…"
-  ];
+  var STARTERS = ["They always said…","On a Saturday they'd…","People came to them for…",
+                  "Their hands…","They were happiest…","What made them laugh…"];
 
   var QUESTION_BANK = {
-    work:    ["What did their hands look like?"],
-    family:  ["Who did they take care of?"],
-    faith:   ["What did their faith look like on an ordinary Tuesday?"],
-    land:    ["Where were they happiest outdoors?"],
-    music:   ["What would be playing?"],
-    service: ["What did they never talk about?"],
-    humour:  ["What would make them laugh until they couldn't breathe?"],
-    general: ["What would they be doing on an ordinary Saturday?",
-              "What did people come to them for?",
-              "What's the thing they always said?"]
+    work:["What did their hands look like?"], family:["Who did they take care of?"],
+    faith:["What did their faith look like on an ordinary Tuesday?"],
+    land:["Where were they happiest outdoors?"], music:["What would be playing?"],
+    service:["What did they never talk about?"],
+    humour:["What would make them laugh until they couldn't breathe?"],
+    general:["What would they be doing on an ordinary Saturday?",
+             "What did people come to them for?","What's the thing they always said?"]
   };
   var KEYS = {
     work:/\b(work|job|built|build|farm|shop|carpenter|mechanic|nurse|teacher|business|craft|hands)\b/i,
@@ -317,119 +363,77 @@
     service:/\b(army|navy|marine|air force|veteran|served|service|war|corps|fire|police)\b/i,
     humour:/\b(laugh|joke|funny|humou?r|tease|grin|smil)\b/i
   };
-  function readStory(t){ var out=[]; for (var k in KEYS) if (KEYS[k].test(t)) out.push(k); return out; }
-  /* CLICK BUDGET — 10 taps to a finished design, and never more:
-       1  name + dates
-       1  their story
-       2  follow-ups        <- capped at 2
-       5  suggestions       <- capped at 5
-       1  choose a proof
-      ---
-      10  total
-     Because at most 5 suggestions can be kept, the pairwise round can never
-     be needed on top of that. Going back costs nothing and is always allowed. */
-  var MAX_FOLLOWUPS = 2, MAX_SUGGESTIONS = 5, CLICK_BUDGET = 10;
-  var clicks = 0;
-  function spend(){ clicks++; paintBudget(); }
-  function paintBudget(){
-    var left = Math.max(0, CLICK_BUDGET - clicks);
-    $("budget").textContent = left === 0 ? "Last one" : left + " to go";
-  }
-
+  function readStory(t){ var o=[]; for(var k in KEYS) if(KEYS[k].test(t)) o.push(k); return o; }
   function chooseFollowUps(tags){
     var qs=[];
     for (var i=0;i<tags.length && qs.length<MAX_FOLLOWUPS;i++) qs.push(QUESTION_BANK[tags[i]][0]);
     var g=QUESTION_BANK.general;
-    for (var j=0; qs.length<MAX_FOLLOWUPS && j<g.length; j++) if (qs.indexOf(g[j])===-1) qs.push(g[j]);
+    for (var j=0; qs.length<MAX_FOLLOWUPS && j<g.length; j++)
+      if (qs.indexOf(g[j])===-1) qs.push(g[j]);
     return qs;
   }
 
-  /* Plain language only. No trade terms without an explanation attached. */
   var CATALOGUE = [
-    { id:"photo",  t:"A photograph of them",        d:"Their face etched into the stone, so anyone walking past knows them.", tags:["family","general"] },
-    { id:"words",  t:"Something they always said",  d:"Their own words, cut into the granite.", tags:["humour","general"] },
-    { id:"scene",  t:"A place they loved",          d:"The lake, the ridge, the back field — carved into the stone.", tags:["land"] },
-    { id:"work",   t:"The work of their hands",     d:"The tools of their trade, or the thing they built.", tags:["work"] },
-    { id:"music",  t:"Music",                       d:"A few bars of a song, or the instrument they played.", tags:["music"] },
-    { id:"glass",  t:"Coloured glass set in the stone", d:"Light passes through it and changes all day — a little like stained glass.", tags:["faith","music"] },
-    { id:"bench",  t:"A bench",                     d:"Somewhere for people to sit and stay a while when they visit.", tags:["family","general"] },
-    { id:"bronze", t:"Bronze",                      d:"Warm metal set into the granite. It ages beautifully.", tags:["service","work"] },
-    { id:"symbol", t:"A symbol of their faith",     d:"A cross, a star, or another emblem that meant something to them.", tags:["faith"] }
+    { id:"photo", t:"A photograph of them", d:"Their face set into the stone, so anyone walking past knows them.", tags:["family","general"] },
+    { id:"words", t:"Something they always said", d:"Their own words, cut into the granite.", tags:["humour","general"] },
+    { id:"scene", t:"A place they loved", d:"The lake, the ridge, the back field — carved into the stone.", tags:["land"] },
+    { id:"work",  t:"The work of their hands", d:"The tools of their trade, or the thing they built.", tags:["work"] },
+    { id:"music", t:"Music", d:"A few bars of a song, or the instrument they played.", tags:["music"] },
+    { id:"glass", t:"Coloured glass set in the stone", d:"Light passes through it and changes all day — a little like stained glass.", tags:["faith","music"] },
+    { id:"bench", t:"A bench", d:"Somewhere for people to sit and stay a while when they visit.", tags:["family","general"] },
+    { id:"bronze",t:"Bronze", d:"Warm metal set into the granite. It ages beautifully.", tags:["service","work"] },
+    { id:"symbol",t:"A symbol of their faith", d:"A cross, a star, or another emblem that meant something to them.", tags:["faith"] }
   ];
   function suggest(tags){
     return CATALOGUE.map(function(c){
-      var s=0; for (var i=0;i<c.tags.length;i++) if (tags.indexOf(c.tags[i])!==-1) s+=2;
+      var s=0; for(var i=0;i<c.tags.length;i++) if(tags.indexOf(c.tags[i])!==-1) s+=2;
       if (c.tags.indexOf("general")!==-1) s+=1;
       return {c:c,s:s};
-    }).sort(function(a,b){return b.s-a.s;}).slice(0,7).map(function(x){return x.c;});
+    }).sort(function(a,b){return b.s-a.s;})
+      .slice(0, MAX_SUGGESTIONS).map(function(x){return x.c;});
   }
-  function why(c, tags){
+  function why(c,tags){
     var M={work:"the work you described",family:"what you said about family",faith:"their faith",
-           land:"where they were happiest",music:"the music",service:"their service",humour:"how they made people laugh"};
-    for (var i=0;i<tags.length;i++) if (c.tags.indexOf(tags[i])!==-1 && M[tags[i]]) return M[tags[i]];
+           land:"where they were happiest",music:"the music",service:"their service",
+           humour:"how they made people laugh"};
+    for(var i=0;i<tags.length;i++) if(c.tags.indexOf(tags[i])!==-1 && M[tags[i]]) return M[tags[i]];
     return "what you told us about them";
   }
+  function item(id){ for(var i=0;i<CATALOGUE.length;i++) if(CATALOGUE[i].id===id) return CATALOGUE[i]; return null; }
 
-  /* ---- shapes ---- */
-  function outline(f){
-    if (f==="serpentine") return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
-    if (f==="bench") return "M20,250 L280,250 L280,290 L20,290 Z M45,290 L85,290 L85,360 L45,360 Z M215,290 L255,290 L255,360 L215,360 Z";
-    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
+  /* remaining clicks computed from state — cannot drift */
+  function remaining(){
+    var n=0;
+    if (step<=1) n+=1;
+    if (step<=2) n+=1;
+    if (step<=3) n += Math.max(0, (followQs.length||MAX_FOLLOWUPS) - fi);
+    if (step<=4) n += Math.max(0, (queue.length||MAX_SUGGESTIONS) - qi);
+    n += 1;                       // choosing a proof
+    return Math.max(0, n);
   }
-  var STONES = {
-    grey:{hi:"#A2A6AC",base:"#83878C",cut:"#4E5257",lip:"#B6BAC0"},
-    black:{hi:"#4A4A52",base:"#2A2A2E",cut:"#0E0E11",lip:"#5A5A64"},
-    rose:{hi:"#BE9B95",base:"#A2807B",cut:"#6B504C",lip:"#CBAAA4"}
-  };
-  function proofSvg(form,key,feats,name,dates){
-    var s=STONES[key], uid=key+form;
-    var g='<svg viewBox="0 0 300 400" role="img" aria-label="Preview of the memorial for '+esc(name)+'">'+
-      '<defs><linearGradient id="f'+uid+'" x1="0" y1="0" x2=".35" y2="1">'+
-      '<stop offset="0" stop-color="'+s.hi+'"/><stop offset=".55" stop-color="'+s.base+'"/>'+
-      '<stop offset="1" stop-color="'+s.cut+'"/></linearGradient>'+
-      '<filter id="gr'+uid+'"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="4" seed="5" result="n"/>'+
-      '<feColorMatrix in="n" type="saturate" values="0"/>'+
-      '<feComponentTransfer><feFuncA type="linear" slope=".14"/></feComponentTransfer></filter>'+
-      '<clipPath id="c'+uid+'"><path d="'+outline(form)+'"/></clipPath></defs>'+
-      '<path d="'+outline(form)+'" fill="url(#f'+uid+')"/>'+
-      '<g clip-path="url(#c'+uid+')"><rect width="300" height="400" filter="url(#gr'+uid+')" opacity=".5"/></g>';
-    var y = form==="bench" ? 272 : 178;
-    if (feats.indexOf("photo")!==-1 && form!=="bench"){
-      g+='<ellipse cx="150" cy="'+(y-46)+'" rx="33" ry="41" fill="'+s.cut+'" opacity=".55"/>'+
-         '<ellipse cx="150" cy="'+(y-46)+'" rx="29" ry="37" fill="none" stroke="'+s.lip+'" stroke-width="1.5" opacity=".8"/>';
-      y+=22;
-    }
-    if (feats.indexOf("glass")!==-1 && form!=="bench"){
-      g+='<rect x="112" y="'+(y-78)+'" width="76" height="50" rx="4" fill="#7FA8C4" opacity=".55"/>'+
-         '<rect x="112" y="'+(y-78)+'" width="76" height="50" rx="4" fill="none" stroke="'+s.lip+'" stroke-width="1.5"/>';
-      y+=12;
-    }
-    if (feats.indexOf("bronze")!==-1)
-      g+='<rect x="95" y="'+(y+60)+'" width="110" height="10" rx="2" fill="#B08A45" opacity=".75"/>';
-    var nm=name||"Their Name", size=nm.length>14?Math.max(13,26*14/nm.length):26;
-    g+='<text x="150" y="'+y+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="'+size+'" font-weight="600" dy="1" fill="'+s.lip+'" opacity=".6">'+esc(nm)+'</text>'+
-       '<text x="150" y="'+y+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="'+size+'" font-weight="600" fill="'+s.cut+'">'+esc(nm)+'</text>';
-    if (dates) g+='<text x="150" y="'+(y+26)+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="13" fill="'+s.cut+'">'+esc(dates)+'</text>';
-    return g+'</svg>';
+  function paint(){
+    var left = remaining();
+    $("budget").textContent = step>=6 ? "" : (left<=1 ? "Last one" : left + " to go");
   }
 
-  /* ---- steps ---- */
-  var LABELS={1:"Their story",2:"Their story",3:"Their story",4:"What matters",5:"Narrowing",6:"Three ideas"};
+  var LABELS={1:"Their story",2:"Their story",3:"Their story",4:"What matters",
+              5:"Narrowing",6:"Three ideas"};
   function show(n){
-    for (var i=1;i<=6;i++) $("step"+i).classList.toggle("on", i===n);
+    step=n;
+    for(var i=1;i<=6;i++) $("step"+i).classList.toggle("on", i===n);
     $("railLbl").textContent=LABELS[n];
     var d = n<=3?1:(n===4?2:(n===5?3:4));
-    for (var s=1;s<=4;s++) $("s"+s).classList.toggle("done", s<=d);
-    window.scrollTo(0,0);
+    for(var s=1;s<=4;s++) $("s"+s).classList.toggle("done", s<=d);
+    paint(); window.scrollTo(0,0);
   }
+  function announce(t){ $("live").textContent = t; }
 
   $("chips").innerHTML = STARTERS.map(function(s){
-    return '<button class="chip" data-chip="'+esc(s)+'">'+esc(s)+'</button>';
-  }).join("");
+    return '<button class="chip" data-chip="'+esc(s)+'">'+esc(s)+'</button>'; }).join("");
   $("chips").addEventListener("click", function(e){
     var c=e.target.closest("[data-chip]"); if(!c) return;
     var ta=$("f-story"), v=c.getAttribute("data-chip");
-    ta.value = ta.value ? ta.value.replace(/\s*$/,"") + "\n\n" + v + " " : v + " ";
+    ta.value = ta.value ? ta.value.replace(/\s*$/,"")+"\n\n"+v+" " : v+" ";
     ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
   });
 
@@ -439,8 +443,7 @@
     if (v==="follow"){
       A.name=$("f-name").value.trim(); A.born=$("f-born").value.trim();
       A.died=$("f-died").value.trim(); A.story=$("f-story").value.trim();
-      followQs=chooseFollowUps(readStory(A.story)); fi=0; A.follows=[]; askFollow();
-      return;
+      followQs=chooseFollowUps(readStory(A.story)); fi=0; A.follows=[]; askFollow(); return;
     }
     show(+v);
   });
@@ -448,9 +451,8 @@
   function askFollow(){
     if (fi>=followQs.length){ startCards(); return; }
     $("q3").textContent=followQs[fi];
-    $("sub3").textContent = fi===0
-      ? "Whatever comes to mind. A sentence is plenty."
-      : "Only if it's easy — skip anything that isn't.";
+    $("sub3").textContent = fi===0 ? "Whatever comes to mind. A sentence is plenty."
+                                   : "Only if it's easy — skip anything that isn't.";
     $("f-follow").value=""; show(3); $("f-follow").focus();
   }
   $("followNext").onclick=function(){ A.follows.push($("f-follow").value.trim()); fi++; askFollow(); };
@@ -459,56 +461,45 @@
 
   function allText(){ return A.story+" "+A.follows.join(" "); }
 
-  /* ---- ONE suggestion at a time ---- */
-  function startCards(){
-    var tags=readStory(allText());
-    queue=suggest(tags); qi=0; yes=[]; maybe=[];
-    renderCard();
-  }
+  function startCards(){ queue=suggest(readStory(allText())); qi=0; yes=[]; maybe=[]; renderCard(); }
   function renderCard(){
     if (qi>=queue.length){ afterCards(); return; }
     var c=queue[qi], tags=readStory(allText());
-    $("counter").innerHTML = (qi+1)+" of "+queue.length +
-      (yes.length ? ' &middot; <span class="kept">'+yes.length+' kept</span>' : "");
-    $("card").innerHTML =
-      "<h3>"+esc(c.t)+"</h3><p class=\"what\">"+esc(c.d)+"</p>"+
+    $("counter").innerHTML=(qi+1)+" of "+queue.length+
+      (yes.length?' &middot; <span class="kept">'+yes.length+' kept</span>':"");
+    $("card").innerHTML="<h3>"+esc(c.t)+"</h3><p class=\"what\">"+esc(c.d)+"</p>"+
       '<p class="why"><b>Why we suggested it:</b> '+esc(why(c,tags))+".</p>";
-    show(4);
+    show(4); announce(c.t);
   }
-  function answer(kind){
+  function answer(k){
     var c=queue[qi];
-    if (kind==="yes") yes.push(c.id);
-    else if (kind==="maybe") maybe.push(c.id);
+    if(k==="yes") yes.push(c.id); else if(k==="maybe") maybe.push(c.id);
     qi++; renderCard();
   }
-  $("ansYes").onclick=function(){ answer("yes"); };
-  $("ansMaybe").onclick=function(){ answer("maybe"); };
-  $("ansNo").onclick=function(){ answer("no"); };
+  $("ansYes").onclick=function(){answer("yes");};
+  $("ansMaybe").onclick=function(){answer("maybe");};
+  $("ansNo").onclick=function(){answer("no");};
   $("cardBack").onclick=function(){
-    if (qi===0){ fi=followQs.length-1; askFollow(); return; }
-    qi--;
-    var id=queue[qi].id;
+    if(qi===0){ fi=Math.max(0,followQs.length-1); askFollow(); return; }
+    qi--; var id=queue[qi].id;
     yes=yes.filter(function(x){return x!==id;});
     maybe=maybe.filter(function(x){return x!==id;});
     renderCard();
   };
 
-  function item(id){ for(var i=0;i<CATALOGUE.length;i++) if(CATALOGUE[i].id===id) return CATALOGUE[i]; return null; }
-
   function afterCards(){
     var chosen=yes.slice();
-    if (chosen.length<3) chosen=chosen.concat(maybe);      // too few — pull the maybes in
-    if (chosen.length===0) chosen=queue.slice(0,3).map(function(c){return c.id;});
-    if (chosen.length>5) startVersus(chosen); else buildProofs(chosen);
+    if(chosen.length<3) chosen=chosen.concat(maybe);
+    if(chosen.length===0) chosen=queue.slice(0,3).map(function(c){return c.id;});
+    if(chosen.length>5) startVersus(chosen); else buildProofs(chosen);
   }
 
-  /* ---- pairwise ---- */
   var vsQueue=[], vsKeep=[];
-  function startVersus(list){ vsQueue=list.slice(); vsKeep=[]; nextVersus(); }
+  function startVersus(l){ vsQueue=l.slice(); vsKeep=[]; nextVersus(); }
   function nextVersus(){
-    if (vsQueue.length<=1){
+    if(vsQueue.length<=1){
       vsKeep=vsKeep.concat(vsQueue);
-      if (vsKeep.length>5){ vsQueue=vsKeep; vsKeep=[]; nextVersus(); return; }
+      if(vsKeep.length>5){ vsQueue=vsKeep; vsKeep=[]; nextVersus(); return; }
       buildProofs(vsKeep.slice(0,5)); return;
     }
     var a=item(vsQueue.shift()), b=item(vsQueue.shift());
@@ -517,8 +508,7 @@
       '<button class="vs-card" data-vs="'+a.id+'"><b>'+esc(a.t)+'</b><span>'+esc(a.d)+'</span></button>'+
       '<div class="vs-mid">or</div>'+
       '<button class="vs-card" data-vs="'+b.id+'"><b>'+esc(b.t)+'</b><span>'+esc(b.d)+'</span></button>';
-    $("versus").setAttribute("data-pair", a.id+","+b.id);
-    show(5);
+    $("versus").setAttribute("data-pair", a.id+","+b.id); show(5);
   }
   $("versus").addEventListener("click", function(e){
     var c=e.target.closest("[data-vs]"); if(!c) return;
@@ -526,34 +516,88 @@
   });
   $("vsEqual").onclick=function(){
     var p=($("versus").getAttribute("data-pair")||"").split(",");
-    if (p[0]) vsKeep.push(p[0]); if (p[1]) vsKeep.push(p[1]);
-    nextVersus();
+    if(p[0])vsKeep.push(p[0]); if(p[1])vsKeep.push(p[1]); nextVersus();
   };
 
-  /* ---- proofs ---- */
+  /* ---- shapes ---- */
+  function outline(f){
+    if(f==="slant") return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
+    if(f==="bench") return "M20,250 L280,250 L280,290 L20,290 Z M45,290 L85,290 L85,360 L45,360 Z M215,290 L255,290 L255,360 L215,360 Z";
+    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
+  }
+  var STONE_SVG = {
+    upright:{hi:"#A2A6AC",base:"#83878C",cut:"#4E5257",lip:"#B6BAC0"},
+    slant:  {hi:"#BE9B95",base:"#A2807B",cut:"#6B504C",lip:"#CBAAA4"},
+    black:  {hi:"#4A4A52",base:"#2A2A2E",cut:"#0E0E11",lip:"#5A5A64"}
+  };
+  function svgFor(key,form,feats,name,dates){
+    var s=STONE_SVG[key], uid=key+form;
+    var g='<svg viewBox="0 0 300 400" role="img" aria-label="Preview for '+esc(name)+'">'+
+      '<defs><linearGradient id="f'+uid+'" x1="0" y1="0" x2=".35" y2="1">'+
+      '<stop offset="0" stop-color="'+s.hi+'"/><stop offset=".55" stop-color="'+s.base+'"/>'+
+      '<stop offset="1" stop-color="'+s.cut+'"/></linearGradient>'+
+      '<filter id="g'+uid+'"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="4" seed="5" result="n"/>'+
+      '<feColorMatrix in="n" type="saturate" values="0"/>'+
+      '<feComponentTransfer><feFuncA type="linear" slope=".14"/></feComponentTransfer></filter>'+
+      '<clipPath id="c'+uid+'"><path d="'+outline(form)+'"/></clipPath></defs>'+
+      '<path d="'+outline(form)+'" fill="url(#f'+uid+')"/>'+
+      '<g clip-path="url(#c'+uid+')"><rect width="300" height="400" filter="url(#g'+uid+')" opacity=".5"/></g>';
+    var y = form==="bench"?272:178;
+    if(feats.indexOf("photo")!==-1 && form!=="bench"){
+      g+='<ellipse cx="150" cy="'+(y-46)+'" rx="33" ry="41" fill="'+s.cut+'" opacity=".55"/>'+
+         '<ellipse cx="150" cy="'+(y-46)+'" rx="29" ry="37" fill="none" stroke="'+s.lip+'" stroke-width="1.5" opacity=".8"/>'; y+=22; }
+    if(feats.indexOf("glass")!==-1 && form!=="bench"){
+      g+='<rect x="112" y="'+(y-78)+'" width="76" height="50" rx="4" fill="#7FA8C4" opacity=".55"/>'+
+         '<rect x="112" y="'+(y-78)+'" width="76" height="50" rx="4" fill="none" stroke="'+s.lip+'" stroke-width="1.5"/>'; y+=12; }
+    if(feats.indexOf("bronze")!==-1)
+      g+='<rect x="95" y="'+(y+60)+'" width="110" height="10" rx="2" fill="#B08A45" opacity=".75"/>';
+    var nm=name||"Their Name", size=nm.length>14?Math.max(13,26*14/nm.length):26;
+    g+='<text x="150" y="'+y+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="'+size+'" font-weight="600" dy="1" fill="'+s.lip+'" opacity=".6">'+esc(nm)+'</text>'+
+       '<text x="150" y="'+y+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="'+size+'" font-weight="600" fill="'+s.cut+'">'+esc(nm)+'</text>';
+    if(dates) g+='<text x="150" y="'+(y+26)+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="13" fill="'+s.cut+'">'+esc(dates)+'</text>';
+    return g+'</svg>';
+  }
+
   var SETS=[
-    {form:"upright",stone:"grey",title:"The traditional one",
-     why:"A shape that reads as permanent, with what mattered marked plainly. This is what most families choose, and it's never wrong."},
-    {form:"serpentine",stone:"rose",title:"The personal one",
+    {key:"upright",form:"upright",title:"The traditional one",
+     why:"A shape that reads as permanent. This is what most families choose, and it's never wrong."},
+    {key:"slant",form:"slant",title:"The personal one",
      why:"Warmer stone and a softer shape, so it looks less like a standard marker and more like a person."},
-    {form:"upright",stone:"black",title:"The quiet one",
+    {key:"black",form:"upright",title:"The quiet one",
      why:"Darker and simpler, carrying only what's needed — which is often exactly right."}
   ];
   function buildProofs(feats){
     var dates=(A.born&&A.died)?(A.born+" – "+A.died):(A.born||A.died||"");
     var nm=A.name||"Their Name";
-    var sets=SETS.map(function(p){return {form:p.form,stone:p.stone,title:p.title,why:p.why};});
-    if (feats.indexOf("bench")!==-1) sets[1].form="bench";
+    var sets=SETS.map(function(p){return {key:p.key,form:p.form,title:p.title,why:p.why};});
+    if(feats.indexOf("bench")!==-1) sets[1].form="bench";
     $("q6").textContent="Three ways to remember "+nm.split(" ")[0]+".";
-    $("sub6").textContent="Built from what you told us. Choose one, or ask for three more.";
+    $("sub6").textContent="Built from what you told us. Tap a memorial to see what it costs.";
     $("proofs").innerHTML=sets.map(function(p){
+      var b=BASES[p.key], pr=priceFor(p.key,feats);
       var names=feats.map(function(f){var it=item(f);return it?it.t:"";}).filter(Boolean).slice(0,5);
-      return '<div class="proof"><div class="canvas">'+proofSvg(p.form,p.stone,feats,nm,dates)+"</div>"+
-        '<div class="meta"><h3>'+esc(p.title)+"</h3><p>"+esc(p.why)+"</p><ul>"+
-        names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+"</ul></div></div>";
+      var rows=pr.lines.map(function(l){return "<tr><td>"+esc(l[0])+"</td><td>"+esc(l[1])+"</td></tr>";}).join("");
+      var q=pr.quotes.length
+        ? '<tr><td colspan="2" class="quote">'+esc(pr.quotes.join(", "))+" &mdash; priced by the monument company</td></tr>" : "";
+      return '<button class="proof" data-proof="'+p.key+'" aria-expanded="false">'+
+        '<span class="canvas">'+svgFor(p.key,p.form,feats,nm,dates)+
+          '<span class="tapme">Tap for price</span></span>'+
+        '<span class="meta"><h3>'+esc(p.title)+"</h3>"+
+          '<p class="stone">'+esc(b.stone)+" &middot; "+esc(b.cat)+"</p>"+
+          '<p class="why">'+esc(p.why)+"</p><ul>"+
+          names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+"</ul></span>"+
+        '<span class="price"><span class="price-in">'+
+          '<p class="price-total">'+money(pr.total)+"</p>"+
+          '<p class="price-est">Estimated, including setting</p>'+
+          "<table><tbody>"+rows+q+"</tbody></table></span></span></button>";
     }).join("");
     show(6);
   }
+  $("proofs").addEventListener("click", function(e){
+    var p=e.target.closest("[data-proof]"); if(!p) return;
+    var open=p.classList.toggle("open");
+    p.setAttribute("aria-expanded", open?"true":"false");
+  });
   $("proofBack").onclick=function(){ startCards(); };
 
   show(1); $("f-name").focus();
