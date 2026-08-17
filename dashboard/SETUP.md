@@ -40,10 +40,17 @@ Left sidebar → **SQL Editor** → **New query**.
 
 Open `dashboard/schema.sql` from this repo, copy the whole file, paste it in, and press **Run**.
 
+Then **New query** again, and do the same with `dashboard/access.sql`. That one sets up the four
+access tiers. Run it second — it depends on the tables the first file creates.
+
 You should see *Success. No rows returned.* That's correct — you just created empty tables.
 
-Check it worked: sidebar → **Table Editor**. You should see `funeral_homes`, `orders`, and
-`suppliers`.
+Check it worked: sidebar → **Table Editor**. You should see `funeral_homes`, `orders`,
+`suppliers`, `user_profiles`, `memorials`, `memorial_access` and `designs`.
+
+Your own account is promoted to **founder** automatically, because the trigger matches on
+`bhomer@healingpartners.us`. Everyone else who signs up starts as **family** and has to be promoted
+deliberately — nobody can grant themselves staff access just by registering.
 
 ## Step 4 — Turn on sign-in
 
