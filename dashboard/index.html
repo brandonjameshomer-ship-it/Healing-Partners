@@ -282,6 +282,14 @@
        clear() -> admin only
      Schema is in dashboard/schema.sql.
      ================================================================ */
+  /* ---- Supabase config. Paste both values from Project Settings -> API.
+     Leave them empty and the page runs in browser-only demo mode instead.
+     Both are safe to commit; Row Level Security is what protects the data.
+     See dashboard/SETUP.md. ---- */
+  var SUPABASE_URL  = "";
+  var SUPABASE_ANON = "";
+  var LIVE = !!(SUPABASE_URL && SUPABASE_ANON);
+
   var KEY = "healing-partners.orders.v1";
   var Store = {
     all: function(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; }

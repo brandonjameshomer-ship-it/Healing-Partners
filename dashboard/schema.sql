@@ -91,7 +91,70 @@ where o.status = 'started'
   and o.started_at < now() - interval '7 days'
 order by o.started_at;
 
--- Row level security. Healing Partners sees everything; a funeral home user
--- sees only their own rows. Enable before any real data goes in.
+-- Suppliers. Remember Them works with several monument companies, not one, and
+-- each has its own price sheet, markup, finish codes, alphabets and lead times.
+-- The design is captured in neutral terms and translated per supplier.
+create table if not exists suppliers (
+  id             uuid primary key default gen_random_uuid(),
+  name           text not null,
+  address        text,
+  phone          text,
+  fax            text,
+  email          text,
+  website        text,
+  logo_url       text,
+  contact_main   text,
+  contact_alt    text,
+
+  markup         numeric not null default 2.5,   -- wholesale -> retail
+  -- Their own vocabulary, so the order form speaks their language.
+  finish_codes   jsonb,   -- {"P2":"polish front and back", ...}
+  granite_cats   jsonb,   -- {"Cat 1":["Georgia Gray", ...], ...}
+  alphabets      jsonb,   -- their typeface catalogue names
+  borders        jsonb,   -- their border catalogue names
+  min_stroke_in  numeric, -- thinnest line they will cut
+  cut_depth_in   jsonb,   -- {"min":0.0625,"max":0.1875}
+  lead_time_note text,
+  proofs_included boolean not null default false,  -- AFM: true. Others: ask.
+
+  active         boolean not null default true,
+  created_at     timestamptz not null default now()
+);
+
+alter table orders add column if not exists supplier_id uuid references suppliers(id);
+
+-- Row level security. Nothing is readable until a policy allows it, which is
+-- why an empty table right after setup is correct rather than broken.
 alter table orders        enable row level security;
 alter table funeral_homes enable row level security;
+alter table suppliers     enable row level security;
+
+-- Start simple: any signed-in user can read and write. Tighten to per-home
+-- access once funeral home staff have their own logins.
+create policy "signed in can read orders"    on orders
+  for select to authenticated using (true);
+create policy "signed in can write orders"   on orders
+  for insert to authenticated with check (true);
+create policy "signed in can update orders"  on orders
+  for update to authenticated using (true);
+
+create policy "signed in can read homes"     on funeral_homes
+  for select to authenticated using (true);
+create policy "signed in can write homes"    on funeral_homes
+  for all to authenticated using (true) with check (true);
+
+create policy "signed in can read suppliers" on suppliers
+  for select to authenticated using (true);
+create policy "signed in can write suppliers" on suppliers
+  for all to authenticated using (true) with check (true);
+
+-- Seed the supplier you already have.
+insert into suppliers (name, address, phone, fax, email, contact_main, markup, proofs_included,
+                       finish_codes, lead_time_note)
+values ('Affordable Family Memorials',
+        '6615 SE Harold St, Portland, OR 97206',
+        '503-515-7640', '503-772-3691', 'afmemorials@comcast.net',
+        'Angie & Jason Pope', 2.5, true,
+        '{"P2":"polish front and back of tablet","P3":"back, front and top","P5":"all polish"}'::jsonb,
+        'Standard granite 3-4 months. India/China 7-10 months. Bronze ~10 weeks, in parallel.')
+on conflict do nothing;
