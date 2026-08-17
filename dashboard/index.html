@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Orders — Healing Partners</title>
+<style>
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --ok:#2F6B4F; --ok-soft:#E4F0EA;
+    --warn:#A3352F; --warn-soft:#F7E4E2;
+    --info:#3A4560; --info-soft:#E6EAF2;
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:.9375rem; --f-lg:1.0625rem;
+    --f-xl:1.25rem; --f-2xl:1.625rem; --f-3xl:2.25rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06;
+      --ok:#7EC49E; --ok-soft:#1D3329;
+      --warn:#E08078; --warn-soft:#3A2321;
+      --info:#9AA8C6; --info-soft:#222941;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06;
+    --ok:#7EC49E; --ok-soft:#1D3329;
+    --warn:#E08078; --warn-soft:#3A2321;
+    --info:#9AA8C6; --info-soft:#222941;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink);
+         font-family:var(--sans); font-size:var(--f-base); line-height:1.55;
+         -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:76rem; margin:0 auto; padding:0 1.5rem; }
+
+  header.top { border-bottom:1px solid var(--line); background:var(--surface); }
+  .top-in { max-width:76rem; margin:0 auto; padding:1rem 1.5rem;
+            display:flex; align-items:baseline; gap:.625rem; flex-wrap:wrap; }
+  .top-in h1 { font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+               margin:0; letter-spacing:-.01em; }
+  .top-in .parent { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+                    color:var(--ink-3); border-left:1px solid var(--line-strong);
+                    padding-left:.625rem; }
+  .top-in .month { margin-left:auto; font-size:var(--f-sm); color:var(--ink-2); }
+
+  .banner { background:var(--warn-soft); border-bottom:1px solid var(--warn);
+            font-size:var(--f-sm); color:var(--ink); }
+  .banner .wrap { padding:.75rem 1.5rem; }
+  .banner b { color:var(--warn); }
+
+  section { padding:2rem 0; }
+  h2.sec { font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+           margin:0 0 .375rem; letter-spacing:-.015em; }
+  p.note { color:var(--ink-2); font-size:var(--f-sm); margin:0 0 1.25rem; max-width:44rem; }
+
+  /* summary tiles */
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));
+           gap:1rem; margin-bottom:1.5rem; }
+  .tile { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+          padding:1.125rem 1.25rem; box-shadow:var(--shadow); }
+  .tile .k { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.1em;
+             color:var(--ink-3); margin:0 0 .375rem; }
+  .tile .v { font-family:var(--serif); font-size:var(--f-3xl); font-weight:600;
+             line-height:1; letter-spacing:-.025em; margin:0;
+             font-variant-numeric:tabular-nums; }
+  .tile .s { font-size:var(--f-xs); color:var(--ink-3); margin:.375rem 0 0; }
+  .tile.flag { border-color:var(--warn); }
+  .tile.flag .v { color:var(--warn); }
+  .tile.good .v { color:var(--ok); }
+
+  /* table */
+  .tblwrap { overflow-x:auto; background:var(--surface); border:1px solid var(--line);
+             border-radius:var(--radius); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
+  thead th { text-align:left; font-size:var(--f-xs); text-transform:uppercase;
+             letter-spacing:.08em; color:var(--ink-3); font-weight:600;
+             padding:.875rem 1rem; border-bottom:1px solid var(--line-strong);
+             white-space:nowrap; background:var(--surface-2); }
+  tbody td { padding:.875rem 1rem; border-bottom:1px solid var(--line); color:var(--ink-2);
+             vertical-align:top; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover { background:var(--surface-2); }
+  td.name { color:var(--ink); font-weight:550; white-space:nowrap; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.date { font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink-3); }
+
+  .pill { display:inline-block; font-size:var(--f-xs); font-weight:600; padding:.2rem .55rem;
+          border-radius:999px; white-space:nowrap; }
+  .p-started { background:var(--info-soft); color:var(--info); }
+  .p-submitted { background:var(--accent-soft); color:var(--accent-ink); }
+  .p-proof, .p-approved { background:var(--accent-soft); color:var(--accent-ink); }
+  .p-production { background:var(--info-soft); color:var(--info); }
+  .p-set { background:var(--ok-soft); color:var(--ok); }
+  .p-stale { background:var(--warn-soft); color:var(--warn); }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .p-submitted,
+    :root:not([data-theme="light"]) .p-proof,
+    :root:not([data-theme="light"]) .p-approved { color:var(--accent); }
+  }
+  :root[data-theme="dark"] .p-submitted,
+  :root[data-theme="dark"] .p-proof,
+  :root[data-theme="dark"] .p-approved { color:var(--accent); }
+
+  button, select, input { font:inherit; }
+  .btn { padding:.5rem .875rem; border-radius:var(--radius); cursor:pointer;
+         border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent);
+                 color:var(--on-accent); font-weight:600; }
+  .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
+  :is(button,select,input):focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  select.status { border:1px solid var(--line); background:var(--surface); color:var(--ink);
+                  border-radius:8px; padding:.3rem .5rem; font-size:var(--f-xs); }
+
+  .toolbar { display:flex; gap:.625rem; align-items:center; flex-wrap:wrap; margin-bottom:1rem; }
+  .toolbar .spacer { margin-left:auto; }
+
+  /* rollup */
+  .rollup td.num { color:var(--ink); }
+  .rollup tfoot td { font-weight:700; color:var(--ink); border-top:2px solid var(--line-strong);
+                     background:var(--surface-2); }
+
+  dialog { border:1px solid var(--line); border-radius:var(--radius); padding:0;
+           background:var(--surface); color:var(--ink); max-width:32rem; width:92vw;
+           box-shadow:0 24px 60px -20px rgba(0,0,0,.5); }
+  dialog::backdrop { background:rgba(16,20,38,.6); }
+  .dlg-in { padding:1.5rem; }
+  .dlg-in h3 { font-family:var(--serif); font-size:var(--f-xl); margin:0 0 1rem; }
+  .fld { display:flex; flex-direction:column; gap:.3rem; margin-bottom:.875rem; }
+  .fld label { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.08em;
+               color:var(--ink-3); }
+  .fld input, .fld select { border:1px solid var(--line-strong); border-radius:8px;
+                            padding:.55rem .7rem; background:var(--ground); color:var(--ink); }
+  .dlg-actions { display:flex; gap:.625rem; margin-top:1.25rem; }
+  .dlg-actions .spacer { margin-left:auto; }
+
+  footer.site { border-top:1px solid var(--line); background:var(--surface);
+                padding:1.5rem 0 3rem; font-size:var(--f-xs); color:var(--ink-3); }
+  code { font-family:var(--mono); font-size:.95em; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <h1>Orders</h1>
+    <span class="parent">Healing Partners</span>
+    <span class="month" id="monthLabel"></span>
+  </div>
+</header>
+
+<div class="banner">
+  <div class="wrap">
+    <b>Demo data, no sign-in yet.</b>
+    This page is public on GitHub Pages, so it must not hold real family or funeral home data until
+    authentication is connected. Everything below lives in this browser only.
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2 class="sec">This month</h2>
+    <p class="note">Commission is charged on the <b>retail</b> price. Each funeral home's rate is set
+      by how many memorials they created this month — 1&ndash;5&nbsp;&rarr;&nbsp;15%,
+      6&ndash;19&nbsp;&rarr;&nbsp;12%, 20+&nbsp;&rarr;&nbsp;10% — plus $150/month each.</p>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section>
+    <h2 class="sec">Commission by funeral home</h2>
+    <p class="note">Rate is recalculated from each home's own monthly volume. Subscription is
+      charged whether or not they ordered.</p>
+    <div class="tblwrap">
+      <table class="rollup">
+        <thead><tr>
+          <th>Funeral home</th><th class="num">Orders</th><th class="num">Rate</th>
+          <th class="num">Retail</th><th class="num">Commission</th>
+          <th class="num">Subscription</th><th class="num">Total owed</th>
+        </tr></thead>
+        <tbody id="rollupBody"></tbody>
+        <tfoot id="rollupFoot"></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">All orders</h2>
+    <p class="note">A design that was started but never submitted is the leak to watch — it usually
+      means the order was phoned in directly. Anything sitting in <b>Started</b> for more than a
+      week is flagged.</p>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="addBtn">Add an order</button>
+      <button class="btn" id="exportBtn">Export CSV</button>
+      <span class="spacer"></span>
+      <button class="btn" id="seedBtn">Reload sample data</button>
+      <button class="btn" id="clearBtn">Clear</button>
+    </div>
+    <div class="tblwrap">
+      <table>
+        <thead><tr>
+          <th>Started</th><th>Funeral home</th><th>Family</th><th>Memorial</th>
+          <th class="num">Retail</th><th class="num">Commission</th><th>Status</th>
+        </tr></thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    Healing Partners &middot; internal. Data is stored in this browser only
+    (<code>localStorage</code>). Replace <code>Store</code> in the source with Supabase calls to
+    make it real &mdash; the rest of the page does not change.
+  </div>
+</footer>
+
+<dialog id="dlg">
+  <form method="dialog" class="dlg-in" id="addForm">
+    <h3>Add an order</h3>
+    <div class="fld"><label for="i-home">Funeral home</label>
+      <input id="i-home" required placeholder="Riverside Family Funeral Home"></div>
+    <div class="fld"><label for="i-family">Family</label>
+      <input id="i-family" required placeholder="Alvarez"></div>
+    <div class="fld"><label for="i-memorial">Memorial</label>
+      <input id="i-memorial" required placeholder="Upright, Academy Black, 24×6×24"></div>
+    <div class="fld"><label for="i-retail">Retail price (what the family pays)</label>
+      <input id="i-retail" type="number" min="0" step="1" required placeholder="6425"></div>
+    <div class="fld"><label for="i-status">Status</label>
+      <select id="i-status">
+        <option value="started">Started</option>
+        <option value="submitted">Submitted to supplier</option>
+        <option value="proof">Proof sent</option>
+        <option value="approved">Approved</option>
+        <option value="production">In production</option>
+        <option value="set">Set / installed</option>
+      </select></div>
+    <div class="dlg-actions">
+      <button class="btn" value="cancel" formnovalidate>Cancel</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="saveBtn" value="save">Add order</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+
+  /* ================================================================
+     Store — the ONLY place data is read or written.
+     Swap these four methods for Supabase and nothing else changes:
+       all()  -> await supabase.from('orders').select()
+       add(o) -> await supabase.from('orders').insert(o)
+       set(id,patch) -> ...update(patch).eq('id',id)
+       clear() -> admin only
+     Schema is in dashboard/schema.sql.
+     ================================================================ */
+  var KEY = "healing-partners.orders.v1";
+  var Store = {
+    all: function(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+                     catch(e){ return []; } },
+    save: function(rows){ try { localStorage.setItem(KEY, JSON.stringify(rows)); } catch(e){} },
+    add: function(o){ var r=Store.all(); r.unshift(o); Store.save(r); },
+    set: function(id, patch){
+      var r=Store.all();
+      for (var i=0;i<r.length;i++) if (r[i].id===id) Object.assign(r[i], patch);
+      Store.save(r);
+    },
+    clear: function(){ Store.save([]); }
+  };
+
+  var SUBSCRIPTION = 150;
+  function rateFor(count){ return count >= 20 ? 0.10 : count >= 6 ? 0.12 : 0.15; }
+  var STATUS = { started:"Started", submitted:"Submitted", proof:"Proof sent",
+                 approved:"Approved", production:"In production", set:"Set / installed" };
+  var COUNTED = ["submitted","proof","approved","production","set"];   // started is NOT an order yet
+
+  function daysSince(iso){ return Math.floor((Date.now() - new Date(iso)) / 86400000); }
+  function thisMonth(iso){
+    var d=new Date(iso), n=new Date();
+    return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth();
+  }
+
+  function sample(){
+    var now=new Date(), rows=[], id=1;
+    function mk(homeName, family, memorial, retail, status, daysAgo){
+      var d=new Date(now.getTime() - daysAgo*86400000);
+      rows.push({ id:"o"+(id++), started:d.toISOString(), home:homeName, family:family,
+                  memorial:memorial, retail:retail, status:status });
+    }
+    mk("Riverside Family Funeral Home","Alvarez","Upright, Blue Pearl, 24×6×24",8563,"production",22);
+    mk("Riverside Family Funeral Home","Whitmore","Companion upright, Barre Gray",12570,"approved",18);
+    mk("Riverside Family Funeral Home","Nguyen","Bevel, Academy Black, 24×12",2275,"submitted",9);
+    mk("Riverside Family Funeral Home","Okafor","Slant, Colonial Rose, 24×16",4000,"proof",6);
+    mk("Riverside Family Funeral Home","Bell","Flat, Georgia Gray, 24×12",1363,"started",11);
+    mk("Cedar Hill Memorial Chapel","Ramirez","Upright, Academy Black, 36×6×24",5188,"set",26);
+    mk("Cedar Hill Memorial Chapel","Kowalski","Bevel, Barre Gray, 36×12",3250,"production",15);
+    mk("Cedar Hill Memorial Chapel","Duarte","Flat, Sierra White, 20×10",1063,"started",3);
+    mk("Millbrook Funeral Home","Petrov","Upright, Jet Mist, 24×6×30",4188,"submitted",4);
+    return rows;
+  }
+
+  function render(){
+    var rows = Store.all();
+    var now = new Date();
+    $("monthLabel").textContent = now.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+
+    var month = rows.filter(function(r){ return thisMonth(r.started); });
+    var counted = month.filter(function(r){ return COUNTED.indexOf(r.status)!==-1; });
+    var started = month.filter(function(r){ return r.status==="started"; });
+    var stale = started.filter(function(r){ return daysSince(r.started) > 7; });
+
+    /* per-home rollup — rate depends on that home's own volume */
+    var homes = {};
+    month.forEach(function(r){
+      var h = homes[r.home] || (homes[r.home] = { orders:0, retail:0 });
+      if (COUNTED.indexOf(r.status)!==-1){ h.orders++; h.retail += Number(r.retail)||0; }
+    });
+    var names = Object.keys(homes).sort();
+    var totRetail=0, totComm=0, totSubs=0, totOrders=0;
+    $("rollupBody").innerHTML = names.map(function(n){
+      var h=homes[n], rate=rateFor(h.orders), comm=h.retail*rate;
+      totRetail+=h.retail; totComm+=comm; totSubs+=SUBSCRIPTION; totOrders+=h.orders;
+      return "<tr><td class='name'>"+esc(n)+"</td>"+
+        "<td class='num'>"+h.orders+"</td>"+
+        "<td class='num'>"+Math.round(rate*100)+"%</td>"+
+        "<td class='num'>"+money(h.retail)+"</td>"+
+        "<td class='num'>"+money(comm)+"</td>"+
+        "<td class='num'>"+money(SUBSCRIPTION)+"</td>"+
+        "<td class='num'>"+money(comm+SUBSCRIPTION)+"</td></tr>";
+    }).join("") || "<tr><td colspan='7' style='text-align:center;padding:2rem'>No orders yet this month.</td></tr>";
+    $("rollupFoot").innerHTML = names.length
+      ? "<tr><td>Total</td><td class='num'>"+totOrders+"</td><td class='num'>&mdash;</td>"+
+        "<td class='num'>"+money(totRetail)+"</td><td class='num'>"+money(totComm)+"</td>"+
+        "<td class='num'>"+money(totSubs)+"</td><td class='num'>"+money(totComm+totSubs)+"</td></tr>" : "";
+
+    /* tiles */
+    var owed = totComm + totSubs;
+    $("tiles").innerHTML =
+      tile("Orders submitted", counted.length, names.length+" funeral homes") +
+      tile("Retail booked", money(totRetail), "what families are paying") +
+      tile("Commission owed", money(totComm), "on retail, per home tier", "good") +
+      tile("Plus subscriptions", money(totSubs), names.length+" × $150") +
+      tile("Total owed to you", money(owed), "this month", "good") +
+      tile("Started, not submitted", started.length,
+           stale.length ? stale.length+" older than a week" : "none stale",
+           stale.length ? "flag" : "");
+
+    /* orders table */
+    $("ordersBody").innerHTML = rows.map(function(r){
+      var isStale = r.status==="started" && daysSince(r.started)>7;
+      var homeCount = homes[r.home] ? homes[r.home].orders : 0;
+      var comm = COUNTED.indexOf(r.status)!==-1
+        ? money((Number(r.retail)||0) * rateFor(homeCount)) : "—";
+      var opts = Object.keys(STATUS).map(function(k){
+        return "<option value='"+k+"'"+(k===r.status?" selected":"")+">"+STATUS[k]+"</option>";
+      }).join("");
+      return "<tr><td class='date'>"+new Date(r.started).toLocaleDateString("en-US",
+                {month:"short",day:"numeric"})+"</td>"+
+        "<td class='name'>"+esc(r.home)+"</td>"+
+        "<td>"+esc(r.family)+"</td>"+
+        "<td>"+esc(r.memorial)+"</td>"+
+        "<td class='num'>"+money(r.retail)+"</td>"+
+        "<td class='num'>"+comm+"</td>"+
+        "<td>"+(isStale?"<span class='pill p-stale'>Stale "+daysSince(r.started)+"d</span> ":"")+
+          "<select class='status' data-id='"+r.id+"'>"+opts+"</select></td></tr>";
+    }).join("") || "<tr><td colspan='7' style='text-align:center;padding:2rem'>No orders. Add one, or load the sample data.</td></tr>";
+  }
+
+  function tile(k,v,s,cls){
+    return "<div class='tile "+(cls||"")+"'><p class='k'>"+esc(k)+"</p>"+
+           "<p class='v'>"+esc(String(v))+"</p><p class='s'>"+esc(s||"")+"</p></div>";
+  }
+
+  document.addEventListener("change", function(e){
+    var s=e.target.closest("select.status"); if(!s) return;
+    Store.set(s.getAttribute("data-id"), { status:s.value }); render();
+  });
+
+  $("addBtn").onclick=function(){ $("dlg").showModal(); };
+  $("addForm").addEventListener("submit", function(e){
+    if (e.submitter && e.submitter.value==="cancel") return;
+    Store.add({ id:"o"+Date.now(), started:new Date().toISOString(),
+      home:$("i-home").value.trim(), family:$("i-family").value.trim(),
+      memorial:$("i-memorial").value.trim(), retail:Number($("i-retail").value)||0,
+      status:$("i-status").value });
+    $("addForm").reset(); render();
+  });
+
+  $("seedBtn").onclick=function(){ Store.save(sample()); render(); };
+  $("clearBtn").onclick=function(){
+    if (confirm("Clear all orders from this browser?")) { Store.clear(); render(); }
+  };
+  $("exportBtn").onclick=function(){
+    var rows=Store.all();
+    var head=["Started","Funeral home","Family","Memorial","Retail","Status"];
+    var csv=[head.join(",")].concat(rows.map(function(r){
+      return [new Date(r.started).toISOString().slice(0,10), r.home, r.family, r.memorial,
+              r.retail, STATUS[r.status]||r.status]
+        .map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(",");
+    })).join("\n");
+    var a=document.createElement("a");
+    a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+    a.download="healing-partners-orders.csv"; a.click();
+  };
+
+  if (Store.all().length===0) Store.save(sample());
+  render();
+})();
+</script>
+</body>
+</html>
