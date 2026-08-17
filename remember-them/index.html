@@ -318,11 +318,29 @@
     humour:/\b(laugh|joke|funny|humou?r|tease|grin|smil)\b/i
   };
   function readStory(t){ var out=[]; for (var k in KEYS) if (KEYS[k].test(t)) out.push(k); return out; }
+  /* CLICK BUDGET — 10 taps to a finished design, and never more:
+       1  name + dates
+       1  their story
+       2  follow-ups        <- capped at 2
+       5  suggestions       <- capped at 5
+       1  choose a proof
+      ---
+      10  total
+     Because at most 5 suggestions can be kept, the pairwise round can never
+     be needed on top of that. Going back costs nothing and is always allowed. */
+  var MAX_FOLLOWUPS = 2, MAX_SUGGESTIONS = 5, CLICK_BUDGET = 10;
+  var clicks = 0;
+  function spend(){ clicks++; paintBudget(); }
+  function paintBudget(){
+    var left = Math.max(0, CLICK_BUDGET - clicks);
+    $("budget").textContent = left === 0 ? "Last one" : left + " to go";
+  }
+
   function chooseFollowUps(tags){
     var qs=[];
-    for (var i=0;i<tags.length && qs.length<2;i++) qs.push(QUESTION_BANK[tags[i]][0]);
+    for (var i=0;i<tags.length && qs.length<MAX_FOLLOWUPS;i++) qs.push(QUESTION_BANK[tags[i]][0]);
     var g=QUESTION_BANK.general;
-    for (var j=0; qs.length<3 && j<g.length; j++) if (qs.indexOf(g[j])===-1) qs.push(g[j]);
+    for (var j=0; qs.length<MAX_FOLLOWUPS && j<g.length; j++) if (qs.indexOf(g[j])===-1) qs.push(g[j]);
     return qs;
   }
 
