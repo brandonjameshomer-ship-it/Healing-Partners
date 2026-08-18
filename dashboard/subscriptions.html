@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Subscriptions — Healing Partners</title>
+<style>
+
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --ok:#2F6B4F; --ok-soft:#E4F0EA;
+    --warn:#A3352F; --warn-soft:#F7E4E2;
+    --info:#3A4560; --info-soft:#E6EAF2;
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:.9375rem; --f-lg:1.0625rem;
+    --f-xl:1.25rem; --f-2xl:1.625rem; --f-3xl:2.25rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06;
+      --ok:#7EC49E; --ok-soft:#1D3329;
+      --warn:#E08078; --warn-soft:#3A2321;
+      --info:#9AA8C6; --info-soft:#222941;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06;
+    --ok:#7EC49E; --ok-soft:#1D3329;
+    --warn:#E08078; --warn-soft:#3A2321;
+    --info:#9AA8C6; --info-soft:#222941;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  /* --warn is this palette's red. Alias it once so every theme state follows,
+     and reserve the accent for "needs a look" as distinct from "act now". */
+  :root { --danger:var(--warn); --danger-soft:var(--warn-soft); }
+
+  * { box-sizing:border-box; }
+    /* --warn is this palette's red. Alias it once so every theme state follows,
+     and reserve the accent for "needs a look" as distinct from "act now". */
+  :root { --danger:var(--warn); --danger-soft:var(--warn-soft); }
+
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink);
+         font-family:var(--sans); font-size:var(--f-base); line-height:1.55;
+         -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:74rem; margin:0 auto; padding:0 1.5rem; }
+  h1,h2 { font-family:var(--serif); font-weight:600; letter-spacing:-.015em; margin:0; }
+  :focus-visible { outline:3px solid var(--accent); outline-offset:2px; border-radius:4px; }
+
+  header.top { background:var(--surface); border-bottom:1px solid var(--line); }
+  .top-in { max-width:74rem; margin:0 auto; padding:1.125rem 1.5rem;
+            display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+  .top-in h1 { font-size:var(--f-xl); margin-right:auto; }
+  .top-in h1 span { font-family:var(--sans); font-size:var(--f-xs); font-weight:600;
+                    text-transform:uppercase; letter-spacing:.12em; color:var(--ink-3);
+                    margin-left:.625rem; }
+  .mode { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.1em;
+          font-weight:700; padding:.3125rem .625rem; border-radius:999px;
+          background:var(--surface-2); color:var(--ink-3); }
+  .mode.demo { background:var(--accent-soft); color:var(--accent-ink); }
+
+  .btn { display:inline-flex; align-items:center; gap:.4375rem; padding:.5625rem 1rem;
+         min-height:2.625rem; border-radius:10px; border:1px solid var(--line-strong);
+         background:var(--surface); color:var(--ink); font:inherit; font-size:var(--f-sm);
+         font-weight:600; cursor:pointer; text-decoration:none; }
+  .btn:hover { border-color:var(--accent); }
+  .btn-primary { background:var(--accent); color:var(--on-accent); border-color:transparent; }
+  .btn-sm { padding:.375rem .75rem; min-height:2.125rem; font-size:var(--f-xs); }
+
+  section { padding:2rem 0; }
+  h2.sec { font-size:var(--f-lg); margin-bottom:1rem; }
+  h2.sec small { font-family:var(--sans); font-size:var(--f-sm); font-weight:400;
+                 color:var(--ink-3); margin-left:.625rem; letter-spacing:0; }
+
+  /* ---- summary tiles ---- */
+  .tiles { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); }
+  .tile { background:var(--surface); border:1px solid var(--line); border-radius:14px;
+          padding:1.25rem; }
+  .tile .k { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.1em;
+             font-weight:600; color:var(--ink-3); margin-bottom:.5rem; }
+  .tile .v { font-family:var(--serif); font-size:2rem; line-height:1;
+             font-variant-numeric:tabular-nums; }
+  .tile .s { font-size:var(--f-xs); color:var(--ink-3); margin-top:.4375rem; }
+  .tile.money { border-color:var(--accent); }
+  .tile.money .v { color:var(--accent-ink); }
+  .tile.alarm { border-color:var(--danger); background:var(--danger-soft); }
+  .tile.alarm .v, .tile.alarm .k { color:var(--danger); }
+
+  /* ---- attention queue ---- */
+  .queue { display:grid; gap:.75rem; }
+  .q { display:flex; gap:1rem; align-items:center; flex-wrap:wrap;
+       background:var(--surface); border:1px solid var(--line);
+       border-left:3px solid var(--accent); border-radius:12px; padding:1rem 1.25rem; }
+  .q.urgent { border-left-color:var(--danger); }
+  .q .who { font-weight:600; }
+  .q .issue { font-size:var(--f-sm); color:var(--ink-2); }
+  .q .when { font-size:var(--f-xs); color:var(--ink-3); margin-left:auto;
+             font-variant-numeric:tabular-nums; }
+  .q .act { display:flex; gap:.5rem; }
+  .empty { background:var(--surface); border:1px dashed var(--line-strong);
+           border-radius:12px; padding:2rem; text-align:center; color:var(--ink-3);
+           font-size:var(--f-sm); }
+
+  /* ---- table ---- */
+  .tw { background:var(--surface); border:1px solid var(--line); border-radius:14px;
+        overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
+  th, td { text-align:left; padding:.8125rem 1rem; border-bottom:1px solid var(--line);
+           white-space:nowrap; }
+  th { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.08em;
+       color:var(--ink-3); font-weight:600; background:var(--surface-2); }
+  tbody tr:last-child td { border-bottom:none; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  th.num { text-align:right; }
+
+  .pill { display:inline-block; font-size:var(--f-xs); font-weight:700;
+          text-transform:uppercase; letter-spacing:.06em; padding:.25rem .5625rem;
+          border-radius:999px; }
+  .p-trialing { background:var(--accent-soft); color:var(--accent-ink); }
+  .p-active   { background:var(--ok-soft);     color:var(--ok); }
+  .p-past_due, .p-unpaid { background:var(--danger-soft); color:var(--danger); }
+  .p-canceled, .p-incomplete, .p-incomplete_expired, .p-paused {
+                background:var(--surface-2);  color:var(--ink-3); }
+
+  .unclaimed { font-size:var(--f-xs); font-weight:700; color:var(--danger); }
+  .note { font-size:var(--f-sm); color:var(--ink-2); max-width:44rem; margin-top:.75rem; }
+  footer { border-top:1px solid var(--line); padding:2rem 0 3rem; color:var(--ink-3);
+           font-size:var(--f-sm); }
+  footer a { color:var(--ink-2); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <h1>Subscriptions<span>Healing Partners</span></h1>
+    <span class="mode" id="mode"></span>
+    <a class="btn" href="./">Orders</a>
+    <button class="btn" id="refreshBtn" type="button">Refresh</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2 class="sec">Where the business stands</h2>
+    <div class="tiles" id="tiles"></div>
+    <p class="note" id="mrrNote"></p>
+  </section>
+
+  <section>
+    <h2 class="sec">Needs you today <small>card declined, trial converting, or paid but not set up</small></h2>
+    <div class="queue" id="queue"></div>
+  </section>
+
+  <section>
+    <h2 class="sec">Every subscription</h2>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Funeral home</th>
+            <th scope="col">Contact</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="num">Monthly</th>
+            <th scope="col">Trial ends</th>
+            <th scope="col">Renews</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="note" id="tableNote"></p>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    Subscription revenue only. Marker commission is on the
+    <a href="./">orders dashboard</a>, and the two are never added together.
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g,
+    function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function money(n){ return "$" + Math.round(Number(n) || 0).toLocaleString("en-US"); }
+
+  /* ---- Supabase config. Paste both from Project Settings -> API.
+     Leave empty and the page runs on sample data instead.
+     Both are safe to commit; Row Level Security protects the rows. ---- */
+  var SUPABASE_URL  = "";
+  var SUPABASE_ANON = "";
+  var LIVE = !!(SUPABASE_URL && SUPABASE_ANON);
+
+  var STATUS_LABEL = {
+    trialing:"On trial", active:"Paying", past_due:"Card declined",
+    unpaid:"Unpaid", canceled:"Cancelled", paused:"Paused",
+    incomplete:"Incomplete", incomplete_expired:"Expired"
+  };
+
+  function days(iso){
+    if (!iso) return null;
+    return Math.round((new Date(iso) - new Date()) / 86400000);
+  }
+  function when(iso){
+    if (!iso) return "—";
+    var d = days(iso);
+    if (d === 0)  return "today";
+    if (d === 1)  return "tomorrow";
+    if (d > 0)    return "in " + d + " days";
+    return Math.abs(d) + " days ago";
+  }
+  function ago(iso){
+    if (!iso) return "";
+    var d = Math.abs(days(iso));
+    return d === 0 ? "today" : d === 1 ? "1 day" : d + " days";
+  }
+
+  /* ================================================================
+     Sample data. Deliberately includes the three states that hurt:
+     an unclaimed trial, a declined card, and a trial converting
+     tomorrow — because a dashboard that only shows the happy path
+     never gets designed for the day something goes wrong.
+     ================================================================ */
+  function sample(){
+    function iso(d){ return new Date(Date.now() + d*86400000).toISOString(); }
+    return [
+      { id:"s1", home_name:"Riverside Family Funeral Home", funeral_home_id:"fh1",
+        contact_name:"Dana Whitfield", email:"dana@riversidefh.example",
+        status:"active", amount:150, trial_ends_at:iso(-61), current_period_end:iso(12),
+        cancel_at_period_end:false, created_at:iso(-64) },
+      { id:"s2", home_name:"Cedar Hill Memorial Chapel", funeral_home_id:"fh2",
+        contact_name:"Marcus Bell", email:"m.bell@cedarhill.example",
+        status:"active", amount:150, trial_ends_at:iso(-33), current_period_end:iso(26),
+        cancel_at_period_end:false, created_at:iso(-36) },
+      { id:"s3", home_name:"Millbrook Funeral Home", funeral_home_id:"fh3",
+        contact_name:"Ruth Okonkwo", email:"office@millbrookfh.example",
+        status:"past_due", amount:150, trial_ends_at:iso(-90), current_period_end:iso(-3),
+        cancel_at_period_end:false, created_at:iso(-93) },
+      { id:"s4", home_name:"Fairwood & Sons", funeral_home_id:null,
+        contact_name:"Peter Fairwood", email:"peter@fairwoodandsons.example",
+        status:"trialing", amount:150, trial_ends_at:iso(1), current_period_end:iso(1),
+        cancel_at_period_end:false, created_at:iso(-2) },
+      { id:"s5", home_name:null, funeral_home_id:null,
+        contact_name:null, email:"jhalloran@gmail.example",
+        status:"trialing", amount:150, trial_ends_at:iso(2), current_period_end:iso(2),
+        cancel_at_period_end:false, created_at:iso(-1) },
+      { id:"s6", home_name:"Northgate Funeral Care", funeral_home_id:"fh4",
+        contact_name:"Alicia Reyes", email:"areyes@northgate.example",
+        status:"canceled", amount:150, trial_ends_at:iso(-120), current_period_end:iso(-8),
+        cancel_at_period_end:true, created_at:iso(-123) }
+    ];
+  }
+
+  var rows = [];
+
+  async function load(){
+    if (!LIVE) { rows = sample(); return; }
+    /* Live path. Requires @supabase/supabase-js on the page and a signed-in
+       founder; RLS returns nothing to anyone else. See dashboard/SETUP.md.
+         const { data } = await supabase.from('subscriptions').select('*');
+         rows = data || []; */
+    rows = sample();
+  }
+
+  /* ---- summary ---------------------------------------------------- */
+  function paint(){
+    var paying   = rows.filter(function(r){ return r.status === "active"; });
+    var trialing = rows.filter(function(r){ return r.status === "trialing"; });
+    var atRisk   = rows.filter(function(r){ return r.status === "past_due" || r.status === "unpaid"; });
+    var orphan   = rows.filter(function(r){ return !r.funeral_home_id &&
+                     (r.status === "trialing" || r.status === "active"); });
+
+    var mrr      = paying.reduce(function(a,r){ return a + (Number(r.amount)||0); }, 0);
+    var pipeline = trialing.reduce(function(a,r){ return a + (Number(r.amount)||0); }, 0);
+
+    var t = [
+      { k:"Paying now",  v:paying.length,   s:"funeral homes", cls:"" },
+      { k:"Monthly revenue", v:money(mrr),  s:"from paying homes only", cls:"money" },
+      { k:"On trial",    v:trialing.length, s:money(pipeline) + " if they all convert", cls:"" },
+      { k:"At risk",     v:atRisk.length,   s:"declined or unpaid",
+        cls:atRisk.length ? "alarm" : "" },
+      { k:"Not set up",  v:orphan.length,   s:"paid, no funeral home yet",
+        cls:orphan.length ? "alarm" : "" }
+    ];
+
+    $("tiles").innerHTML = t.map(function(x){
+      return '<div class="tile ' + x.cls + '">' +
+             '<div class="k">' + esc(x.k) + '</div>' +
+             '<div class="v">' + esc(x.v) + '</div>' +
+             '<div class="s">' + esc(x.s) + '</div></div>';
+    }).join("");
+
+    $("mrrNote").textContent =
+      "Monthly revenue counts only homes actually being charged. Trials are shown "
+      + "separately and deliberately excluded — they have not paid yet, and adding "
+      + "them in is how a number stops being true.";
+
+    paintQueue(atRisk, trialing, orphan);
+    paintTable();
+  }
+
+  /* ---- the queue -------------------------------------------------- */
+  function paintQueue(atRisk, trialing, orphan){
+    var items = [];
+
+    atRisk.forEach(function(r){
+      items.push({ urgent:true, who:name(r),
+        issue:"Card declined " + ago(r.current_period_end) + " ago. Stripe will retry, "
+            + "then give up. Call them.",
+        when:when(r.current_period_end), r:r });
+    });
+
+    orphan.forEach(function(r){
+      items.push({ urgent:true, who:name(r),
+        issue:"Paid, but no funeral home record exists yet. They are a customer who "
+            + "cannot use anything.",
+        when:"waiting " + ago(r.created_at), r:r, claim:true });
+    });
+
+    trialing.forEach(function(r){
+      var d = days(r.trial_ends_at);
+      if (d !== null && d <= 1 && r.funeral_home_id) {
+        items.push({ urgent:false, who:name(r),
+          issue:"Trial converts " + when(r.trial_ends_at) + ". First $150 charge.",
+          when:when(r.trial_ends_at), r:r });
+      }
+    });
+
+    rows.filter(function(r){ return r.cancel_at_period_end && r.status !== "canceled"; })
+        .forEach(function(r){
+      items.push({ urgent:false, who:name(r),
+        issue:"Cancelling at the end of this period. Worth one conversation.",
+        when:when(r.current_period_end), r:r });
+    });
+
+    if (!items.length) {
+      $("queue").innerHTML = '<div class="empty">Nothing needs you. '
+        + 'Every subscription is current and every paying home is set up.</div>';
+      return;
+    }
+
+    $("queue").innerHTML = items.map(function(i){
+      return '<div class="q' + (i.urgent ? " urgent" : "") + '">'
+        + '<div><div class="who">' + esc(i.who) + '</div>'
+        + '<div class="issue">' + esc(i.issue) + '</div></div>'
+        + '<div class="when">' + esc(i.when) + '</div>'
+        + '<div class="act">'
+        + (i.r.email ? '<a class="btn btn-sm" href="mailto:' + esc(i.r.email) + '">Email</a>' : '')
+        + (i.claim ? '<button class="btn btn-sm btn-primary" data-claim="' + esc(i.r.id)
+                     + '" type="button">Set them up</button>' : '')
+        + '</div></div>';
+    }).join("");
+  }
+
+  function name(r){
+    return r.home_name || r.contact_name || r.email || "Unknown — check Stripe";
+  }
+
+  /* ---- table ------------------------------------------------------ */
+  function paintTable(){
+    var order = { past_due:0, unpaid:1, trialing:2, active:3, paused:4,
+                  canceled:5, incomplete:6, incomplete_expired:7 };
+    var sorted = rows.slice().sort(function(a,b){
+      return (order[a.status] ?? 9) - (order[b.status] ?? 9);
+    });
+
+    $("rows").innerHTML = sorted.map(function(r){
+      var unclaimed = !r.funeral_home_id &&
+                      (r.status === "trialing" || r.status === "active");
+      return "<tr>"
+        + "<td>" + esc(r.home_name || "—")
+        + (unclaimed ? ' <span class="unclaimed">NOT SET UP</span>' : "") + "</td>"
+        + "<td>" + esc(r.contact_name || r.email || "—") + "</td>"
+        + '<td><span class="pill p-' + esc(r.status) + '">'
+        + esc(STATUS_LABEL[r.status] || r.status) + "</span></td>"
+        + '<td class="num">' + money(r.amount) + "</td>"
+        + "<td>" + esc(r.status === "trialing" ? when(r.trial_ends_at) : "—") + "</td>"
+        + "<td>" + esc(r.status === "canceled" ? "—" : when(r.current_period_end)) + "</td>"
+        + "<td>" + (unclaimed
+            ? '<button class="btn btn-sm" data-claim="' + esc(r.id) + '" type="button">Set up</button>'
+            : "") + "</td>"
+        + "</tr>";
+    }).join("");
+
+    $("tableNote").textContent = LIVE
+      ? "Live from Stripe. Status changes arrive by webhook, usually within seconds."
+      : "Sample data. Paste your Supabase URL and anon key into this file to go live.";
+  }
+
+  /* ---- claiming --------------------------------------------------- */
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-claim]");
+    if (!b) return;
+    var r = rows.filter(function(x){ return x.id === b.getAttribute("data-claim"); })[0];
+    if (!r) return;
+
+    if (!LIVE) {
+      alert("Setting up " + name(r) + "\n\n"
+        + "Live, this creates their funeral home record and calls\n"
+        + "claim_subscription(subscription_id, funeral_home_id),\n"
+        + "which links the two and switches their access on.\n\n"
+        + "Only Healing Partners can do this — the function refuses\n"
+        + "anyone else, and refuses to move a link that already exists.");
+      return;
+    }
+    /* Live: create the funeral_homes row, then
+         await supabase.rpc('claim_subscription',
+           { p_subscription: r.id, p_home: newHomeId }); */
+  });
+
+  $("refreshBtn").addEventListener("click", function(){ load().then(paint); });
+
+  $("mode").textContent = LIVE ? "Live" : "Sample data";
+  $("mode").className = "mode" + (LIVE ? "" : " demo");
+  load().then(paint);
+})();
+</script>
+
+</body>
+</html>

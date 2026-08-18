@@ -225,13 +225,66 @@ supabase secrets set STRIPE_SECRET_KEY=sk_test_...
 In the dashboard, open your endpoint and use **Send test webhook**. A correct setup returns
 `200`, and the delivery log shows the response. This replaces `stripe listen` entirely.
 
-## One gap worth knowing about
+## The subscription side
 
-The handler currently understands **one-off payments** — the $50 VR upgrade. It does not yet
-understand **subscriptions**, which is what the $150/month trial creates. Until it does, a funeral
-home starting a trial will be charged correctly by Stripe, but nothing in the dashboard will record
-that they became a customer.
+Built. `dashboard/subscriptions.sql` holds the state, the webhook handles the events, and
+`dashboard/subscriptions.html` is where you look at it.
 
-Registering the subscription events above is step one; teaching `record_payment` to handle them is
-step two, and is not built yet. At low volume the Stripe dashboard is the source of truth in the
-meantime — but this should not stay true past the first few customers.
+**Run the SQL in order.** Each file depends on the ones before it:
+
+```
+schema.sql  ->  access.sql  ->  payments.sql  ->  subscriptions.sql
+```
+
+### The thing this is really built around
+
+When someone clicks *Start your 3-day free trial*, **there is no funeral home in your database
+yet**. They are a stranger with a card. Stripe takes their money and tells the webhook, and the
+subscription lands with `funeral_home_id` set to NULL.
+
+That is normal, not an error. But it means there is a person who has paid you and cannot use
+anything until you set them up. Two things make sure they are never lost:
+
+- **`subscriptions_unclaimed`** — a view listing exactly those people, oldest first, with how long
+  they have been waiting.
+- **The "Not set up" tile** on the subscriptions dashboard, which turns red the moment the count is
+  above zero.
+
+When you have spoken to them and created their funeral home record, `claim_subscription()` links
+the two. It is founder-only, and it refuses to move a link that already exists — so a subscription
+can never be quietly reassigned to the wrong home.
+
+### What each event does
+
+| Stripe event | Effect |
+|---|---|
+| `customer.subscription.created` | Trial starts. Row created, status `trialing`. |
+| `customer.subscription.updated` | Status change, named properly — `activated`, `past_due`, `canceled`. |
+| `customer.subscription.trial_will_end` | ~24h warning. Check they are set up before the charge. |
+| `invoice.paid` | The monthly $150 cleared. |
+| `invoice.payment_failed` | Card declined. Logged with the retry schedule. |
+| `customer.subscription.deleted` | Cancelled. |
+
+Register all six, plus `checkout.session.completed` and `charge.refunded` for the VR upgrade.
+
+### Access follows billing automatically
+
+`record_subscription()` sets `funeral_homes.active` from the subscription status: on for
+`trialing`, `active` and `past_due`, off for anything else. A home whose card fails keeps working
+while Stripe retries, and only loses access when Stripe gives up and moves them to `unpaid`.
+
+That is deliberate. Cutting a funeral home off mid-arrangement over a card that expired would be
+the wrong thing to do to them and to the family sitting in their office.
+
+### The one thing that would have broken
+
+`checkout.session.completed` fires for both a trial signup and a VR upgrade. Without a check on
+`session.mode`, a $150 subscription would have been recorded as a $150 VR sale — inflating VR
+revenue and putting a payment against a memorial that does not exist. The handler now returns early
+on `mode === "subscription"` and lets the subscription events own it.
+
+## Still manual
+
+Creating the funeral home record itself. When an unclaimed subscription appears you create the home
+by hand, then claim it. At the volumes you are starting at that is a five-minute job and a good
+excuse to talk to a new customer. It is worth automating once several arrive in a week, not before.
