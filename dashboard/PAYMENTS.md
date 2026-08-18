@@ -144,3 +144,94 @@ keeps you clear of PCI compliance. Don't be tempted to build your own form.
 
 **Test mode and live mode are separate worlds.** Separate keys, separate links, separate payments.
 The most common mistake is shipping a test link and wondering why no money arrives.
+
+---
+
+# The Stripe CLI — what it is and isn't for
+
+These commands come up in Stripe's quickstart guides:
+
+```
+stripe login
+stripe listen --forward-to localhost:4242/webhook
+cd ~/stripe-checkout && ./setup.sh --webhook-secret whsec_xxxxx
+./doctor.sh
+```
+
+**They do not apply to this project**, and running them will not get you anywhere. Here is why, and
+what to do instead.
+
+## Why they don't fit
+
+`stripe listen --forward-to localhost:4242/webhook` forwards test events to **a web server running
+on your own computer**, at port 4242. It exists so that a developer building a checkout on their
+laptop can receive webhooks without deploying anything.
+
+We have no server on your computer. The webhook handler is
+`supabase/functions/stripe-webhook/index.ts`, and it runs on Supabase at a **public HTTPS address**.
+Stripe can reach that directly — there is nothing to tunnel.
+
+`~/stripe-checkout/setup.sh` and `doctor.sh` belong to a **Stripe sample application** you would
+have to clone first. That sample is a Node server with its own checkout page. It is a different
+architecture from this one and would replace, not complete, what is already built.
+
+The Stripe CLI is also not installed on this Chromebook, and installing it would not change the
+above.
+
+## What to do instead — all in the browser
+
+### 1. Deploy the handler
+
+```
+supabase functions deploy stripe-webhook --no-verify-jwt
+```
+
+`--no-verify-jwt` is deliberate: Stripe cannot present a Supabase token. The request is
+authenticated by its **Stripe signature**, which the handler checks before trusting anything.
+
+The function's address is:
+
+```
+https://<your-project-ref>.supabase.co/functions/v1/stripe-webhook
+```
+
+### 2. Register it with Stripe
+
+**Stripe dashboard → Developers → Webhooks → Add endpoint.** Paste that URL and select these
+events:
+
+| Event | What it means |
+|---|---|
+| `checkout.session.completed` | A trial started, or a VR upgrade was paid |
+| `invoice.paid` | A funeral home's monthly $150 went through |
+| `invoice.payment_failed` | Their card was declined — chase it |
+| `customer.subscription.trial_will_end` | Fires one day before the first charge |
+| `customer.subscription.deleted` | They cancelled |
+| `charge.refunded` | Money returned |
+
+### 3. Copy the signing secret
+
+Stripe shows a **Signing secret** beginning `whsec_`. Put it where the function can read it:
+
+```
+supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_...
+supabase secrets set STRIPE_SECRET_KEY=sk_test_...
+```
+
+**Never commit either of these.** The repository is public.
+
+### 4. Test it
+
+In the dashboard, open your endpoint and use **Send test webhook**. A correct setup returns
+`200`, and the delivery log shows the response. This replaces `stripe listen` entirely.
+
+## One gap worth knowing about
+
+The handler currently understands **one-off payments** — the $50 VR upgrade. It does not yet
+understand **subscriptions**, which is what the $150/month trial creates. Until it does, a funeral
+home starting a trial will be charged correctly by Stripe, but nothing in the dashboard will record
+that they became a customer.
+
+Registering the subscription events above is step one; teaching `record_payment` to handle them is
+step two, and is not built yet. At low volume the Stripe dashboard is the source of truth in the
+meantime — but this should not stay true past the first few customers.

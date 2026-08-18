@@ -182,6 +182,21 @@
                 margin-bottom:1rem; }
   .price-card .btn-primary { display:block; text-align:center; }
 
+  /* the first-three-days assignment */
+  .assign { display:grid; gap:1.25rem; margin-top:2rem; }
+  @media (min-width:44rem){ .assign { grid-template-columns:1fr 1fr; } }
+  .task { background:var(--surface); border:1px solid var(--line);
+          border-left:3px solid var(--accent); border-radius:var(--radius);
+          padding:1.5rem; }
+  .task .tag { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+               font-weight:700; color:var(--accent); margin-bottom:.625rem; }
+  .task h3 { margin-bottom:.5rem; }
+  .task p { font-size:var(--f-sm); color:var(--ink-2); }
+  .task p + p { margin-top:.75rem; }
+  .task .why { border-top:1px solid var(--line); margin-top:1rem; padding-top:.875rem;
+               font-size:var(--f-sm); color:var(--ink-2); }
+  .task .why strong { color:var(--ink); }
+
   /* objection handling */
   .faq { border-top:1px solid var(--line); margin-top:1.75rem; }
   details { border-bottom:1px solid var(--line); }
@@ -227,8 +242,9 @@
       <a class="btn btn-primary" data-trial href="#pricing">Start your 3-day free trial</a>
       <a class="btn" href="./remember-them/">See it work first &rarr;</a>
     </div>
-    <p class="fine" style="margin-top:.875rem">Three days free. $150 a month after that.
-       Cancel any time.</p>
+    <p class="fine" style="margin-top:.875rem">Three days free &mdash; long enough to
+       recreate the last three memorials you sold and see how close it gets.
+       $150 a month after that. Cancel any time.</p>
   </section>
 
   <section>
@@ -316,6 +332,46 @@
     </div>
   </section>
 
+  <section>
+    <p class="eyebrow">Your first three days</p>
+    <h2>Don&rsquo;t evaluate it. Use it on something you already know the answer to.</h2>
+    <p>Most software trials fail because nobody knows what to do with them. Here is exactly
+       what to do with this one &mdash; it takes about half an hour, and you don&rsquo;t need
+       a family in the building.</p>
+
+    <div class="assign">
+      <div class="task">
+        <p class="tag">Start here</p>
+        <h3>Recreate your last three memorials.</h3>
+        <p>Pull the last three markers you sold. Run each one through as if the family were
+           sitting there &mdash; the same stories, the same person &mdash; and see what
+           comes back.</p>
+        <p class="why"><strong>Why this one first:</strong> you already know what those
+           families chose and what you charged. It is the only honest test there is. Either
+           the software lands near the memorial you actually sold, or it finds something
+           better that you would have shown them if there had been time. Both answers tell
+           you something. A blank demo tells you nothing.</p>
+      </div>
+
+      <div class="task">
+        <p class="tag">Then this</p>
+        <h3>Design one for someone you loved.</h3>
+        <p>Your father. Your grandmother. Yourself, if you would rather. Answer the questions
+           honestly, the way a family would.</p>
+        <p class="why"><strong>Why it matters:</strong> this is the only way to find out
+           whether the interview actually works. Recreating a sale tests the pricing and the
+           product list. Designing for someone you knew tests the part that has to earn a
+           grieving family&rsquo;s trust &mdash; and you will know within two questions
+           whether it does.</p>
+      </div>
+    </div>
+
+    <div class="cta-row" style="margin-top:2rem">
+      <a class="btn btn-primary" data-trial href="#pricing">Start the trial and try it</a>
+      <span class="fine">No family required. Half an hour is enough to decide.</span>
+    </div>
+  </section>
+
   <section id="pricing">
     <p class="eyebrow">Pricing</p>
     <h2>One subscription. A share only when you sell.</h2>
@@ -347,9 +403,10 @@
       <details>
         <summary>Three days isn&rsquo;t long. What can I actually do in it?</summary>
         <div class="a">
-          <p>Enough to know whether it fits how you work. Walk a full design yourself in about
-             ten minutes, load your own supplier&rsquo;s price list, and look at the order form
-             it produces. If a family comes in during those three days, use it with them.</p>
+          <p>Enough, if you don&rsquo;t wait for a family. Recreate the last three memorials
+             you sold &mdash; you already know what those families chose, so you can judge the
+             result honestly &mdash; then design one for someone you loved. That is about half
+             an hour, and it answers the question better than a walkthrough would.</p>
           <p>If you need longer because you&rsquo;re waiting on a particular family, email me and
              I&rsquo;ll extend it. I would rather you try it properly than decide against it
              because the calendar was awkward.</p>
@@ -413,8 +470,9 @@
   </section>
 
   <section class="close-cta">
-    <h2>The next family is already on the calendar.</h2>
-    <p>Start the trial now and you can use it with them. Setting up takes about two minutes.</p>
+    <h2>You already have three memorials to test it on.</h2>
+    <p>The last three you sold. Run them through tonight and you will know by morning
+       whether this belongs in your arrangement room.</p>
     <div class="cta-row">
       <a class="btn btn-primary" data-trial href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20free%20trial">Start your 3-day free trial</a>
       <a class="btn" href="./remember-them/">Try the demo first</a>

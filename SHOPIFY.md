@@ -150,29 +150,61 @@ by eye.
 
 ---
 
-## Which to use
+## The reliable, expandable setup
 
-**Use Option A for your first funeral home meeting.** Fewer moving parts, and the demo opening in
-its own tab is actually cleaner on a tablet — full screen, no theme chrome around it.
+Pasting HTML into a Shopify page works for a first meeting. **It is not what you want six months
+from now**, for three concrete reasons:
 
-Move to Option B once you've watched a few people go through it and know it holds up.
+- Shopify's rich-text editor **rewrites your markup on save**. It strips `<script>`, mangles some
+  attributes, and reformats CSS. You will paste something that works and find it broken later
+  without touching it.
+- **Your theme's CSS collides with the pasted CSS.** A theme update can change how your page looks
+  with no warning and no way to see it coming.
+- **You cannot grow it.** Logins, saved designs, uploads, dashboards — none of that can live inside
+  a Shopify page.
 
----
+So split the job. This is the setup that holds:
 
-## Optional — put the sales page on your own domain
+| What | Where | Why |
+|---|---|---|
+| Marketing page | **Shopify**, built with your theme's sections | Matches the store, survives theme updates, editable without code |
+| The product | **`app.healingpartners.us`**, its own host | Full control, no Shopify limits, room to grow into a real app |
+| The link between them | A button on the Shopify page | The only connection needed |
 
-Right now the full sales page lives on the GitHub URL, which is long and doesn't say
-healingpartners.us. Two ways to fix that:
+### Step 1 — Point a subdomain at the app
 
-**Simplest:** rebuild the sales page as a Shopify page using your theme's sections. It'll look like
-the rest of your store. Copy the words out of `for-funeral-homes.html`.
+In **Shopify admin → Settings → Domains → your domain → Manage DNS records**, add:
 
-**Or:** point a subdomain at GitHub Pages. In your Shopify domain settings add a CNAME record for
-`demo` pointing at `brandonjameshomer-ship-it.github.io`, then commit a file named `CNAME`
-containing `demo.healingpartners.us` to the repo root. Then the demo lives at
-`demo.healingpartners.us` and looks like yours.
+| Type | Name | Points to |
+|---|---|---|
+| CNAME | `app` | `brandonjameshomer-ship-it.github.io` |
 
-The subdomain route is worth doing before you send links to people you don't know.
+Then create a file named `CNAME` (no extension, capital letters) in the repo root containing one
+line: `app.healingpartners.us`. In **GitHub → repo Settings → Pages**, enter the same domain under
+*Custom domain* and tick **Enforce HTTPS** once the certificate is issued (usually under an hour).
+
+Everything now lives at `app.healingpartners.us` and looks like yours.
+
+### Step 2 — Rebuild the marketing page with Shopify sections
+
+Open the theme editor and build the page from your theme's own blocks: an image-with-text for the
+hero, a multi-column for the four steps, a rich text for pricing. Copy the words out of
+`for-funeral-homes.html`.
+
+It takes longer than pasting once, and then it never breaks again — and you can edit the copy
+yourself without opening a code editor.
+
+### Step 3 — One button, pointing out
+
+The Shopify page's primary button goes to your Stripe trial link. The secondary goes to
+`https://app.healingpartners.us/remember-them/`. That is the whole integration.
+
+### When you outgrow GitHub Pages
+
+GitHub Pages serves static files only — no server, no secrets, no logins. The moment you need
+those, move the app to **Vercel** or **Netlify** (both free to start, both deploy from the same
+repo, both let you keep `app.healingpartners.us` by changing one DNS record). Nothing about the
+Shopify side changes.
 
 ---
 
