@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Remember Them designs memorials with the family in about ten minutes, instead of the two to ten hours it takes now. For independent funeral homes. From Healing Partners.">
+<meta name="description" content="Remember Them is memorial design software for independent funeral homes. Design a headstone with the family in about ten minutes instead of two to ten hours. Real supplier pricing, three proofs, and order forms filled in automatically. Three days free, then $150 a month.">
+<link rel="canonical" href="https://healingpartners.us/pages/for-funeral-homes">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Remember Them for Funeral Homes">
+<meta property="og:description" content="Design a headstone with the family in ten minutes, not ten hours. Three days free, then $150 a month.">
+<meta property="og:site_name" content="Healing Partners">
 <title>Remember Them for Funeral Homes</title>
 <style>
   :root {
@@ -164,6 +169,39 @@
   footer.site a:hover { color:var(--accent); }
   footer.site .spacer { margin-left:auto; }
 
+  /* sticky bar, so the trial is reachable from anywhere on the page */
+  header.top { position:sticky; top:0; z-index:20; }
+  .top .btn { padding:.625rem 1.125rem; min-height:2.75rem; font-size:var(--f-sm); }
+  .top .btn.only-wide { display:none; }
+  @media (min-width:48rem){ .top .btn.only-wide { display:inline-block; } }
+
+  /* trial badge */
+  .trial-flag { display:inline-block; background:var(--ok-soft); color:var(--ok);
+                font-size:var(--f-xs); font-weight:700; text-transform:uppercase;
+                letter-spacing:.1em; padding:.375rem .75rem; border-radius:999px;
+                margin-bottom:1rem; }
+  .price-card .btn-primary { display:block; text-align:center; }
+
+  /* objection handling */
+  .faq { border-top:1px solid var(--line); margin-top:1.75rem; }
+  details { border-bottom:1px solid var(--line); }
+  summary { cursor:pointer; padding:1.1875rem 2.25rem 1.1875rem 0; font-weight:600;
+            list-style:none; position:relative; }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"+"; position:absolute; right:.25rem; top:1rem; font-size:1.375rem;
+                   line-height:1; font-weight:400; color:var(--accent);
+                   transition:transform .2s ease; }
+  details[open] summary::after { transform:rotate(45deg); }
+  details .a { padding:0 0 1.375rem; color:var(--ink-2); font-size:var(--f-sm);
+               max-width:42rem; }
+  details .a p + p { margin-top:.75rem; }
+
+  /* closing block */
+  .close-cta { text-align:center; padding:3rem 0 1rem; }
+  .close-cta h2 { margin-bottom:.875rem; }
+  .close-cta > p { color:var(--ink-2); max-width:34rem; margin:0 auto 1.75rem; }
+  .close-cta .cta-row { justify-content:center; }
+
   @media (max-width:34rem){ :root{--f-4xl:2.5rem;--f-3xl:2rem;} .hero{padding:3rem 0 2.5rem;} }
 </style>
 </head>
@@ -172,7 +210,8 @@
 <header class="top">
   <div class="top-in">
     <div class="brand">Remember Them<span>Healing Partners</span></div>
-    <a class="btn" href="./remember-them/">See the demo</a>
+    <a class="btn only-wide" href="./remember-them/">See the demo</a>
+    <a class="btn btn-primary" data-trial href="#pricing">Start free trial</a>
   </div>
 </header>
 
@@ -185,9 +224,11 @@
        from the monument company wrong, and you start again. Remember Them does it with the
        family in about ten minutes.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="./remember-them/">Try it yourself &mdash; no sign-up</a>
-      <span class="fine">Takes about two minutes.</span>
+      <a class="btn btn-primary" data-trial href="#pricing">Start your 3-day free trial</a>
+      <a class="btn" href="./remember-them/">See it work first &rarr;</a>
     </div>
+    <p class="fine" style="margin-top:.875rem">Three days free. $150 a month after that.
+       Cancel any time.</p>
   </section>
 
   <section>
@@ -275,10 +316,11 @@
     </div>
   </section>
 
-  <section>
+  <section id="pricing">
     <p class="eyebrow">Pricing</p>
     <h2>One subscription. A share only when you sell.</h2>
     <div class="price-card">
+      <span class="trial-flag">First 3 days free</span>
       <p class="amt">$150</p>
       <p class="per">per month, per funeral home &middot; cancel any time</p>
       <table class="tiers">
@@ -292,7 +334,66 @@
       <p class="note">The share falls as your volume rises. We only do well when you sell more,
         which is the point &mdash; it keeps our work pointed at helping families decide rather
         than at selling you features.</p>
-      <a class="btn btn-primary" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20%E2%80%94%20I'd%20like%20to%20talk">Start a conversation</a>
+      <a class="btn btn-primary" data-trial href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20free%20trial">Start your 3-day free trial</a>
+      <p class="note" style="text-align:center;margin:.875rem 0 0">Card required.
+         Nothing is charged until day four. Cancel in the first three days and you pay nothing.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Before you start</p>
+    <h2>Straight answers.</h2>
+    <div class="faq">
+      <details>
+        <summary>Three days isn&rsquo;t long. What can I actually do in it?</summary>
+        <div class="a">
+          <p>Enough to know whether it fits how you work. Walk a full design yourself in about
+             ten minutes, load your own supplier&rsquo;s price list, and look at the order form
+             it produces. If a family comes in during those three days, use it with them.</p>
+          <p>If you need longer because you&rsquo;re waiting on a particular family, email me and
+             I&rsquo;ll extend it. I would rather you try it properly than decide against it
+             because the calendar was awkward.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Do I have to change suppliers?</summary>
+        <div class="a">
+          <p>No. It works from the price lists you already use and fills in the order forms your
+             monument companies already send you. It sits on top of the relationships you have,
+             and you can upload a new price list yourself whenever one changes.</p>
+        </div>
+      </details>
+      <details>
+        <summary>What happens to my family service counselor?</summary>
+        <div class="a">
+          <p>They stay in the room. The software doesn&rsquo;t sell &mdash; it removes the part
+             of their job that was paperwork and revisions. What&rsquo;s left is the part
+             they&rsquo;re actually good at, and they get to do more of it.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Will my staff be able to use it?</summary>
+        <div class="a">
+          <p>A family reaches a finished design in ten clicks or fewer, and can always go back
+             and choose differently. If it needed a training day it would have failed. Nothing
+             to install &mdash; it runs in the browser you already have, on a desk or a tablet.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Why a share of the sale on top of the subscription?</summary>
+        <div class="a">
+          <p>It ties what I earn to what you sell. The subscription keeps the software running;
+             the share means I only do well when orders are actually going through it. It falls
+             as your volume rises, so the homes using it most pay the least on each one.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Can I cancel?</summary>
+        <div class="a">
+          <p>Any time, month to month. No contract and no cancellation fee. Cancel during the
+             three days and you are not charged at all.</p>
+        </div>
+      </details>
     </div>
   </section>
 
@@ -305,10 +406,21 @@
          where those ten hours go — and that families decide more confidently when they can
          see clearly.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20%E2%80%94%20I'd%20like%20to%20talk">Email me directly</a>
+        <a class="btn" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20%E2%80%94%20I%27d%20like%20to%20talk">Email me directly</a>
         <a class="btn" href="./remember-them/">See the demo first</a>
       </div>
     </div>
+  </section>
+
+  <section class="close-cta">
+    <h2>The next family is already on the calendar.</h2>
+    <p>Start the trial now and you can use it with them. Setting up takes about two minutes.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" data-trial href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20free%20trial">Start your 3-day free trial</a>
+      <a class="btn" href="./remember-them/">Try the demo first</a>
+    </div>
+    <p class="fine" style="margin-top:1rem">Questions first?
+       <a href="mailto:bhomer@healingpartners.us" style="color:var(--ink-2)">bhomer@healingpartners.us</a></p>
   </section>
 
 </div>
@@ -320,6 +432,30 @@
     <a class="spacer" href="./">healingpartners.us</a>
   </div>
 </footer>
+
+<script>
+  /* ------------------------------------------------------------------
+     THE ONE LINE TO EDIT.
+
+     Paste the Stripe Payment Link for the $150/month subscription with
+     the 3-day trial. It is a full URL and looks like this:
+
+         https://buy.stripe.com/aEU5kQ2Xy4Vd1bO288
+
+     A bare id such as "profile_..." or "price_..." is NOT a payment
+     link and will not work here.
+
+     While this is empty, every trial button falls back to email instead
+     of sitting dead. Never show a customer a button that goes nowhere.
+     ------------------------------------------------------------------ */
+  var TRIAL_LINK = "";
+
+  (function () {
+    if (!TRIAL_LINK) return;
+    var b = document.querySelectorAll("[data-trial]");
+    for (var i = 0; i < b.length; i++) { b[i].href = TRIAL_LINK; b[i].rel = "noopener"; }
+  })();
+</script>
 
 </body>
 </html>

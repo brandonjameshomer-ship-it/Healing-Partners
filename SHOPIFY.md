@@ -22,6 +22,48 @@ Nothing below works until that's off.
 
 ---
 
+## Make the Stripe link (do this before the page goes up)
+
+The sales page has a **Start your 3-day free trial** button. It needs a real Stripe Payment Link,
+and one specific kind: a *subscription* with a *trial period*, not a one-off charge.
+
+**What you sent me — `profile_61VF02K350AaL9HwVA6VF02J8fSQQ1m4omyoacWKu8YK` — is not a payment
+link.** Payment links are full URLs beginning `https://buy.stripe.com/`. Here is how to get one.
+
+1. **Stripe dashboard → Product catalogue → Add product**
+   - Name: `Remember Them`
+   - Description: `Memorial design software for funeral homes`
+2. Under **Pricing**, choose **Recurring**
+   - Amount `150.00`, currency USD, billing period **Monthly**
+   - Save
+3. **Payment links → New**, select that product
+4. Open **Options → Subscription settings** and set **Free trial period → 3 days**
+   *This is the step that makes it a trial. Miss it and the first card is charged immediately.*
+5. Under **After payment**, set the confirmation page to
+   `https://healingpartners.us/pages/thank-you` (or leave Stripe's default for now)
+6. **Create link**, then **Copy** it. It looks like `https://buy.stripe.com/aEU5kQ2Xy4Vd1bO288`
+
+Then paste it into **one place**: the bottom of `for-funeral-homes.html`, in the line
+
+```js
+var TRIAL_LINK = "";
+```
+
+Every trial button on the page reads from that one variable. Until it's filled in, the buttons
+fall back to your email address rather than going nowhere.
+
+**Two things worth knowing before you switch it on:**
+
+- **A card is required to start a trial** on a Stripe payment link. That's normal for B2B, and it
+  filters out people who were never going to buy. There is no card-free option on payment links.
+- **Stripe takes 2.9% + $0.30.** On $150 that's $4.65, so you net **$145.35** a month per home.
+
+Use **test mode** first — the toggle at the top of the Stripe dashboard. Test card `4242 4242 4242
+4242`, any future expiry, any CVC. Test links contain `/test_`, so you can always tell which one
+is pasted in.
+
+---
+
 ## Option A — Link out (do this first)
 
 **Ten minutes. Nothing can break.**
@@ -32,7 +74,7 @@ device and there is nothing to debug in front of a funeral director.
 1. **Online Store → Pages → Add page**
 2. Title: `For Funeral Homes`
 3. Click the **`< >`** button in the editor toolbar to switch to HTML view
-4. Paste this:
+4. Paste this, replacing `PASTE_YOUR_STRIPE_LINK_HERE` with your Stripe payment link:
 
 ```html
 <div style="max-width:42rem;margin:0 auto;padding:2rem 0;font-size:1.0625rem;line-height:1.65">
@@ -44,15 +86,23 @@ device and there is nothing to debug in front of a funeral director.
     monument company wrong, and you start again. Remember Them does it with the family in
     about ten minutes.
   </p>
-  <p>
-    <a href="https://brandonjameshomer-ship-it.github.io/Healing-Partners/remember-them/"
-       target="_blank" rel="noopener"
+  <p style="display:flex;flex-wrap:wrap;gap:.75rem">
+    <a href="PASTE_YOUR_STRIPE_LINK_HERE"
        style="display:inline-block;background:#A8761F;color:#2A1E08;font-weight:600;
               padding:.875rem 1.5rem;border-radius:12px;text-decoration:none">
-      Try it yourself — no sign-up
+      Start your 3-day free trial
+    </a>
+    <a href="https://brandonjameshomer-ship-it.github.io/Healing-Partners/remember-them/"
+       target="_blank" rel="noopener"
+       style="display:inline-block;background:#fff;color:#191F33;font-weight:600;
+              border:1px solid #C6CDDF;padding:.875rem 1.5rem;border-radius:12px;
+              text-decoration:none">
+      See it work first
     </a>
   </p>
-  <p style="color:#7C85A0;font-size:.9375rem">Takes about two minutes.</p>
+  <p style="color:#7C85A0;font-size:.9375rem">
+    Three days free. $150 a month after that. Cancel any time.
+  </p>
 </div>
 ```
 
