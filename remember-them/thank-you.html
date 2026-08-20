@@ -131,12 +131,23 @@
 
 <script>
   /* Stripe returns here with the reference we sent. Use the name if we have it,
-     so the page speaks about a person rather than a transaction. */
+     so the page speaks about a person rather than a transaction.
+
+     The designer sends a UUID (see index.html newId()), which carries no name —
+     splitting one on its hyphens yields hex, not a person. So a UUID-shaped
+     reference is left alone, and anything else must read as words before it is
+     shown. Better a generic thank-you than one addressed to "550E8400 E29b". */
   (function () {
+    var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    var WORDS = /^[a-z][a-z' ]*$/i;
     try {
       var q = new URLSearchParams(location.search);
       var ref = q.get("memorial") || q.get("client_reference_id") || "";
-      var name = ref.split("-").slice(0, -1).join(" ").trim();
+      var name = "";
+      if (ref && !UUID.test(ref)) {
+        name = ref.split("-").slice(0, -1).join(" ").trim();
+        if (!WORDS.test(name)) name = "";
+      }
       if (name) {
         name = name.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
         document.getElementById("head").textContent = "Thank you.";
