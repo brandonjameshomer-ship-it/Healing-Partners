@@ -101,9 +101,19 @@ create table if not exists email_log (
   -- out of everything, which is what a recipient expects it to mean.
   unsubscribe_token  uuid not null default gen_random_uuid(),
 
+  -- Which billing period this message belongs to — the subscription's
+  -- current_period_end at the time it was queued. "Once per subscription" is
+  -- the wrong guarantee for a monthly notice; "once per period" is the right
+  -- one, and this column is what makes the difference expressible.
+  -- The sender fills it from emails_due().due_date.
+  period_end         date,
+
   sent_at            timestamptz,
   created_at         timestamptz not null default now()
 );
+
+-- For instances created before period_end existed.
+alter table email_log add column if not exists period_end date;
 
 create index if not exists email_log_token_idx  on email_log (unsubscribe_token);
 create index if not exists email_log_recip_idx  on email_log (lower(recipient), created_at desc);
@@ -111,8 +121,19 @@ create index if not exists email_log_recip_idx  on email_log (lower(recipient), 
 -- The guarantee that nobody gets the same message twice. If the sender crashes
 -- halfway and runs again, this index refuses the duplicate rather than
 -- apologising for it afterwards.
-create unique index if not exists email_once_per_subscription
-  on email_log (subscription_id, template_key)
+--
+-- Keyed on the billing period as well as the subscription. Without that, the
+-- first renewal notice a funeral home received would be the only one they ever
+-- got: next month's send is a second row with the same (subscription, template)
+-- pair, and the index would reject it — silently, in a scheduled job nobody
+-- watches. Scoping to the period keeps the crash-safety guarantee while letting
+-- a monthly notice actually be monthly.
+--
+-- coalesce guards the null case: Postgres treats nulls as distinct in a unique
+-- index, so a null period_end would wave every duplicate through.
+drop index if exists email_once_per_subscription;
+create unique index if not exists email_once_per_period
+  on email_log (subscription_id, template_key, coalesce(period_end, 'epoch'::date))
   where subscription_id is not null;
 
 alter table email_log enable row level security;
@@ -124,6 +145,12 @@ create policy log_founder on email_log for select to authenticated using (is_fou
 -- ============================================================
 -- Called by the scheduled send function. Returns one row per email that should
 -- go out, already filtered for suppression and for anything already sent.
+--
+-- CONTRACT FOR THE SENDER: write the returned due_date into email_log.period_end
+-- on every row you insert. That column is what makes "once per billing period"
+-- work. Leave it null and the unique index falls back to 'epoch' for every row,
+-- which collapses the guarantee back to once per subscription for all time —
+-- the exact failure this is written to prevent, and a silent one.
 
 create or replace function emails_due()
 returns table (
@@ -154,9 +181,20 @@ begin
     and s.current_period_end is not null
     and s.current_period_end::date = current_date + (-t.offset_days)
     and coalesce(f.email, s.email) is not null
+    -- Same rule as the lapse branch below. A renewal notice is normally
+    -- transactional, but nothing in the schema stops a template being filed as
+    -- trigger 'renewal' with category 'marketing' — the two constraints are
+    -- independent. Without this, such a template would reach an address that
+    -- had already unsubscribed.
+    and (t.category = 'transactional'
+         or not exists (select 1 from email_suppressions e
+                         where e.email = lower(coalesce(f.email, s.email))))
+    -- Scoped to this billing period, matching email_once_per_period. The old
+    -- 20-day window said "not again this month" but the index said "not ever";
+    -- keyed on the period, the query and the constraint now agree.
     and not exists (select 1 from email_log l
                      where l.subscription_id = s.id and l.template_key = t.key
-                       and l.created_at > now() - interval '20 days')
+                       and l.period_end = s.current_period_end::date)
 
   union all
 
@@ -178,8 +216,15 @@ begin
     and (t.category = 'transactional'
          or not exists (select 1 from email_suppressions e
                          where e.email = lower(coalesce(f.email, s.email))))
+    -- Also scoped to the period, for the same reason and to agree with the
+    -- index. Within one lapse this is unchanged — current_period_end does not
+    -- move while a payment is failing, so each step of the sequence still goes
+    -- out exactly once. It differs only for a home that lapsed, recovered, and
+    -- lapsed again months later on a new period: that is a new episode and
+    -- should get the sequence again, not silence.
     and not exists (select 1 from email_log l
-                     where l.subscription_id = s.id and l.template_key = t.key);
+                     where l.subscription_id = s.id and l.template_key = t.key
+                       and l.period_end = s.current_period_end::date);
 end; $$;
 
 revoke all on function emails_due() from public, anon, authenticated;
