@@ -1,5 +1,14 @@
 # Putting this on healingpartners.us
 
+> **Superseded in part.** The sales page is now live at
+> `healingpartners.us/pages/for-funeral-homes`, written to the store through the Shopify Admin
+> API rather than pasted into the page editor. **Read [`shopify/README.md`](shopify/README.md)
+> first** — it describes how the page is pushed and how to change it.
+>
+> What is still current below: taking the store out of "Opening soon", making the Stripe
+> payment link, and the `app.healingpartners.us` subdomain. What is superseded: Options A and B,
+> which describe pasting HTML into the Shopify page editor.
+
 Everything already lives on GitHub Pages. The job is to connect Shopify to it, not to rebuild
 anything inside Shopify.
 
