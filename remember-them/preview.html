@@ -1,0 +1,117 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Remember Them — renderer preview</title>
+<style>
+  :root { --ink:#1A1A1B; --ink-2:#4A4A4E; --ink-3:#77777D; --line:#E3E1DD; --bg:#FBFAF8; --card:#fff; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); padding:2rem 1.5rem 5rem;
+         font:400 16px/1.6 ui-sans-serif, system-ui, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto }
+  h1 { font:600 1.75rem/1.2 ui-serif, Georgia, serif; margin:0 0 .5rem }
+  h2 { font:600 1.15rem/1.3 ui-serif, Georgia, serif; margin:2.75rem 0 .35rem }
+  p.note { color:var(--ink-2); max-width:60ch; margin:.25rem 0 1.25rem }
+  .grid { display:grid; gap:1rem; grid-template-columns:repeat(auto-fill,minmax(168px,1fr)) }
+  .cell { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.5rem .5rem .6rem }
+  .cell svg { width:100%; height:auto; display:block; border-radius:6px }
+  .cap { font-size:.72rem; color:var(--ink-3); text-align:center; margin-top:.4rem; letter-spacing:.02em }
+  .pair { display:grid; gap:1.25rem; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); align-items:start }
+  .pair .cell { padding:.75rem }
+  .tag { display:inline-block; font-size:.68rem; letter-spacing:.09em; text-transform:uppercase;
+         padding:.2rem .5rem; border-radius:99px; margin-bottom:.5rem }
+  .old { background:#FBE9E7; color:#9A3B2C } .new { background:#E8F1E9; color:#2F6B41 }
+  .controls { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin:1rem 0 0 }
+  .controls label { font-size:.8rem; color:var(--ink-2) }
+  input[type=text] { font:inherit; padding:.4rem .6rem; border:1px solid var(--line); border-radius:6px }
+  footer { margin-top:3.5rem; padding-top:1.25rem; border-top:1px solid var(--line);
+           color:var(--ink-3); font-size:.82rem; max-width:64ch }
+</style>
+<script src="stone.js"></script>
+<div class="wrap">
+  <h1>Renderer preview</h1>
+  <p class="note">A working page for checking <code>stone.js</code>, the renderer both the guided
+     flow and the configurator now share. Not part of the customer flow.</p>
+
+  <div class="controls">
+    <label>Name <input type="text" id="nm" value="Margaret Ellen Whitfield"></label>
+    <label>Dates <input type="text" id="dt" value="1934 – 2021"></label>
+  </div>
+
+  <h2>The inscription, before and after</h2>
+  <p class="note">The old renderer filled the lettering with a colour darker than the stone on
+     every material. On black granite that put a near-black name on a dark grey face. Sandblasting
+     frosts the cut so it reads <em>paler</em> than the polish around it — which is exactly why
+     black granite is the premium choice.</p>
+  <div class="pair" id="cmp"></div>
+
+  <h2>Every shape, every material</h2>
+  <p class="note">Bronze is cast rather than cut, so its letters stand proud and catch light on
+     top instead of sitting in shadow. White marble gets no contrast from frosting, so the cut
+     reads as its own shadow. Both are handled separately from the granites.</p>
+  <div class="grid" id="all"></div>
+
+  <footer>
+    A screen cannot reproduce stone, bronze, etching or polish, and the difference between this
+    preview and the finished memorial is not a design error — Partner User Agreement §3.8.
+    Every customer-facing surface that shows a design carries that notice.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var S = window.RememberThem.Stone;
+
+  /* The renderer as it stood before, kept only so the comparison above is
+     honest about what actually changed. */
+  function legacy(stoneId, formId, name, dates) {
+    var s = S.stone(stoneId), f = S.form(formId), uid = "old" + stoneId + formId;
+    var y = f.nameY;
+    return '<svg viewBox="0 0 300 400">' +
+      '<defs><linearGradient id="f' + uid + '" x1="0" y1="0" x2=".35" y2="1">' +
+      '<stop offset="0" stop-color="' + s.hi + '"/><stop offset=".55" stop-color="' + s.base + '"/>' +
+      '<stop offset="1" stop-color="' + s.cut + '"/></linearGradient>' +
+      '<filter id="g' + uid + '"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="4" seed="5" result="n"/>' +
+      '<feColorMatrix in="n" type="saturate" values="0"/>' +
+      '<feComponentTransfer><feFuncA type="linear" slope=".14"/></feComponentTransfer></filter>' +
+      '<clipPath id="c' + uid + '"><path d="' + f.d + '"/></clipPath></defs>' +
+      '<path d="' + f.d + '" fill="url(#f' + uid + ')"/>' +
+      '<g clip-path="url(#c' + uid + ')"><rect width="300" height="400" filter="url(#g' + uid + ')" opacity=".5"/></g>' +
+      '<text x="150" y="' + y + '" text-anchor="middle" font-family="ui-serif,Georgia,serif" font-size="24" ' +
+        'font-weight="600" dy="1" fill="' + s.lip + '" opacity=".6">' + name + '</text>' +
+      '<text x="150" y="' + y + '" text-anchor="middle" font-family="ui-serif,Georgia,serif" font-size="24" ' +
+        'font-weight="600" fill="' + s.cut + '">' + name + '</text>' +
+      '<text x="150" y="' + (y + 26) + '" text-anchor="middle" font-family="ui-serif,Georgia,serif" ' +
+        'font-size="13" fill="' + s.cut + '">' + dates + '</text></svg>';
+  }
+
+  function draw() {
+    var name = document.getElementById("nm").value || "Their Name";
+    var dates = document.getElementById("dt").value;
+
+    document.getElementById("cmp").innerHTML =
+      ["black", "grey", "bronze"].map(function (sid) {
+        return '<div class="cell"><span class="tag old">Before — ' + S.stone(sid).label + '</span>' +
+                 legacy(sid, "upright", name, dates) + '</div>' +
+               '<div class="cell"><span class="tag new">After — ' + S.stone(sid).label + '</span>' +
+                 S.render({ uid: "n" + sid, form: "upright", stone: sid, name: name,
+                            dates: dates, emblem: "rose" }) + '</div>';
+      }).join("");
+
+    var out = [];
+    S.FORMS.forEach(function (f) {
+      S.STONES.forEach(function (st) {
+        out.push('<div class="cell">' +
+          S.render({ uid: f.id + st.id, form: f.id, stone: st.id, name: name, dates: dates,
+                     emblem: "cross", epitaph: "She kept the porch light on." }) +
+          '<div class="cap">' + f.label + ' · ' + st.label + '</div></div>');
+      });
+    });
+    document.getElementById("all").innerHTML = out.join("");
+  }
+
+  document.getElementById("nm").addEventListener("input", draw);
+  document.getElementById("dt").addEventListener("input", draw);
+  draw();
+})();
+</script>

@@ -355,6 +355,7 @@
   </section>
 </main>
 
+<script src="stone.js"></script>
 <script>
 (function () {
   "use strict";
@@ -632,42 +633,22 @@
   };
 
   /* ---- shapes ---- */
-  function outline(f){
-    if(f==="slant") return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
-    if(f==="bench") return "M20,250 L280,250 L280,290 L20,290 Z M45,290 L85,290 L85,360 L45,360 Z M215,290 L255,290 L255,360 L215,360 Z";
-    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
-  }
-  var STONE_SVG = {
-    upright:{hi:"#A2A6AC",base:"#83878C",cut:"#4E5257",lip:"#B6BAC0"},
-    slant:  {hi:"#BE9B95",base:"#A2807B",cut:"#6B504C",lip:"#CBAAA4"},
-    black:  {hi:"#4A4A52",base:"#2A2A2E",cut:"#0E0E11",lip:"#5A5A64"}
-  };
+  /* Drawing lives in stone.js, shared with the configurator. Each proof names
+     a stone; BASES below names the matching real granite and its category, so
+     the picture and the price always describe the same rock. */
+  var Stone = window.RememberThem.Stone;
+  var PROOF_STONE = { upright:"grey", slant:"rose", black:"black" };
+
   function svgFor(key,form,feats,name,dates){
-    var s=STONE_SVG[key], uid=key+form;
-    var g='<svg viewBox="0 0 300 400" role="img" aria-label="Preview for '+esc(name)+'">'+
-      '<defs><linearGradient id="f'+uid+'" x1="0" y1="0" x2=".35" y2="1">'+
-      '<stop offset="0" stop-color="'+s.hi+'"/><stop offset=".55" stop-color="'+s.base+'"/>'+
-      '<stop offset="1" stop-color="'+s.cut+'"/></linearGradient>'+
-      '<filter id="g'+uid+'"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="4" seed="5" result="n"/>'+
-      '<feColorMatrix in="n" type="saturate" values="0"/>'+
-      '<feComponentTransfer><feFuncA type="linear" slope=".14"/></feComponentTransfer></filter>'+
-      '<clipPath id="c'+uid+'"><path d="'+outline(form)+'"/></clipPath></defs>'+
-      '<path d="'+outline(form)+'" fill="url(#f'+uid+')"/>'+
-      '<g clip-path="url(#c'+uid+')"><rect width="300" height="400" filter="url(#g'+uid+')" opacity=".5"/></g>';
-    var y = form==="bench"?272:178;
-    if(feats.indexOf("photo")!==-1 && form!=="bench"){
-      g+='<ellipse cx="150" cy="'+(y-46)+'" rx="33" ry="41" fill="'+s.cut+'" opacity=".55"/>'+
-         '<ellipse cx="150" cy="'+(y-46)+'" rx="29" ry="37" fill="none" stroke="'+s.lip+'" stroke-width="1.5" opacity=".8"/>'; y+=22; }
-    if(feats.indexOf("glass")!==-1 && form!=="bench"){
-      g+='<rect x="112" y="'+(y-78)+'" width="76" height="50" rx="4" fill="#7FA8C4" opacity=".55"/>'+
-         '<rect x="112" y="'+(y-78)+'" width="76" height="50" rx="4" fill="none" stroke="'+s.lip+'" stroke-width="1.5"/>'; y+=12; }
-    if(feats.indexOf("bronze")!==-1)
-      g+='<rect x="95" y="'+(y+60)+'" width="110" height="10" rx="2" fill="#B08A45" opacity=".75"/>';
-    var nm=name||"Their Name", size=nm.length>14?Math.max(13,26*14/nm.length):26;
-    g+='<text x="150" y="'+y+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="'+size+'" font-weight="600" dy="1" fill="'+s.lip+'" opacity=".6">'+esc(nm)+'</text>'+
-       '<text x="150" y="'+y+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="'+size+'" font-weight="600" fill="'+s.cut+'">'+esc(nm)+'</text>';
-    if(dates) g+='<text x="150" y="'+(y+26)+'" text-anchor="middle" font-family=\'ui-serif,Georgia,serif\' font-size="13" fill="'+s.cut+'">'+esc(dates)+'</text>';
-    return g+'</svg>';
+    return Stone.render({
+      uid:       key+form,
+      form:      form,
+      stone:     PROOF_STONE[key] || "grey",
+      lettering: "traditional",
+      name:      name,
+      dates:     dates,
+      features:  feats
+    });
   }
 
   var SETS=[

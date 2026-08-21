@@ -333,6 +333,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="stone.js"></script>
 <script>
 (function () {
   "use strict";
@@ -415,41 +416,15 @@
 
   var KEY = "healing-partners.remember-them.designs.v2";
 
-  var FORMS = [
-    { id:"upright",    label:"Upright",     dims:"24 × 30 × 4 in" },
-    { id:"serpentine", label:"Serpentine",  dims:"28 × 22 × 4 in" },
-    { id:"flat",       label:"Flat marker", dims:"24 × 12 × 4 in" },
-    { id:"plaque",     label:"Plaque",      dims:"18 × 12 in" },
-    { id:"heart",      label:"Heart",       dims:"26 × 22 × 4 in" },
-    { id:"cross",      label:"Cross",       dims:"22 × 34 × 4 in" }
-  ];
+  /* Shapes, stones, lettering and emblems live in stone.js, which also draws
+     them. The guided flow reads the same catalogue, so the two pages can no
+     longer drift apart the way they had. */
+  var Stone     = window.RememberThem.Stone;
+  var FORMS     = Stone.FORMS;
+  var STONES    = Stone.STONES;
+  var LETTERING = Stone.LETTERING;
+  var EMBLEMS   = Stone.EMBLEMS;
 
-  var STONES = [
-    { id:"black",  label:"Black granite", base:"#2A2A2E", hi:"#4A4A52", cut:"#0E0E11", lip:"#5A5A64" },
-    { id:"grey",   label:"Grey granite",  base:"#83878C", hi:"#A2A6AC", cut:"#4E5257", lip:"#B6BAC0" },
-    { id:"rose",   label:"Rose granite",  base:"#A2807B", hi:"#BE9B95", cut:"#6B504C", lip:"#CBAAA4" },
-    { id:"marble", label:"White marble",  base:"#DEDAD2", hi:"#F1EEE8", cut:"#A49F94", lip:"#FFFFFF" },
-    { id:"bronze", label:"Bronze",        base:"#6E5327", hi:"#9A7838", cut:"#3E2E13", lip:"#C9A24E" },
-    { id:"blue",   label:"Blue pearl",    base:"#3A4560", hi:"#556383", cut:"#1E2536", lip:"#6D7C9E" }
-  ];
-
-  var LETTERING = [
-    { id:"traditional", label:"Traditional", css:'ui-serif, "Iowan Old Style", Georgia, serif', weight:600, track:".02em" },
-    { id:"modern",      label:"Modern",      css:'system-ui, "Segoe UI", Helvetica, Arial, sans-serif', weight:500, track:".06em" },
-    { id:"script",      label:"Script",      css:'"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive', weight:500, track:".01em" }
-  ];
-
-  var EMBLEMS = {
-    none:  { label:"None", path:null },
-    cross: { label:"Cross", path:"M-4,-22 h8 v12 h12 v8 h-12 v24 h-8 v-24 h-12 v-8 h12 z" },
-    celtic:{ label:"Celtic", path:"M-3.5,-22 h7 v10 h11 v7 h-11 v27 h-7 v-27 h-11 v-7 h11 z M0,-11.5 m-13,0 a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0 M0,-11.5 m-9,0 a9,9 0 1,1 18,0 a9,9 0 1,1 -18,0" },
-    star:  { label:"Star", path:"M0,-22 L12.7,0 L-12.7,0 Z M0,22 L12.7,0 L-12.7,0 Z" },
-    heart: { label:"Heart", path:"M0,18 C-18,4 -18,-14 0,-6 C18,-14 18,4 0,18 Z" },
-    tree:  { label:"Tree", path:"M-2.5,20 h5 v-16 h-5 z M0,-20 m-14,6 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" },
-    dove:  { label:"Dove", path:"M-18,4 C-10,-6 4,-10 16,-8 C10,-2 12,4 18,6 C8,12 -6,12 -18,4 Z M6,-8 C8,-14 2,-16 -2,-12" },
-    rose:  { label:"Rose", path:"M0,-12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M0,-12 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0 M-1.5,-4 h3 v22 h-3 z M1.5,6 C8,4 11,-1 12,-5 C6,-5 2,-1 1.5,4 Z" },
-    hands: { label:"Hands", path:"M-3,20 C-9,12 -11,2 -10,-8 C-9.5,-14 -6,-16 -5,-11 L-3,2 Z M3,20 C9,12 11,2 10,-8 C9.5,-14 6,-16 5,-11 L3,2 Z" }
-  };
   var EMBLEM_ORDER = ["none","cross","celtic","star","heart","tree","dove","rose","hands"];
 
   var DEFAULTS = { form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
@@ -474,107 +449,27 @@
     toastTimer=setTimeout(function(){ t.classList.remove("show"); }, 3200);
   }
 
-  /* ---------------- geometry ---------------- */
-
-  function outline(form) {
-    switch (form) {
-      case "upright":    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
-      case "serpentine": return "M25,360 L25,130 C25,60 90,88 150,88 C210,88 275,60 275,130 L275,360 Z";
-      case "flat":       return "M20,215 L280,215 L280,340 L20,340 Z";
-      case "plaque":     return "M35,120 L265,120 L265,330 L35,330 Z";
-      case "heart":      return "M150,368 C40,285 18,175 62,128 C104,84 150,120 150,158 C150,120 196,84 238,128 C282,175 260,285 150,368 Z";
-      case "cross":      return "M118,372 L118,215 L28,215 L28,140 L118,140 L118,28 L182,28 L182,140 L272,140 L272,215 L182,215 L182,372 Z";
-    }
-    return "M35,370 L35,90 A115,115 0 0,1 265,90 L265,370 Z";
-  }
-
-  function metrics(form) {
-    switch (form) {
-      case "upright":    return { emblemY:118, nameY:190, dateY:228, epiY:266, scale:1,   w:200 };
-      case "serpentine": return { emblemY:138, nameY:206, dateY:242, epiY:278, scale:1,   w:210 };
-      case "flat":       return { emblemY:246, nameY:266, dateY:296, epiY:322, scale:.82, w:230 };
-      case "plaque":     return { emblemY:158, nameY:206, dateY:240, epiY:276, scale:.88, w:200 };
-      case "heart":      return { emblemY:168, nameY:224, dateY:258, epiY:292, scale:.86, w:170 };
-      case "cross":      return { emblemY:88,  nameY:186, dateY:250, epiY:288, scale:.78, w:130 };
-    }
-    return { emblemY:118, nameY:190, dateY:228, epiY:266, scale:1, w:200 };
-  }
-
-  function wrap(text, perLine) {
-    var words = String(text).split(/\s+/).filter(Boolean), lines=[], cur="";
-    for (var i=0;i<words.length;i++) {
-      var t = cur ? cur+" "+words[i] : words[i];
-      if (t.length > perLine && cur) { lines.push(cur); cur = words[i]; }
-      else cur = t;
-    }
-    if (cur) lines.push(cur);
-    return lines.slice(0,4);
-  }
-
   /* ---------------- render ---------------- */
 
-  function engraved(txt, x, y, size, stone, font) {
-    if (!txt) return "";
-    var common = 'x="'+x+'" y="'+y+'" text-anchor="middle" ' +
-                 'font-family=\''+font.css+'\' font-size="'+size+'" ' +
-                 'font-weight="'+font.weight+'" letter-spacing="'+font.track+'"';
-    /* highlight sits just below the incision, dark cut on top → reads as carved */
-    return '<text '+common+' dy="1.1" fill="'+stone.lip+'" opacity=".65">'+esc(txt)+'</text>' +
-           '<text '+common+' fill="'+stone.cut+'">'+esc(txt)+'</text>';
-  }
-
   function render() {
-    var stone = byId(STONES, d.stone);
-    var font  = byId(LETTERING, d.lettering);
-    var m     = metrics(d.form);
-    var em    = EMBLEMS[d.emblem] || EMBLEMS.none;
-
+    var f  = byId(FORMS, d.form);
+    var st = byId(STONES, d.stone);
+    var lt = byId(LETTERING, d.lettering);
+    var em = EMBLEMS[d.emblem] || EMBLEMS.none;
     var dates = (d.born && d.died) ? (d.born + " – " + d.died) : (d.born || d.died || "");
-    var epiLines = d.epitaph ? wrap(d.epitaph, Math.round(m.w / 5.4)) : [];
 
-    var nm = d.name || "Their Name";
-    var nameSize = 30 * m.scale;
-    if (nm.length > 14) nameSize *= 14 / nm.length;
-    if (nameSize < 13) nameSize = 13;
+    $("stage").innerHTML = Stone.render({
+      uid:       "stage",
+      form:      d.form,
+      stone:     d.stone,
+      lettering: d.lettering,
+      emblem:    d.emblem,
+      name:      d.name || "Their Name",
+      dates:     dates,
+      epitaph:   d.epitaph
+    });
 
-    var svg =
-      '<svg viewBox="0 0 300 400" role="img" aria-label="Preview of the memorial for ' + esc(nm) + '">' +
-      '<defs>' +
-        '<linearGradient id="face" x1="0" y1="0" x2="0.35" y2="1">' +
-          '<stop offset="0" stop-color="'+stone.hi+'"/>' +
-          '<stop offset="0.55" stop-color="'+stone.base+'"/>' +
-          '<stop offset="1" stop-color="'+stone.cut+'"/>' +
-        '</linearGradient>' +
-        '<filter id="grain" x="0" y="0" width="100%" height="100%">' +
-          '<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="7" result="n"/>' +
-          '<feColorMatrix in="n" type="saturate" values="0"/>' +
-          '<feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>' +
-        '</filter>' +
-        '<clipPath id="clip"><path d="'+outline(d.form)+'"/></clipPath>' +
-      '</defs>' +
-      '<path d="'+outline(d.form)+'" fill="url(#face)"/>' +
-      '<g clip-path="url(#clip)"><rect width="300" height="400" filter="url(#grain)" opacity=".55"/></g>' +
-      '<path d="'+outline(d.form)+'" fill="none" stroke="'+stone.lip+'" stroke-width="1.5" opacity=".5"/>' +
-      (em.path
-        ? '<g transform="translate(150,'+m.emblemY+') scale('+(0.9*m.scale)+')">' +
-          '<path d="'+em.path+'" fill="'+stone.lip+'" opacity=".55" transform="translate(0,1.2)"/>' +
-          '<path d="'+em.path+'" fill="'+stone.cut+'"/></g>'
-        : "") +
-      engraved(nm, 150, m.nameY, nameSize, stone, font) +
-      engraved(dates, 150, m.dateY, 15*m.scale, stone, font);
-
-    for (var i=0;i<epiLines.length;i++) {
-      svg += engraved(epiLines[i], 150, m.epiY + i*(17*m.scale), 12.5*m.scale, stone, font);
-    }
-    if (d.form!=="plaque" && d.form!=="flat") {
-      svg += '<ellipse cx="150" cy="374" rx="128" ry="9" fill="'+stone.cut+'" opacity=".18"/>';
-    }
-    svg += '</svg>';
-
-    $("stage").innerHTML = svg;
-
-    var f = byId(FORMS, d.form);
-    $("specLine").textContent = f.label + " · " + stone.label + " · " + font.label +
+    $("specLine").textContent = f.label + " · " + st.label + " · " + lt.label +
       (em.path ? " · " + em.label + " emblem" : "");
     $("dimLine").textContent = f.dims;
   }
@@ -582,8 +477,7 @@
   /* ---------------- choice UI ---------------- */
 
   function thumb(formId) {
-    return '<span class="shape"><svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet">' +
-           '<path d="'+outline(formId)+'" fill="currentColor" opacity=".8"/></svg></span>';
+    return '<span class="shape">' + Stone.thumb(formId) + '</span>';
   }
 
   function buildChoices() {
