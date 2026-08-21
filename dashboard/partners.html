@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Partner pricing — Healing Partners</title>
+<style>
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --ok:#2F6B4F; --ok-soft:#E4F0EA;
+    --warn:#A3352F; --warn-soft:#F7E4E2;
+    --info:#3A4560; --info-soft:#E6EAF2;
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:.9375rem; --f-lg:1.0625rem;
+    --f-xl:1.25rem; --f-2xl:1.625rem; --f-3xl:2.25rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06;
+      --ok:#7EC49E; --ok-soft:#1D3329;
+      --warn:#E08078; --warn-soft:#3A2321;
+      --info:#9AA8C6; --info-soft:#222941;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06;
+    --ok:#7EC49E; --ok-soft:#1D3329;
+    --warn:#E08078; --warn-soft:#3A2321;
+    --info:#9AA8C6; --info-soft:#222941;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink);
+         font-family:var(--sans); font-size:var(--f-base); line-height:1.55;
+         -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:76rem; margin:0 auto; padding:0 1.5rem; }
+
+  header.top { border-bottom:1px solid var(--line); background:var(--surface); }
+  .top-in { max-width:76rem; margin:0 auto; padding:1rem 1.5rem;
+            display:flex; align-items:baseline; gap:.625rem; flex-wrap:wrap; }
+  .top-in h1 { font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+               margin:0; letter-spacing:-.01em; }
+  .top-in .parent { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+                    color:var(--ink-3); border-left:1px solid var(--line-strong);
+                    padding-left:.625rem; }
+  .top-in .month { margin-left:auto; font-size:var(--f-sm); color:var(--ink-2); }
+
+  .banner { background:var(--warn-soft); border-bottom:1px solid var(--warn);
+            font-size:var(--f-sm); color:var(--ink); }
+  .banner .wrap { padding:.75rem 1.5rem; }
+  .banner b { color:var(--warn); }
+
+  section { padding:2rem 0; }
+  h2.sec { font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+           margin:0 0 .375rem; letter-spacing:-.015em; }
+  p.note { color:var(--ink-2); font-size:var(--f-sm); margin:0 0 1.25rem; max-width:44rem; }
+
+  /* summary tiles */
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));
+           gap:1rem; margin-bottom:1.5rem; }
+  .tile { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+          padding:1.125rem 1.25rem; box-shadow:var(--shadow); }
+  .tile .k { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.1em;
+             color:var(--ink-3); margin:0 0 .375rem; }
+  .tile .v { font-family:var(--serif); font-size:var(--f-3xl); font-weight:600;
+             line-height:1; letter-spacing:-.025em; margin:0;
+             font-variant-numeric:tabular-nums; }
+  .tile .s { font-size:var(--f-xs); color:var(--ink-3); margin:.375rem 0 0; }
+  .tile.flag { border-color:var(--warn); }
+  .tile.flag .v { color:var(--warn); }
+  .tile.good .v { color:var(--ok); }
+
+  /* table */
+  .tblwrap { overflow-x:auto; background:var(--surface); border:1px solid var(--line);
+             border-radius:var(--radius); box-shadow:var(--shadow); }
+  table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
+  thead th { text-align:left; font-size:var(--f-xs); text-transform:uppercase;
+             letter-spacing:.08em; color:var(--ink-3); font-weight:600;
+             padding:.875rem 1rem; border-bottom:1px solid var(--line-strong);
+             white-space:nowrap; background:var(--surface-2); }
+  tbody td { padding:.875rem 1rem; border-bottom:1px solid var(--line); color:var(--ink-2);
+             vertical-align:top; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover { background:var(--surface-2); }
+  td.name { color:var(--ink); font-weight:550; white-space:nowrap; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.date { font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink-3); }
+
+  .pill { display:inline-block; font-size:var(--f-xs); font-weight:600; padding:.2rem .55rem;
+          border-radius:999px; white-space:nowrap; }
+  .p-started { background:var(--info-soft); color:var(--info); }
+  .p-submitted { background:var(--accent-soft); color:var(--accent-ink); }
+  .p-proof, .p-approved { background:var(--accent-soft); color:var(--accent-ink); }
+  .p-production { background:var(--info-soft); color:var(--info); }
+  .p-set { background:var(--ok-soft); color:var(--ok); }
+  .p-stale { background:var(--warn-soft); color:var(--warn); }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) .p-submitted,
+    :root:not([data-theme="light"]) .p-proof,
+    :root:not([data-theme="light"]) .p-approved { color:var(--accent); }
+  }
+  :root[data-theme="dark"] .p-submitted,
+  :root[data-theme="dark"] .p-proof,
+  :root[data-theme="dark"] .p-approved { color:var(--accent); }
+
+  button, select, input { font:inherit; }
+  .btn { padding:.5rem .875rem; border-radius:var(--radius); cursor:pointer;
+         border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent);
+                 color:var(--on-accent); font-weight:600; }
+  .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
+  :is(button,select,input):focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  select.status { border:1px solid var(--line); background:var(--surface); color:var(--ink);
+                  border-radius:8px; padding:.3rem .5rem; font-size:var(--f-xs); }
+
+  .toolbar { display:flex; gap:.625rem; align-items:center; flex-wrap:wrap; margin-bottom:1rem; }
+  .toolbar .spacer { margin-left:auto; }
+
+  /* rollup */
+  .rollup td.num { color:var(--ink); }
+  .rollup tfoot td { font-weight:700; color:var(--ink); border-top:2px solid var(--line-strong);
+                     background:var(--surface-2); }
+
+  dialog { border:1px solid var(--line); border-radius:var(--radius); padding:0;
+           background:var(--surface); color:var(--ink); max-width:32rem; width:92vw;
+           box-shadow:0 24px 60px -20px rgba(0,0,0,.5); }
+  dialog::backdrop { background:rgba(16,20,38,.6); }
+  .dlg-in { padding:1.5rem; }
+  .dlg-in h3 { font-family:var(--serif); font-size:var(--f-xl); margin:0 0 1rem; }
+  .fld { display:flex; flex-direction:column; gap:.3rem; margin-bottom:.875rem; }
+  .fld label { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.08em;
+               color:var(--ink-3); }
+  .fld input, .fld select { border:1px solid var(--line-strong); border-radius:8px;
+                            padding:.55rem .7rem; background:var(--ground); color:var(--ink); }
+  .dlg-actions { display:flex; gap:.625rem; margin-top:1.25rem; }
+  .dlg-actions .spacer { margin-left:auto; }
+
+  footer.site { border-top:1px solid var(--line); background:var(--surface);
+                padding:1.5rem 0 3rem; font-size:var(--f-xs); color:var(--ink-3); }
+  code { font-family:var(--mono); font-size:.95em; }
+
+  /* ---------- partner pricing page ---------- */
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+          box-shadow:var(--shadow); padding:1.25rem 1.375rem; margin-bottom:1rem; }
+  .card.flag { border-color:var(--warn); }
+  .card-head { display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap;
+               margin-bottom:1rem; }
+  .card-head h3 { font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+                  margin:0; letter-spacing:-.01em; color:var(--ink); }
+  .card-head .spacer { margin-left:auto; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:1rem; }
+  .grid.tight { grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr)); }
+
+  .fld { display:flex; flex-direction:column; gap:.3rem; }
+  .fld label { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.08em;
+               color:var(--ink-3); }
+  .fld input, .fld select {
+    border:1px solid var(--line-strong); border-radius:8px; padding:.55rem .7rem;
+    background:var(--ground); color:var(--ink); font:inherit; width:100%;
+  }
+  .fld input:focus-visible, .fld select:focus-visible, button:focus-visible {
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  .fld input.unset { border-color:var(--warn); background:var(--warn-soft); }
+  .fld .sub { font-size:var(--f-xs); color:var(--ink-3); }
+  .fld .sub.warn { color:var(--warn); font-weight:600; }
+
+  .clause { font-size:var(--f-xs); color:var(--ink-3); font-style:italic;
+            border-left:2px solid var(--line-strong); padding-left:.625rem;
+            margin:.75rem 0 1rem; max-width:44rem; line-height:1.55; }
+  .clause b { font-style:normal; color:var(--ink-2); }
+
+  .sub-head { font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.1em;
+              color:var(--ink-3); font-weight:700; margin:1.5rem 0 .75rem;
+              padding-top:1rem; border-top:1px solid var(--line); }
+
+  .p-ok    { background:var(--ok-soft);   color:var(--ok); }
+  .p-warn  { background:var(--warn-soft); color:var(--warn); }
+  .p-info  { background:var(--info-soft); color:var(--info); }
+
+  .calc { background:var(--surface-2); border-radius:8px; padding:.875rem 1rem;
+          font-size:var(--f-sm); color:var(--ink-2); margin-top:1rem; }
+  .calc b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  .calc .line { display:flex; gap:.75rem; }
+  .calc .line + .line { margin-top:.35rem; }
+  .calc .line .spacer { margin-left:auto; }
+
+  .toolbar { display:flex; gap:.625rem; align-items:center; flex-wrap:wrap; margin-bottom:1.25rem; }
+  .toolbar .spacer { margin-left:auto; }
+  .btn { font:inherit; font-size:var(--f-sm); font-weight:600; cursor:pointer;
+         border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+         border-radius:8px; padding:.5rem .875rem; text-decoration:none; display:inline-block; }
+  .btn:hover { background:var(--surface-2); }
+  .btn-primary { background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+  .btn-primary:hover { filter:brightness(1.06); }
+
+  .toast { position:fixed; left:50%; bottom:1.5rem; transform:translateX(-50%);
+           background:var(--ink); color:var(--ground); padding:.625rem 1.125rem;
+           border-radius:999px; font-size:var(--f-sm); box-shadow:var(--shadow);
+           opacity:0; pointer-events:none; transition:opacity .25s; z-index:10; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <h1>Partner pricing</h1>
+    <span class="parent">Healing Partners</span>
+    <span class="month"></span>
+    <a class="btn" href="./index.html">Orders</a>
+    <a class="btn" href="./subscriptions.html">Subscriptions</a>
+  </div>
+</header>
+
+<div class="banner">
+  <div class="wrap">
+    <b>Demo data, no sign-in yet.</b>
+    This page is public on GitHub Pages, so it must not hold real funeral home data until
+    authentication is connected. Everything below lives in this browser only.
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2 class="sec">What each Partner charges, and what they owe</h2>
+    <p class="note">
+      Every figure on this page is set by the Partner User Agreement. The markup is the Partner's
+      own decision, not ours. The commission schedule depends on whether they carry qualifying
+      insurance. The service particulars are negotiated per Partner and are blank in the template,
+      so a blank field here means <b>not agreed yet</b> — never zero.
+    </p>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="toolbar">
+      <button class="btn btn-primary" id="addBtn">Add a Partner</button>
+      <span class="spacer"></span>
+      <button class="btn" id="seedBtn">Reload sample data</button>
+      <button class="btn" id="clearBtn">Clear</button>
+    </div>
+
+    <div id="host"></div>
+  </section>
+
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    Healing Partners &middot; internal. Clause references are to the Remember Them Partner User
+    Agreement. Data is stored in this browser only (<code>localStorage</code>); run
+    <code>dashboard/pricing.sql</code> and replace <code>Store</code> to make it real.
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     Every constant here is a term of the Partner User Agreement, not a
+     product decision. Changing one means the agreement changed.
+     ------------------------------------------------------------------ */
+
+  var PLAN = {
+    discounted: { price:150, label:"Discounted — $150/mo",
+                  note:"Six-month initial term, automatic payment required (Sec. 5.1)." },
+    standard:   { price:350, label:"Standard — $350/mo",
+                  note:"Month-to-month, no minimum term, no recapture (Sec. 5.1)." }
+  };
+
+  /* Exhibit B. Bands are 1-5 / 6-20 / 21+ and do not overlap.
+     Covered applies when the Partner carries the Sec. 7 insurance. */
+  function rateFor(count, insured) {
+    if (insured) return count >= 21 ? 0.07 : count >= 6 ? 0.08 : 0.10;
+    return           count >= 21 ? 0.10 : count >= 6 ? 0.12 : 0.15;
+  }
+
+  /* Sec. 7.1 */
+  var INSURANCE_REQUIREMENT = "$1M per claim / $2M aggregate professional liability (E&O)";
+
+  /* Exhibit A-4. NULL means not agreed, which is not the same as zero. */
+  var TERMS = [
+    { k:"users_included",      label:"Users included",      unit:"users", int:true },
+    { k:"additional_user_fee", label:"Extra user",          unit:"$/mo" },
+    { k:"turnaround_days",     label:"Turnaround target",   unit:"days",  int:true },
+    { k:"rush_days",           label:"Rush turnaround",     unit:"days",  int:true },
+    { k:"rush_fee",            label:"Rush fee",            unit:"$" },
+    { k:"revisions_included",  label:"Revisions included",  unit:"rounds", int:true },
+    { k:"revision_fee",        label:"Extra revision",      unit:"$" }
+  ];
+  /* Sec. 3.6 meters revisions, so without these the app cannot tell anyone
+     whether a revision is included or chargeable. */
+  var REQUIRED = ["users_included","turnaround_days","revisions_included",
+                  "revision_fee","deliverable_formats"];
+
+  var SUGGESTED_MARKUP = 2.5;   /* Healing Partners' suggestion. Sec. 6.8 leaves it to the Partner. */
+  var SAMPLE_WHOLESALE = 1000;  /* Reference figure for the "what a family sees" line. */
+
+  /* ------------------------------------------------------------------ */
+  var KEY = "healing-partners.partners.v1";
+  var Store = {
+    all: function () {
+      try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; }
+    },
+    save: function (rows) {
+      try { localStorage.setItem(KEY, JSON.stringify(rows)); } catch (e) { /* private mode */ }
+    }
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+  function money(n) {
+    return "$" + Number(n || 0).toLocaleString("en-US", { maximumFractionDigits:0 });
+  }
+  function money2(n) {
+    return "$" + Number(n || 0).toLocaleString("en-US",
+      { minimumFractionDigits:2, maximumFractionDigits:2 });
+  }
+  function pct(n) { return (n * 100).toFixed(0) + "%"; }
+  function toast(m) {
+    var t = $("toast"); t.textContent = m; t.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+
+  /* Sec. 7.4: a lapse is NOT a breach. It moves the Partner to the Standard
+     Schedule beginning the first calendar month AFTER the lapse — so a policy
+     that expired this month still earns the Covered rate this month. */
+  function insuranceState(p) {
+    if (!p.insured) return { covered:false, tone:"info", text:"Standard Schedule" };
+    if (!p.insurance_expires_at) {
+      return { covered:true, tone:"warn", text:"Covered — expiry date missing" };
+    }
+    var exp = new Date(p.insurance_expires_at + "T00:00:00");
+    var now = new Date();
+    var startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (exp < startOfThisMonth) {
+      return { covered:false, tone:"warn",
+               text:"Lapsed " + p.insurance_expires_at + " — Standard Schedule applies" };
+    }
+    var days = Math.ceil((exp - now) / 86400000);
+    if (days <= 45) {
+      return { covered:true, tone:"warn",
+               text:"Covered — renews in " + (days < 0 ? 0 : days) + " days" };
+    }
+    return { covered:true, tone:"ok", text:"Covered Schedule" };
+  }
+
+  function missingTerms(p) {
+    return REQUIRED.filter(function (k) {
+      return p[k] === null || p[k] === undefined || p[k] === "";
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Rendering
+     ------------------------------------------------------------------ */
+  function card(p, i) {
+    var ins  = insuranceState(p);
+    var rate = rateFor(p.orders_this_month || 0, ins.covered);
+    var miss = missingTerms(p);
+    var plan = PLAN[p.plan] || PLAN.discounted;
+    var salePrice = (p.sale_price_this_month || 0);
+    var commission = salePrice * rate;
+    var altRate = rateFor(p.orders_this_month || 0, !ins.covered);
+    var delta = Math.abs(salePrice * (altRate - rate));
+
+    var h = '<div class="card' + (miss.length ? " flag" : "") + '" data-i="' + i + '">';
+
+    h += '<div class="card-head">' +
+           "<h3>" + esc(p.name) + "</h3>" +
+           '<span class="pill p-' + ins.tone + '">' + esc(ins.text) + "</span>" +
+           (miss.length
+             ? '<span class="pill p-warn">' + miss.length + " term" + (miss.length > 1 ? "s" : "") +
+               " not agreed</span>"
+             : '<span class="pill p-ok">Terms complete</span>') +
+           '<span class="spacer"></span>' +
+           '<button class="btn" data-del="' + i + '" type="button">Remove</button>' +
+         "</div>";
+
+    /* ---- retail pricing ---- */
+    h += '<p class="clause"><b>Sec. 6.8</b> — "Partner independently establishes the price charged ' +
+         'to its customers." ' + SUGGESTED_MARKUP + '&times; is the Healing Partners suggestion. ' +
+         'It is not a rule we may impose, and a Partner may set their own.</p>';
+
+    h += '<div class="grid">' +
+           fld(i, "markup", "Retail markup", "number", p.markup, { step:"0.05", min:"1" },
+               p.markup == SUGGESTED_MARKUP ? "Our suggested figure."
+                                            : "Partner's own figure (we suggest " + SUGGESTED_MARKUP + "&times;).") +
+           fld(i, "plan", "Subscription plan", "select", p.plan, null, plan.note) +
+           fld(i, "insured", "Qualifying insurance", "check", p.insured, null,
+               INSURANCE_REQUIREMENT) +
+           fld(i, "insurance_expires_at", "Coverage expires", "date", p.insurance_expires_at, null,
+               p.insured ? "Sec. 7.3 — notify us within 10 days of a lapse."
+                         : "Only needed on the Covered Schedule.") +
+         "</div>";
+
+    h += '<div class="calc">' +
+           '<div class="line"><span>A ' + money(SAMPLE_WHOLESALE) + ' wholesale marker shows the ' +
+             'family</span><span class="spacer"></span><b>' +
+             money2(SAMPLE_WHOLESALE * (p.markup || SUGGESTED_MARKUP)) + "</b></div>" +
+           '<div class="line"><span>' + (p.orders_this_month || 0) + ' memorial' +
+             ((p.orders_this_month || 0) === 1 ? "" : "s") + ' this month &rarr; ' +
+             (ins.covered ? "Covered" : "Standard") + ' Schedule</span>' +
+             '<span class="spacer"></span><b>' + pct(rate) + "</b></div>" +
+           '<div class="line"><span>Commission on ' + money(salePrice) +
+             ' memorial sale price</span><span class="spacer"></span><b>' +
+             money2(commission) + "</b></div>" +
+           '<div class="line"><span>Subscription</span><span class="spacer"></span><b>' +
+             money(plan.price) + "</b></div>" +
+           '<div class="line" style="border-top:1px solid var(--line-strong);padding-top:.4rem">' +
+             "<span>Owed by the 15th of next month (Sec. 6.4)</span>" +
+             '<span class="spacer"></span><b>' + money2(commission + plan.price) + "</b></div>" +
+           (delta > 0
+             ? '<div class="line" style="color:var(--ink-3)"><span>' +
+               (ins.covered ? "The insurance discount is saving them"
+                            : "Qualifying insurance would save them") +
+               '</span><span class="spacer"></span><b>' + money2(delta) + "/mo</b></div>"
+             : "") +
+         "</div>";
+
+    /* Sec. 5.2 */
+    if (p.plan === "discounted" && (p.discounted_months_served || 0) > 0) {
+      h += '<div class="calc"><div class="line"><span>If they left the discounted term today, ' +
+           "recapture would be (350 &minus; 150) &times; " + p.discounted_months_served +
+           ' months (Sec. 5.2)</span><span class="spacer"></span><b>' +
+           money((350 - 150) * p.discounted_months_served) + "</b></div></div>";
+    }
+
+    /* ---- Exhibit A-4 ---- */
+    h += '<p class="sub-head">Exhibit A-4 — service particulars</p>';
+    h += '<p class="clause">These are blank in the template agreement and must be agreed with each ' +
+         'Partner. <b>Sec. 3.6</b> meters revision rounds, so until the revision fields are set the ' +
+         'app has no basis to tell anyone whether a revision is included or chargeable.</p>';
+
+    h += '<div class="grid tight">' +
+           TERMS.map(function (t) {
+             return fld(i, t.k, t.label, "number", p[t.k],
+                        { step: t.int ? "1" : "0.01", min:"0" }, t.unit);
+           }).join("") +
+         "</div>";
+
+    h += '<div class="grid" style="margin-top:1rem">' +
+           fld(i, "deliverable_formats", "Deliverable formats", "text", p.deliverable_formats, null,
+               "What the fabricator actually receives.") +
+           fld(i, "orders_this_month", "Memorials this month", "number", p.orders_this_month,
+               { step:"1", min:"0" }, "Drives the Exhibit B tier.") +
+           fld(i, "sale_price_this_month", "Memorial sale price, month to date", "number",
+               p.sale_price_this_month, { step:"0.01", min:"0" },
+               "Sec. 1.8 — excludes tax, cemetery fees and shipping at cost.") +
+         "</div>";
+
+    if (miss.length) {
+      h += '<p class="clause" style="border-left-color:var(--warn);color:var(--warn)">' +
+           "Cannot be onboarded yet — still to agree: " +
+           esc(miss.map(function (k) {
+             var t = TERMS.filter(function (x) { return x.k === k; })[0];
+             return t ? t.label.toLowerCase() : k.replace(/_/g, " ");
+           }).join(", ")) + ".</p>";
+    }
+
+    return h + "</div>";
+  }
+
+  function fld(i, key, label, type, val, attrs, sub) {
+    var id = "f-" + i + "-" + key;
+    var out = '<div class="fld"><label for="' + id + '">' + label + "</label>";
+
+    if (type === "select") {
+      out += '<select id="' + id + '" data-i="' + i + '" data-k="' + key + '">' +
+             Object.keys(PLAN).map(function (k) {
+               return '<option value="' + k + '"' + (val === k ? " selected" : "") + ">" +
+                      esc(PLAN[k].label) + "</option>";
+             }).join("") + "</select>";
+    } else if (type === "check") {
+      out += '<select id="' + id + '" data-i="' + i + '" data-k="' + key + '">' +
+             '<option value="no"'  + (val ? "" : " selected") + ">Not carried</option>" +
+             '<option value="yes"' + (val ? " selected" : "") + ">Carried and verified</option>" +
+             "</select>";
+    } else {
+      var a = "";
+      if (attrs) for (var n in attrs) a += " " + n + '="' + attrs[n] + '"';
+      var unset = (val === null || val === undefined || val === "");
+      out += '<input id="' + id + '" type="' + type + '" data-i="' + i + '" data-k="' + key + '"' +
+             a + ' value="' + esc(unset ? "" : val) + '"' +
+             (unset && REQUIRED.indexOf(key) >= 0 ? ' class="unset" placeholder="not agreed"' : "") +
+             ">";
+    }
+
+    if (sub) {
+      var warn = (val === null || val === undefined || val === "") && REQUIRED.indexOf(key) >= 0;
+      out += '<span class="sub' + (warn ? " warn" : "") + '">' +
+             (warn ? "Not agreed yet" : sub) + "</span>";
+    }
+    return out + "</div>";
+  }
+
+  function tiles(rows) {
+    var totalComm = 0, totalSubs = 0, covered = 0, incomplete = 0, atSuggested = 0;
+    rows.forEach(function (p) {
+      var ins = insuranceState(p);
+      totalComm += (p.sale_price_this_month || 0) * rateFor(p.orders_this_month || 0, ins.covered);
+      totalSubs += (PLAN[p.plan] || PLAN.discounted).price;
+      if (ins.covered) covered++;
+      if (missingTerms(p).length) incomplete++;
+      if (Number(p.markup) === SUGGESTED_MARKUP) atSuggested++;
+    });
+
+    function tile(k, v, s, cls) {
+      return '<div class="tile ' + (cls || "") + '"><p class="k">' + k + '</p>' +
+             '<p class="v">' + v + '</p><p class="s">' + s + "</p></div>";
+    }
+
+    $("tiles").innerHTML =
+      tile("Partners", rows.length, covered + " on the Covered Schedule") +
+      tile("Commission this month", money(totalComm), "On memorial sale price") +
+      tile("Subscriptions", money(totalSubs), rows.length + " Partners") +
+      tile("Using our 2.5&times;", atSuggested + " of " + rows.length,
+           "The rest set their own — Sec. 6.8", atSuggested === rows.length ? "" : "good") +
+      tile("Terms not agreed", incomplete, incomplete ? "Cannot onboard yet" : "All complete",
+           incomplete ? "flag" : "good");
+  }
+
+  function render() {
+    var rows = Store.all();
+    tiles(rows);
+    $("host").innerHTML = rows.length
+      ? rows.map(card).join("")
+      : '<div class="card"><p class="note" style="margin:0">No Partners yet. ' +
+        'Add one, or reload the sample data.</p></div>';
+  }
+
+  /* ------------------------------------------------------------------
+     Editing
+     ------------------------------------------------------------------ */
+  var INT_KEYS = ["users_included","turnaround_days","rush_days","revisions_included",
+                  "orders_this_month","discounted_months_served"];
+
+  document.addEventListener("change", function (e) {
+    var el = e.target;
+    var k = el.getAttribute && el.getAttribute("data-k");
+    if (!k) return;
+
+    var rows = Store.all();
+    var p = rows[Number(el.getAttribute("data-i"))];
+    if (!p) return;
+
+    if (k === "insured") {
+      p.insured = el.value === "yes";
+    } else if (el.type === "number") {
+      p[k] = el.value === "" ? null
+           : (INT_KEYS.indexOf(k) >= 0 ? parseInt(el.value, 10) : parseFloat(el.value));
+      if (p[k] !== null && isNaN(p[k])) p[k] = null;
+    } else {
+      p[k] = el.value === "" ? null : el.value;
+    }
+
+    Store.save(rows);
+    render();
+    toast("Saved");
+  });
+
+  document.addEventListener("click", function (e) {
+    var del = e.target.getAttribute && e.target.getAttribute("data-del");
+    if (del === null || del === undefined) return;
+    var rows = Store.all();
+    var name = rows[Number(del)] && rows[Number(del)].name;
+    if (!confirm("Remove " + name + "?")) return;
+    rows.splice(Number(del), 1);
+    Store.save(rows);
+    render();
+    toast("Removed");
+  });
+
+  $("addBtn").addEventListener("click", function () {
+    var name = prompt("Partner legal name");
+    if (!name || !name.trim()) return;
+    var rows = Store.all();
+    rows.push(blank(name.trim()));
+    Store.save(rows);
+    render();
+    toast("Added — agree the Exhibit A terms next");
+  });
+
+  /* A new Partner starts at our suggested markup and on the discounted plan,
+     with every Exhibit A field null. Null is the honest starting state: those
+     terms have not been negotiated yet. */
+  function blank(name) {
+    var p = { name:name, markup:SUGGESTED_MARKUP, plan:"discounted",
+              discounted_months_served:0, insured:false, insurance_expires_at:null,
+              deliverable_formats:null, orders_this_month:0, sale_price_this_month:0 };
+    TERMS.forEach(function (t) { p[t.k] = null; });
+    return p;
+  }
+
+  $("clearBtn").addEventListener("click", function () {
+    if (!confirm("Clear all Partners from this browser?")) return;
+    Store.save([]); render(); toast("Cleared");
+  });
+
+  $("seedBtn").addEventListener("click", function () { Store.save(sample()); render(); });
+
+  /* Sample data deliberately shows the three states worth seeing: a Partner
+     fully set up on the Covered Schedule, one still missing Exhibit A terms,
+     and one who has set their own markup rather than taking our suggestion. */
+  function sample() {
+    function iso(daysFromNow) {
+      return new Date(Date.now() + daysFromNow * 86400000).toISOString().slice(0, 10);
+    }
+    return [
+      { name:"Riverside Family Funeral Home", markup:2.5, plan:"discounted",
+        discounted_months_served:4, insured:true, insurance_expires_at:iso(200),
+        insurance_carrier:"Sentinel Mutual", users_included:3, additional_user_fee:25,
+        turnaround_days:5, rush_days:2, rush_fee:150, revisions_included:2, revision_fee:75,
+        deliverable_formats:"PDF proof, layered EPS, stencil-ready DXF",
+        orders_this_month:7, sale_price_this_month:28450 },
+
+      { name:"Cedar Hill Memorial Chapel", markup:2.5, plan:"standard",
+        discounted_months_served:0, insured:false, insurance_expires_at:null,
+        users_included:null, additional_user_fee:null, turnaround_days:null, rush_days:null,
+        rush_fee:null, revisions_included:null, revision_fee:null, deliverable_formats:null,
+        orders_this_month:3, sale_price_this_month:9800 },
+
+      { name:"Millbrook Funeral Home", markup:2.8, plan:"discounted",
+        discounted_months_served:1, insured:true, insurance_expires_at:iso(20),
+        insurance_carrier:"Cascade Indemnity", users_included:2, additional_user_fee:25,
+        turnaround_days:7, rush_days:3, rush_fee:125, revisions_included:1, revision_fee:75,
+        deliverable_formats:"PDF proof, layered EPS",
+        orders_this_month:22, sale_price_this_month:71200 }
+    ];
+  }
+
+  /* ---------- boot ---------- */
+  if (!Store.all().length) Store.save(sample());
+  render();
+})();
+
+</script>
+</body>
+</html>
