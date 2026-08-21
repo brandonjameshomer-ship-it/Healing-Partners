@@ -707,6 +707,28 @@
     });
   }
 
+  /* Someone may reach the configurator straight from the intake instead of
+     going through the guided flow. Carry over who this is, at minimum — the
+     one thing that must never have to be typed twice. A shared link still
+     wins, because it describes a specific design. */
+  if (!fromLink) {
+    var handed = null;
+    try {
+      var raw = localStorage.getItem("rt.handoff.v1");
+      if (raw) {
+        var r = JSON.parse(raw);
+        /* Same twelve-hour window the guided flow uses: these machines are
+           shared between families and yesterday's must not come back. */
+        if (r && r.v === 1 && r.at && (Date.now() - r.at) < 12 * 60 * 60 * 1000) handed = r;
+      }
+    } catch (e) {}
+    if (handed) {
+      if (handed.name) d.name = handed.name;
+      if (handed.born) d.born = handed.born;
+      if (handed.died) d.died = handed.died;
+    }
+  }
+
   syncInputs();
   syncPressed();
   render();

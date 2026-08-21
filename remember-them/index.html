@@ -439,6 +439,7 @@
   var chosenKey    = null, chosenFeats = [];
   var vrStatus     = "none"; // none | selected | pending | paid | included
   var step         = 1;
+  var intake       = null;   /* the record handed over by intake.html, if any */
 
   /* A memorial needs a stable identifier that is not a person's name. Names
      carry apostrophes, accents, and duplicates, and are not unique. This is
@@ -493,12 +494,41 @@
     { id:"bronze",t:"Bronze", d:"Warm metal set into the granite. It ages beautifully.", tags:["service","work"] },
     { id:"symbol",t:"A symbol of their faith", d:"A cross, a star, or another emblem that meant something to them.", tags:["faith"] }
   ];
-  function suggest(tags){
-    return CATALOGUE.map(function(c){
-      var s=0; for(var i=0;i<c.tags.length;i++) if(tags.indexOf(c.tags[i])!==-1) s+=2;
-      if (c.tags.indexOf("general")!==-1) s+=1;
-      return {c:c,s:s};
-    }).sort(function(a,b){return b.s-a.s;})
+  /* Themes carry the weight the family put on them.
+   *
+   * Page three of the intake asks them to rate every answer 1-10 for how much
+   * it should shape the design. That rating is the narrowing mechanism, and it
+   * used to reach this page and do nothing. Now it is the score.
+   *
+   * A theme takes the HIGHEST rating among the answers that raised it, not the
+   * sum. Summing would reward whoever talked longest; one story rated 10 should
+   * outweigh three rated 3. The question asked was how much it should matter,
+   * so that is the number to use.
+   */
+  function tagWeights(){
+    var src = (intake && intake.items && intake.items.length)
+      ? intake.items
+      : [{ text: allText(), weight: 5 }];   /* typed straight in: all themes equal */
+    var w = {};
+    src.forEach(function(it){
+      readStory(it.text).forEach(function(t){
+        if (!w[t] || it.weight > w[t]) w[t] = it.weight;
+      });
+    });
+    return w;
+  }
+  function rankedTags(w){
+    return Object.keys(w).sort(function(a,b){ return w[b]-w[a]; });
+  }
+  function scoreFor(c, w){
+    var s=0;
+    for(var i=0;i<c.tags.length;i++) if (w[c.tags[i]]) s += w[c.tags[i]];
+    if (c.tags.indexOf("general")!==-1) s+=1;
+    return s;
+  }
+  function suggest(w){
+    return CATALOGUE.map(function(c){ return {c:c, s:scoreFor(c,w)}; })
+      .sort(function(a,b){return b.s-a.s;})
       .slice(0, MAX_SUGGESTIONS).map(function(x){return x.c;});
   }
   function why(c,tags){
@@ -517,6 +547,7 @@
     if (step<=2) n+=1;
     if (step<=3) n += Math.max(0, (followQs.length||MAX_FOLLOWUPS) - fi);
     if (step<=4) n += Math.max(0, (queue.length||MAX_SUGGESTIONS) - qi);
+    if (step<=5) n += Math.floor(vsQueue.length / 2);   // pairwise rounds left
     n += 1;                       // choosing a proof
     return Math.max(0, n);
   }
@@ -570,10 +601,10 @@
 
   function allText(){ return A.story+" "+A.follows.join(" "); }
 
-  function startCards(){ queue=suggest(readStory(allText())); qi=0; yes=[]; maybe=[]; renderCard(); }
+  function startCards(){ queue=suggest(tagWeights()); qi=0; yes=[]; maybe=[]; renderCard(); }
   function renderCard(){
     if (qi>=queue.length){ afterCards(); return; }
-    var c=queue[qi], tags=readStory(allText());
+    var c=queue[qi], tags=rankedTags(tagWeights());
     $("counter").innerHTML=(qi+1)+" of "+queue.length+
       (yes.length?' &middot; <span class="kept">'+yes.length+' kept</span>':"");
     $("card").innerHTML="<h3>"+esc(c.t)+"</h3><p class=\"what\">"+esc(c.d)+"</p>"+
@@ -589,7 +620,11 @@
   $("ansMaybe").onclick=function(){answer("maybe");};
   $("ansNo").onclick=function(){answer("no");};
   $("cardBack").onclick=function(){
-    if(qi===0){ fi=Math.max(0,followQs.length-1); askFollow(); return; }
+    if(qi===0){
+      /* They never answered follow-ups here — they came from the intake. */
+      if (intake && intake.items && intake.items.length){ location.href="intake.html"; return; }
+      fi=Math.max(0,followQs.length-1); askFollow(); return;
+    }
     qi--; var id=queue[qi].id;
     yes=yes.filter(function(x){return x!==id;});
     maybe=maybe.filter(function(x){return x!==id;});
@@ -600,20 +635,53 @@
     var chosen=yes.slice();
     if(chosen.length<3) chosen=chosen.concat(maybe);
     if(chosen.length===0) chosen=queue.slice(0,3).map(function(c){return c.id;});
-    /* suggest() caps the queue at MAX_SUGGESTIONS (5), so `chosen` can never
-       exceed 5 and the pairwise round is unreachable today. It is kept because
-       it becomes live the moment the catalogue grows past five cards — but the
-       call is guarded rather than left as a silent dead branch. */
-    if (chosen.length > MAX_SUGGESTIONS) startVersus(chosen); else buildProofs(chosen);
+
+    /* Narrowing to three to five, in the order the product intends.
+     *
+     * The 1-10 rating from the intake narrows first. Pairwise comparison is
+     * the tiebreaker for the things that come out level — which is exactly
+     * when a family cannot rank them and the step earns its place.
+     *
+     * The old trigger fired only when more than five cards were kept, but
+     * suggest() caps the queue at five, so it could never fire at all. The
+     * essential step in the flow was unreachable.
+     */
+    if (chosen.length > 3){
+      var w = tagWeights();
+      var scored = chosen.map(function(id){ return { id:id, s:scoreFor(item(id), w) }; })
+                         .sort(function(a,b){ return b.s - a.s; });
+      var cut  = scored[2].s;
+      var tied = scored.filter(function(x){ return x.s === cut; });
+
+      if (tied.length > 1){
+        /* Anything scoring above the cut is already settled and skips the
+           comparison; only the level ones get compared. */
+        startVersus(tied.map(function(x){ return x.id; }),
+                    scored.filter(function(x){ return x.s > cut; })
+                          .map(function(x){ return x.id; }));
+        return;
+      }
+      chosen = scored.slice(0,5).map(function(x){ return x.id; });
+    }
+    buildProofs(chosen);
   }
 
-  var vsQueue=[], vsKeep=[];
-  function startVersus(l){ vsQueue=l.slice(); vsKeep=[]; nextVersus(); }
+  /* Pairwise comparison ORDERS; it does not eliminate.
+   *
+   * suggest() hands over at most five cards, so a family can never keep more
+   * than five and the count is already inside the three-to-five the product
+   * aims for. Halving the field by knockout would push them BELOW three, which
+   * is the opposite of the job. What is genuinely undecided when ratings come
+   * out level is which element leads the memorial — so the loser of a pair
+   * keeps its place, just behind the winner.
+   */
+  var vsQueue=[], vsKeep=[], vsLost=[];
+  function startVersus(l, settled){
+    vsQueue=l.slice(); vsKeep=(settled||[]).slice(); vsLost=[]; nextVersus();
+  }
   function nextVersus(){
     if(vsQueue.length<=1){
-      vsKeep=vsKeep.concat(vsQueue);
-      if(vsKeep.length>5){ vsQueue=vsKeep; vsKeep=[]; nextVersus(); return; }
-      buildProofs(vsKeep.slice(0,5)); return;
+      buildProofs(vsKeep.concat(vsQueue).concat(vsLost).slice(0,5)); return;
     }
     var a=item(vsQueue.shift()), b=item(vsQueue.shift());
     $("vsProgress").textContent="Just a couple of these. There's no wrong answer.";
@@ -625,7 +693,12 @@
   }
   $("versus").addEventListener("click", function(e){
     var c=e.target.closest("[data-vs]"); if(!c) return;
-    vsKeep.push(c.getAttribute("data-vs")); nextVersus();
+    var win = c.getAttribute("data-vs");
+    var pair = ($("versus").getAttribute("data-pair")||"").split(",");
+    var lose = (pair[0] === win) ? pair[1] : pair[0];
+    vsKeep.push(win);
+    if (lose) vsLost.push(lose);      /* still theirs, just not the lead */
+    nextVersus();
   });
   $("vsEqual").onclick=function(){
     var p=($("versus").getAttribute("data-pair")||"").split(",");
@@ -806,7 +879,68 @@
     else { alert(msg); }
   };
 
-  show(1); $("f-name").focus();
+  /* ---------- arriving from the intake ----------
+   *
+   * The intake writes the whole record - answers, personality words, and the
+   * 1-10 rating on each - then sends the family here. Previously it passed a
+   * name and two dates to a page that read neither, so three pages of
+   * interview were discarded and the family landed somewhere that did not
+   * know who had died.
+   *
+   * The record is only honoured for a short window. These machines sit on a
+   * funeral home's front desk and are used by one family after another;
+   * yesterday's interview must not surface in today's session. Privacy was the
+   * single objection operators raised, so it gets the strict reading.
+   */
+  var HANDOFF_KEY = "rt.handoff.v1";
+  var HANDOFF_MAX_AGE = 12 * 60 * 60 * 1000;
+
+  function readHandoff(){
+    var q; try { q = new URLSearchParams(location.search); } catch(e){ return null; }
+    if (!q || q.get("from") !== "intake") return null;
+
+    var raw = null;
+    try { raw = localStorage.getItem(HANDOFF_KEY); } catch(e){}
+    if (raw){
+      try {
+        var r = JSON.parse(raw);
+        if (r && r.v === 1 && r.at && (Date.now() - r.at) < HANDOFF_MAX_AGE) return r;
+        if (r) clearHandoff();          /* stale, or a shape we do not know */
+      } catch(e){ clearHandoff(); }
+    }
+    /* Private browsing, or storage cleared between the two pages. The query
+       string still carries who this is, which is the part never to lose. */
+    var nm = q.get("name");
+    if (nm) return { v:1, name:nm, born:q.get("born")||"", died:q.get("died")||"",
+                     items:[], words:[], text:"" };
+    return null;
+  }
+  function clearHandoff(){
+    try { localStorage.removeItem(HANDOFF_KEY); } catch(e){}
+  }
+
+  intake = readHandoff();
+
+  if (intake){
+    A.name = intake.name || "";
+    A.born = intake.born || "";
+    A.died = intake.died || "";
+    $("f-name").value = A.name;
+    $("f-born").value = A.born;
+    $("f-died").value = A.died;
+  }
+
+  if (intake && intake.items && intake.items.length){
+    /* Everything they wrote, so the theme reader and the proofs can use it. */
+    A.story   = intake.text || "";
+    A.follows = intake.items.map(function(it){ return it.text; });
+    $("f-story").value = A.story;
+    startCards();                       /* identity and story are already done */
+  } else if (intake){
+    show(2);                            /* we know who, not yet their story */
+  } else {
+    show(1); $("f-name").focus();
+  }
 })();
 </script>
 </body>

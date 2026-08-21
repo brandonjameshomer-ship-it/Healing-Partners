@@ -596,15 +596,50 @@
   });
   $("back").addEventListener("click", function () { show(page - 1); });
 
-  /* ---------- handoff to the designer ---------- */
+  /* ---------- handoff to the designer ----------
+   *
+   * This used to put the name and dates in a query string and send the family
+   * to the configurator, which read none of them. Three pages of interview and
+   * every 1-10 rating were dropped on the floor, and they arrived at a blank
+   * page that did not know who had died.
+   *
+   * The whole record now goes to the guided flow, weights included, and those
+   * weights decide what gets suggested. That rating is the narrowing mechanism
+   * page three exists for; until now it only drew a summary line.
+   */
+  var HANDOFF_KEY = "rt.handoff.v1";
+
   function handoff() {
     save();
+
+    var items = weighItems().map(function (it) {
+      var w = d.weights[it.id];
+      return { id: it.id, cat: it.cat, text: it.text,
+               weight: (typeof w === "number" ? w : 5) };
+    });
+
+    var record = {
+      v: 1,
+      at: Date.now(),
+      name: d.name,
+      known: d.known,
+      born: d.born,
+      died: d.died,
+      words: d.words.slice(),
+      items: items,
+      /* Everything they wrote, for theme detection. */
+      text: items.map(function (it) { return it.text; }).join("  ")
+    };
+
+    try { localStorage.setItem(HANDOFF_KEY, JSON.stringify(record)); }
+    catch (e) { /* private mode — fall back to the query string below */ }
+
     var q = new URLSearchParams();
-    q.set("name", d.name);
+    q.set("from", "intake");
+    if (d.name) q.set("name", d.name);
     if (d.born) q.set("born", d.born);
     if (d.died) q.set("died", d.died);
-    q.set("from", "intake");
-    window.location.href = "designer.html?" + q.toString();
+    window.location.href = "index.html?" + q.toString();
   }
 
   /* ---------- boot ---------- */
