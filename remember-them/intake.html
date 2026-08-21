@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Remember Them — tell us about the person, and we will shape a memorial around what mattered most. From Healing Partners.">
+<title>Remember Them — About the person</title>
+<style>
+  /* ============================================================
+     Remember Them — intake
+     Page 1 identity · Page 2 interview · Page 3 weighting
+     Shares the "blue hour" tokens used by designer.html.
+     ============================================================ */
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --glow:rgba(200,150,60,.30);
+    --danger:#A3352F;
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:1rem; --f-lg:1.0625rem;
+    --f-xl:1.375rem; --f-2xl:1.875rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06;
+      --glow:rgba(224,177,102,.28); --danger:#E08078;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06;
+    --glow:rgba(224,177,102,.28); --danger:#E08078;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:var(--f-base); line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- masthead ---------- */
+  header.masthead {
+    border-bottom:1px solid var(--line); background:var(--surface);
+    position:sticky; top:0; z-index:5;
+  }
+  .masthead .in {
+    max-width:52rem; margin:0 auto; padding:.875rem 1.25rem;
+    display:flex; align-items:center; gap:.75rem;
+  }
+  /* LOGO SLOT — the Remember Them logo file has not been supplied yet.
+     Drop it in as remember-them/logo.svg (or .png) and swap the <span> for
+     <img src="logo.svg" alt="Remember Them" class="logo">. The wordmark below
+     is a placeholder so the layout is not waiting on the asset. */
+  .logo { height:28px; width:auto; display:block; }
+  .wordmark {
+    font-family:var(--serif); font-size:var(--f-lg); letter-spacing:.02em;
+    color:var(--ink);
+  }
+  .wordmark .tm { font-size:var(--f-xs); vertical-align:super; color:var(--ink-3); }
+  .masthead .spacer { flex:1; }
+  .stepcount { font-size:var(--f-sm); color:var(--ink-3); font-variant-numeric:tabular-nums; }
+
+  /* ---------- progress ---------- */
+  .rail { display:flex; height:3px; background:var(--surface-2); }
+  .rail span { flex:1; background:transparent; transition:background .3s; }
+  .rail span.done { background:var(--accent); }
+
+  /* ---------- layout ---------- */
+  main { max-width:52rem; margin:0 auto; padding:2rem 1.25rem 7rem; }
+  .page { display:none; }
+  .page.on { display:block; animation:rise .3s ease both; }
+  @keyframes rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce) { .page.on { animation:none; } }
+
+  .lede { font-family:var(--serif); font-size:var(--f-2xl); line-height:1.25; margin:0 0 .5rem; }
+  .sub { color:var(--ink-2); margin:0 0 2rem; max-width:38rem; }
+
+  /* ---------- fields ---------- */
+  .card {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem;
+    box-shadow:var(--shadow);
+  }
+  .field { margin-bottom:1rem; }
+  .field:last-child { margin-bottom:0; }
+  label { display:block; font-size:var(--f-sm); color:var(--ink-2); margin-bottom:.375rem; font-weight:600; }
+  input[type=text], input[type=date], textarea {
+    width:100%; font:inherit; color:var(--ink);
+    background:var(--ground); border:1px solid var(--line-strong);
+    border-radius:8px; padding:.625rem .75rem;
+  }
+  input:focus-visible, textarea:focus-visible, button:focus-visible, .word:focus-visible {
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  textarea { min-height:5.5rem; resize:vertical; line-height:1.55; }
+  .row { display:flex; gap:1rem; flex-wrap:wrap; }
+  .row > .field { flex:1 1 12rem; }
+  .hint { font-size:var(--f-sm); color:var(--ink-3); margin-top:.375rem; }
+  .err { color:var(--danger); font-size:var(--f-sm); margin-top:.375rem; display:none; }
+  .err.on { display:block; }
+
+  /* ---------- interview ---------- */
+  .section-label {
+    font-size:var(--f-xs); letter-spacing:.09em; text-transform:uppercase;
+    color:var(--ink-3); font-weight:700; margin:2rem 0 .75rem;
+  }
+  .section-label:first-of-type { margin-top:0; }
+  .q { font-family:var(--serif); font-size:var(--f-lg); color:var(--ink); margin:0 0 .25rem; }
+  .q-why { font-size:var(--f-sm); color:var(--ink-3); margin:0 0 .625rem; }
+  .skip { font-size:var(--f-sm); color:var(--ink-3); }
+
+  /* ---------- personality words ---------- */
+  .words { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:.75rem; }
+  .word {
+    display:inline-flex; align-items:center; gap:.4rem;
+    background:var(--accent-soft); color:var(--accent-ink);
+    border:1px solid var(--accent); border-radius:999px;
+    padding:.3rem .5rem .3rem .75rem; font-size:var(--f-sm); font-weight:600;
+  }
+  .word button {
+    background:none; border:none; color:inherit; cursor:pointer;
+    font-size:1rem; line-height:1; padding:0 .15rem; opacity:.65;
+  }
+  .word button:hover { opacity:1; }
+  .wordcount { font-size:var(--f-sm); color:var(--ink-3); }
+
+  /* ---------- weighting ---------- */
+  .weigh { border-bottom:1px solid var(--line); padding:1rem 0; }
+  .weigh:last-child { border-bottom:none; }
+  .weigh-head { display:flex; align-items:baseline; gap:.75rem; margin-bottom:.25rem; }
+  .weigh-cat {
+    font-size:var(--f-xs); letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-3); font-weight:700;
+  }
+  .weigh-quote {
+    font-family:var(--serif); color:var(--ink-2); margin:.25rem 0 .75rem;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .slide { display:flex; align-items:center; gap:1rem; }
+  .slide input[type=range] { flex:1; accent-color:var(--accent); height:1.5rem; }
+  .score {
+    min-width:2.75rem; text-align:center; font-variant-numeric:tabular-nums;
+    font-weight:700; font-size:var(--f-lg); color:var(--accent-ink);
+    background:var(--accent-soft); border-radius:6px; padding:.15rem 0;
+  }
+  .scale { display:flex; justify-content:space-between; font-size:var(--f-xs); color:var(--ink-3); margin-top:.25rem; }
+
+  /* ---------- buttons ---------- */
+  .bar {
+    position:fixed; left:0; right:0; bottom:0; background:var(--surface);
+    border-top:1px solid var(--line); z-index:5;
+  }
+  .bar .in {
+    max-width:52rem; margin:0 auto; padding:.875rem 1.25rem;
+    display:flex; align-items:center; gap:.75rem;
+  }
+  .bar .spacer { flex:1; }
+  button.btn {
+    font:inherit; font-weight:600; cursor:pointer; border-radius:8px;
+    padding:.625rem 1.25rem; border:1px solid var(--line-strong);
+    background:var(--surface); color:var(--ink);
+  }
+  button.btn:hover { background:var(--surface-2); }
+  button.btn.primary {
+    background:var(--accent); color:var(--on-accent); border-color:var(--accent);
+    box-shadow:0 0 0 0 var(--glow);
+  }
+  button.btn.primary:hover { filter:brightness(1.06); }
+  button.btn.ghost { border-color:transparent; background:none; color:var(--ink-2); }
+
+  /* ---------- privacy + legal ---------- */
+  .privacy {
+    background:var(--surface-2); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1rem 1.125rem;
+    font-size:var(--f-sm); color:var(--ink-2); margin-bottom:1.5rem;
+  }
+  .privacy strong { color:var(--ink); }
+  footer.legal {
+    max-width:52rem; margin:0 auto; padding:0 1.25rem 2rem;
+    font-size:var(--f-xs); color:var(--ink-3); line-height:1.6;
+  }
+  footer.legal p { margin:.5rem 0; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="in">
+    <span class="wordmark">Remember Them<span class="tm">™</span></span>
+    <span class="spacer"></span>
+    <span class="stepcount" id="stepcount">Step 1 of 3</span>
+  </div>
+  <div class="rail" aria-hidden="true">
+    <span id="r1" class="done"></span><span id="r2"></span><span id="r3"></span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ PAGE 1 — IDENTITY ============ -->
+  <section class="page on" id="p1" aria-labelledby="h1">
+    <h1 class="lede" id="h1">Who are we remembering?</h1>
+    <p class="sub">Just the name and the dates for now. Everything else comes next, in your own words.</p>
+
+    <div class="card">
+      <div class="field">
+        <label for="f-first">Full legal name</label>
+        <input type="text" id="f-first" autocomplete="off" maxlength="80"
+               placeholder="As it should appear on the memorial">
+        <p class="hint">Spelling is carried through to the finished stone, so use the spelling the family wants engraved.</p>
+        <p class="err" id="e-name">Please enter the name.</p>
+      </div>
+
+      <div class="field">
+        <label for="f-known">Also known as <span style="font-weight:400;color:var(--ink-3)">(optional)</span></label>
+        <input type="text" id="f-known" autocomplete="off" maxlength="60"
+               placeholder="A nickname, a maiden name, what people actually called them">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="f-born">Date of birth</label>
+          <input type="date" id="f-born">
+        </div>
+        <div class="field">
+          <label for="f-died">Date of death</label>
+          <input type="date" id="f-died">
+        </div>
+      </div>
+      <p class="err" id="e-dates">Please check the dates — the date of death cannot come before the date of birth.</p>
+    </div>
+
+    <div class="privacy">
+      <strong>What happens to what you tell us.</strong> Everything on the next pages stays with your
+      funeral home and with Healing Partners for the purpose of designing this memorial, and nothing
+      else. <strong>It is never used to train artificial-intelligence models.</strong> You can ask for
+      it to be deleted at any time.
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2 — INTERVIEW ============ -->
+  <section class="page" id="p2" aria-labelledby="h2">
+    <h1 class="lede" id="h2">Tell us about <span id="nameEcho">them</span>.</h1>
+    <p class="sub">
+      Answer whichever of these you want to — skip anything that does not fit, and there is no such
+      thing as too much. One specific thing beats ten kind words: a stranger walking past the finished
+      memorial should get something true about who this person was.
+    </p>
+
+    <div id="qHost"></div>
+
+    <p class="section-label">Personality</p>
+    <div class="card">
+      <p class="q">If you had ten words for them, what would they be?</p>
+      <p class="q-why">Type a word and press Enter. These set the whole tone of the design — plain-spoken or ornate, quiet or bold.</p>
+      <div class="words" id="wordList"></div>
+      <input type="text" id="wordInput" maxlength="24" autocomplete="off"
+             placeholder="Stubborn. Generous. Funny. Early. …">
+      <p class="wordcount" id="wordCount">0 of 10</p>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 3 — WEIGHTING ============ -->
+  <section class="page" id="p3" aria-labelledby="h3">
+    <h1 class="lede" id="h3">What matters most on the stone?</h1>
+    <p class="sub">
+      You told us a lot, and a memorial only holds so much. Rate each one from 1 to 10 for how much it
+      should shape the design. A 10 will show up in the memorial itself; a 1 stays part of the story
+      without being carved.
+    </p>
+
+    <div class="card" id="weighHost"></div>
+
+    <div class="privacy" id="topSummary"></div>
+  </section>
+
+</main>
+
+<footer class="legal">
+  <p>
+    Healing Partners LLC · 111 SW 5th Avenue, Floor 5, Portland, Oregon 97204 ·
+    <a href="mailto:bhomer@healingpartners.us" style="color:var(--ink-2)">bhomer@healingpartners.us</a>
+  </p>
+  <p>
+    Remember Them provides memorial design services and design files. Healing Partners does not
+    manufacture, engrave, transport, set, install, or sell physical memorials — your funeral home
+    selects and works with its own fabricator. Every design is confirmed at proof approval before
+    anything is produced.
+  </p>
+</footer>
+
+<div class="bar">
+  <div class="in">
+    <button class="btn ghost" id="back" type="button" hidden>Back</button>
+    <span class="spacer"></span>
+    <button class="btn primary" id="next" type="button">Continue</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     The interview. Categories and coverage are fixed by the product
+     spec: stories across the life stages, then habits, hobbies and
+     talents, then the ten personality words (handled separately in the
+     markup because it is a different kind of input).
+
+     The wording follows the interview guide in the skill: ask about
+     behaviour rather than character, ask about the ordinary rather than
+     the milestone, one question at a time.
+     ------------------------------------------------------------------ */
+  var QUESTIONS = [
+    { group:"Stories", id:"childhood", cat:"Childhood",
+      q:"What were they like as a child?",
+      why:"A place, a day, or the trouble they got into — not what kind of child they were.",
+      ph:"The creek behind the house, the bike with no brakes, the summer they…" },
+
+    { group:"Stories", id:"sports", cat:"Sports",
+      q:"What did they play, coach, watch, or shout at?",
+      why:"Whose games did they never miss? What was on the television every Sunday?",
+      ph:"Played centre until his knees went. Never missed one of the grandkids' games…" },
+
+    { group:"Stories", id:"youngadult", cat:"Young adult",
+      q:"What were they doing at twenty?",
+      why:"First car, first job, first place of their own, the year everything changed.",
+      ph:"Drove a candy-apple Mustang. Left for the coast with forty dollars…" },
+
+    { group:"Stories", id:"dating", cat:"Dating",
+      q:"How did they meet the person they loved?",
+      why:"And who told that story better — them, or the other one?",
+      ph:"At a dance neither of them wanted to go to…" },
+
+    { group:"Stories", id:"marriage", cat:"Marriage",
+      q:"What did their marriage look like on an ordinary Tuesday?",
+      why:"The everyday texture says more than the anniversaries.",
+      ph:"Coffee at five, crossword together, argued about the thermostat for forty years…" },
+
+    { group:"Stories", id:"parenting", cat:"Parenting",
+      q:"What kind of parent were they — and what did they always say?",
+      why:"The phrase the children can still hear in their voice.",
+      ph:"\"We'll figure it out.\" Sat through every recital, front row…" },
+
+    { group:"Stories", id:"work", cat:"Work",
+      q:"What did their hands look like at the end of a workday?",
+      why:"What did they build, grow, or fix that is still standing? What did people come to them for?",
+      ph:"Thirty-one years at the mill. Rewired half the neighbourhood for free…" },
+
+    { group:"Habits, hobbies and talents", id:"habits", cat:"Habits",
+      q:"What did they do the same way every single day?",
+      why:"The small unshakeable routine everyone in the family could set a clock by.",
+      ph:"Up at 4:30 no matter what. Same booth, same order, same waitress…" },
+
+    { group:"Habits, hobbies and talents", id:"hobbies", cat:"Hobbies",
+      q:"Where did their free time actually go?",
+      why:"The garage, the garden, the water, the workshop, the card table.",
+      ph:"Roses along the whole fence line. Tied his own flies…" },
+
+    { group:"Habits, hobbies and talents", id:"talents", cat:"Talents",
+      q:"What could they do that nobody else in the family could?",
+      why:"It does not have to be impressive. It has to be theirs.",
+      ph:"Could fix anything with a screwdriver and patience. Sang harmony without being asked…" }
+  ];
+
+  var MAX_WORDS = 10;
+  var KEY = "rt.intake.v1";
+
+  /* ------------------------------------------------------------------ */
+  var d = { name:"", known:"", born:"", died:"", answers:{}, words:[], weights:{} };
+  var page = 1;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  /* ---------- storage (best-effort; a blocked store must not break the page) ---------- */
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { /* private mode */ }
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) {
+        var o = JSON.parse(raw);
+        if (o && typeof o === "object") {
+          d.name = o.name || ""; d.known = o.known || "";
+          d.born = o.born || ""; d.died = o.died || "";
+          d.answers = o.answers || {}; d.words = o.words || []; d.weights = o.weights || {};
+        }
+      }
+    } catch (e) { /* nothing stored, or storage unreadable */ }
+  }
+
+  /* ---------- page 2: build the questions ---------- */
+  function buildQuestions() {
+    var html = "", lastGroup = "";
+    QUESTIONS.forEach(function (q) {
+      if (q.group !== lastGroup) {
+        html += '<p class="section-label">' + esc(q.group) + "</p>";
+        lastGroup = q.group;
+      }
+      html += '<div class="card">' +
+                '<p class="q">' + esc(q.q) + "</p>" +
+                '<p class="q-why">' + esc(q.why) + "</p>" +
+                '<label class="visually-hidden" for="a-' + q.id + '" style="position:absolute;left:-9999px">' + esc(q.q) + "</label>" +
+                '<textarea id="a-' + q.id + '" data-q="' + q.id + '" placeholder="' + esc(q.ph) + '"></textarea>' +
+              "</div>";
+    });
+    $("qHost").innerHTML = html;
+
+    QUESTIONS.forEach(function (q) {
+      var el = $("a-" + q.id);
+      el.value = d.answers[q.id] || "";
+      el.addEventListener("input", function () {
+        d.answers[q.id] = this.value;
+        save();
+      });
+    });
+  }
+
+  /* ---------- page 2: personality words ---------- */
+  function renderWords() {
+    $("wordList").innerHTML = d.words.map(function (w, i) {
+      return '<span class="word">' + esc(w) +
+             '<button type="button" data-rm="' + i + '" aria-label="Remove ' + esc(w) + '">&times;</button></span>';
+    }).join("");
+    $("wordCount").textContent = d.words.length + " of " + MAX_WORDS;
+    $("wordInput").disabled = d.words.length >= MAX_WORDS;
+    $("wordInput").placeholder = d.words.length >= MAX_WORDS
+      ? "That is ten — remove one to change it."
+      : "Stubborn. Generous. Funny. Early. …";
+  }
+
+  function addWord(raw) {
+    var w = raw.trim().replace(/[,.;]+$/, "");
+    if (!w || d.words.length >= MAX_WORDS) return;
+    var dupe = d.words.some(function (x) { return x.toLowerCase() === w.toLowerCase(); });
+    if (dupe) return;
+    d.words.push(w);
+    save();
+    renderWords();
+  }
+
+  $("wordInput").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addWord(this.value);
+      this.value = "";
+    } else if (e.key === "Backspace" && this.value === "" && d.words.length) {
+      d.words.pop(); save(); renderWords();
+    }
+  });
+  $("wordInput").addEventListener("blur", function () {
+    if (this.value.trim()) { addWord(this.value); this.value = ""; }
+  });
+  $("wordList").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-rm]");
+    if (!b) return;
+    d.words.splice(Number(b.getAttribute("data-rm")), 1);
+    save(); renderWords();
+  });
+
+  /* ---------- page 3: weighting ----------
+     Only what they actually said gets rated. Rating a blank question
+     would be busywork, and the click budget does not allow for it. */
+  function weighItems() {
+    var items = QUESTIONS.filter(function (q) {
+      return (d.answers[q.id] || "").trim().length > 0;
+    }).map(function (q) {
+      return { id:q.id, cat:q.cat, text:d.answers[q.id].trim() };
+    });
+    if (d.words.length) {
+      items.push({ id:"__words", cat:"Personality", text:d.words.join(" · ") });
+    }
+    return items;
+  }
+
+  function buildWeights() {
+    var items = weighItems();
+    if (!items.length) {
+      $("weighHost").innerHTML =
+        '<p class="sub" style="margin:0">You have not written anything yet. Go back a page and tell us ' +
+        'about them — even one line is enough to start from.</p>';
+      $("topSummary").hidden = true;
+      return;
+    }
+    $("topSummary").hidden = false;
+
+    $("weighHost").innerHTML = items.map(function (it) {
+      var v = d.weights[it.id];
+      if (typeof v !== "number") { v = 5; d.weights[it.id] = 5; }
+      return '<div class="weigh">' +
+               '<div class="weigh-head"><span class="weigh-cat">' + esc(it.cat) + "</span></div>" +
+               '<p class="weigh-quote">' + esc(it.text) + "</p>" +
+               '<div class="slide">' +
+                 '<input type="range" min="1" max="10" step="1" value="' + v + '" ' +
+                        'data-w="' + it.id + '" aria-label="How much should ' + esc(it.cat) +
+                        ' shape the design, from 1 to 10">' +
+                 '<span class="score" id="s-' + it.id + '">' + v + "</span>" +
+               "</div>" +
+               '<div class="scale"><span>Part of the story</span><span>Must be on the stone</span></div>' +
+             "</div>";
+    }).join("");
+
+    Array.prototype.forEach.call($("weighHost").querySelectorAll("input[type=range]"), function (r) {
+      r.addEventListener("input", function () {
+        var id = this.getAttribute("data-w");
+        d.weights[id] = Number(this.value);
+        $("s-" + id).textContent = this.value;
+        save();
+        summarise();
+      });
+    });
+    summarise();
+  }
+
+  function summarise() {
+    var items = weighItems().sort(function (a, b) {
+      return (d.weights[b.id] || 0) - (d.weights[a.id] || 0);
+    });
+    var top = items.slice(0, 5).filter(function (it) { return (d.weights[it.id] || 0) >= 6; });
+    if (!top.length) {
+      $("topSummary").innerHTML =
+        "<strong>Nothing is standing out yet.</strong> Push the things that matter most up past 6 " +
+        "so we know what to build the design around.";
+      return;
+    }
+    $("topSummary").innerHTML = "<strong>The design will be built around:</strong> " +
+      top.map(function (it) {
+        return esc(it.cat) + " <span style=\"color:var(--ink-3)\">(" + d.weights[it.id] + ")</span>";
+      }).join(" · ");
+  }
+
+  /* ---------- validation ---------- */
+  function validate1() {
+    var ok = true;
+    d.name = $("f-first").value.trim();
+    d.known = $("f-known").value.trim();
+    d.born = $("f-born").value;
+    d.died = $("f-died").value;
+
+    $("e-name").classList.toggle("on", !d.name);
+    if (!d.name) ok = false;
+
+    var badDates = d.born && d.died && d.born > d.died;
+    $("e-dates").classList.toggle("on", !!badDates);
+    if (badDates) ok = false;
+
+    save();
+    return ok;
+  }
+
+  /* ---------- navigation ---------- */
+  function show(n) {
+    page = n;
+    ["p1","p2","p3"].forEach(function (id, i) {
+      $(id).classList.toggle("on", i + 1 === n);
+    });
+    ["r1","r2","r3"].forEach(function (id, i) {
+      $(id).classList.toggle("done", i + 1 <= n);
+    });
+    $("stepcount").textContent = "Step " + n + " of 3";
+    $("back").hidden = n === 1;
+    $("next").textContent = n === 3 ? "See the designs" : "Continue";
+    if (n === 2) {
+      $("nameEcho").textContent = d.known || d.name.split(/\s+/)[0] || "them";
+    }
+    if (n === 3) buildWeights();
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  $("next").addEventListener("click", function () {
+    if (page === 1) { if (validate1()) show(2); return; }
+    if (page === 2) { show(3); return; }
+    handoff();
+  });
+  $("back").addEventListener("click", function () { show(page - 1); });
+
+  /* ---------- handoff to the designer ---------- */
+  function handoff() {
+    save();
+    var q = new URLSearchParams();
+    q.set("name", d.name);
+    if (d.born) q.set("born", d.born);
+    if (d.died) q.set("died", d.died);
+    q.set("from", "intake");
+    window.location.href = "designer.html?" + q.toString();
+  }
+
+  /* ---------- boot ---------- */
+  load();
+  $("f-first").value = d.name;
+  $("f-known").value = d.known;
+  $("f-born").value  = d.born;
+  $("f-died").value  = d.died;
+  ["f-first","f-known","f-born","f-died"].forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      d[{ "f-first":"name", "f-known":"known", "f-born":"born", "f-died":"died" }[id]] = this.value;
+      save();
+    });
+  });
+  buildQuestions();
+  renderWords();
+  show(1);
+})();
+</script>
+</body>
+</html>
