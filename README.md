@@ -12,13 +12,19 @@ Healing Partners is the company. **Remember Them** is its memorial design app.
 | Path | What it is |
 |---|---|
 | `index.html` | Healing Partners hub page |
-| `pricing.html` | Plans — free for families, $150/month for professionals |
-| `remember-them/index.html` | The designer — self-contained, no build step |
+| `pricing.html` | Plans — free for families; $150/month on a six-month term or $350 month-to-month for professionals |
+| `remember-them/intake.html` | Three intake pages — identity, interview, weighting |
+| `remember-them/index.html` | The guided flow — suggestions, narrowing, three proofs |
+| `remember-them/designer.html` | Direct configurator |
+| `remember-them/stone.js` | The shared renderer both pages draw with |
 
 ## Two audiences, two models
 
 Families design free and pay for the memorial they order. Funeral homes and cemeteries
-get a 7-day trial and then subscribe at $150/month. A family is never shown a paywall.
+get a 3-day trial and then subscribe — $150/month on a six-month term with automatic
+payment, or $350/month with no minimum. Leaving the discounted rate early recaptures
+$200 for each month it was given. Quoting the $150 on its own understates the model.
+A family is never shown a paywall.
 
 ## Demo links
 
@@ -27,10 +33,10 @@ Send these to a prospective client to walk through the whole flow:
 | Link | Shows |
 |---|---|
 | `remember-them/` | What a family sees — no trial, no wall |
-| `remember-them/?plan=pro` | Starts a 7-day professional trial |
+| `remember-them/?plan=pro` | Starts a 3-day professional trial |
 | `remember-them/?trial=expired` | Jumps straight to the lock screen |
 | `remember-them/?unlock=1` | Behaves as a paying subscriber |
-| `remember-them/?trial=reset` | Puts the seven days back |
+| `remember-them/?trial=reset` | Puts the three days back |
 
 ## Important: the trial is not security
 

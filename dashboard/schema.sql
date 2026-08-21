@@ -51,11 +51,17 @@ create table if not exists orders (
 create index if not exists orders_home_started_idx on orders (funeral_home_id, started_at desc);
 create index if not exists orders_status_idx       on orders (status);
 
--- Commission rate is a function of that home's own volume in the month.
--- 1-5 -> 15%, 6-19 -> 12%, 20+ -> 10%.
+-- Commission rate is a function of that home's own volume in the calendar month.
+-- Exhibit B of the Partner User Agreement: 1-5 -> 15%, 6-20 -> 12%, 21+ -> 10%.
+-- These bands do not overlap. The earlier 6-19 / 20+ reading charged a home with
+-- exactly 20 memorials 10% when it owes 12%.
+--
+-- This is the Standard Schedule only. Exhibit B has a second, lower schedule for
+-- Partners carrying qualifying insurance (Sec. 7); pricing.sql replaces this
+-- function with the two-argument version that knows about it. Run pricing.sql.
 create or replace function commission_rate(order_count int)
 returns numeric language sql immutable as $$
-  select case when order_count >= 20 then 0.10
+  select case when order_count >= 21 then 0.10
               when order_count >= 6  then 0.12
               else 0.15 end;
 $$;

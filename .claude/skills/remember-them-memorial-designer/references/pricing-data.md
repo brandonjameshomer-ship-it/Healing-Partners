@@ -243,11 +243,37 @@ pedestals and statuary · custom shape work · turned and inverted vases · full
 
 ## Commission
 
-Charged to the funeral home. **Calculated on the retail price**, not wholesale. $150/month
-subscription applies at every tier.
+Charged to the funeral home, never to the family. Set by Exhibit B of the Remember Them Partner
+User Agreement. **Two schedules, not one.** A Partner carrying professional liability / E&O cover
+of at least $1M per claim and $2M aggregate is on the Covered Schedule (Sec. 7).
 
-| Memorials per month | Share |
-|---|---|
-| 1–5 | 15% |
-| 6–19 | 12% |
-| 20 or more | 10% |
+| Memorials that calendar month | Standard | Covered (insured) |
+|---|---|---|
+| 1–5 | 15% | 10% |
+| 6–20 | 12% | 8% |
+| 21 or more | 10% | 7% |
+
+The bands do not overlap. Counts reset each calendar month, and the month's tier applies to every
+memorial in that month.
+
+**Charged on the Memorial Sale Price** — what the Partner charges its customer — excluding taxes,
+cemetery opening, closing, setting, foundation and permit fees, and documented third-party
+shipping billed at cost. It accrues when the first final Deliverable is delivered after proof
+approval, and is reported and remitted by the 15th of the following month.
+
+Note this is the Partner's own price, which the Partner sets independently (Sec. 6.8). The 2.5x
+markup in this file is Healing Partners' *suggested* retail, not a figure that may be imposed — so
+never state a commission figure as settled without knowing what the Partner actually charged.
+
+### Subscription
+
+Separate from commission, and a choice of two (Sec. 5.1):
+
+| Plan | Rate | Terms |
+|---|---|---|
+| Discounted Partner Rate | $150 / month | Six-month initial term, automatic payment required |
+| Standard Month-to-Month | $350 / month | No minimum term |
+
+Leaving the discounted plan early owes a Discount Recapture Amount of ($350 − $150) × the months
+actually provided at the discount. **Quoting "$150 a month" on its own misstates the model** — it
+hides both the commitment and the standard rate the comparison rests on.

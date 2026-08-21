@@ -90,9 +90,12 @@ Flag immediately if this misses an anniversary or unveiling date.
 
 | Field | Value |
 |---|---|
-| Memorials this month | |
-| Tier | *(1–5 → 15%, 6–19 → 12%, 20+ → 10%)* |
-| Subscription | $150/month — applies at every tier |
+| Memorials this calendar month | |
+| Partner carries qualifying insurance? | *(≥$1M per claim / $2M aggregate — decides which schedule)* |
+| Tier — Standard | *(1–5 → 15%, 6–20 → 12%, 21+ → 10%)* |
+| Tier — Covered, if insured | *(1–5 → 10%, 6–20 → 8%, 21+ → 7%)* |
+| Charged on | Memorial Sale Price — what the Partner charges its customer, less taxes, cemetery fees and shipping at cost |
+| Subscription | $150/month on a six-month term, or $350/month month-to-month — separate from commission |
 
 ## Blocking requirements
 
