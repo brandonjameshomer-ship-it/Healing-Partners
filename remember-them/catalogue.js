@@ -238,8 +238,12 @@ window.RememberThem.Catalogue = (function () {
       id: "bench", label: "Granite bench", form: "bench",
       blurb: "Somewhere to sit with them rather than stand over them. Cemeteries vary on whether a bench is allowed at the grave or only in a garden section.",
       /* Benches are priced by named colour, not by category, and installation
-       * on a bench carries NO markup. Both are handled in price(). */
+       * on a bench carries NO markup. Both are handled in price(). The extras
+       * entry looks redundant next to that special case, but callers ask
+       * `product.extras` to decide whether a product prices its own setting —
+       * without it a bench quietly loses its installation charge. */
       byColour: true,
+      extras: [ { id: "install", label: "Setting", from: "install" } ],
       sizes: [
         { id: "traditional", label: "Traditional, 48 × 14 × 4 seat, harp legs",
           colours: { "gray": 2310, "plum-rose": 3060, "black": 3060 }, install: 450 },

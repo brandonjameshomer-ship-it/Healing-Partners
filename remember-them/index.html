@@ -371,13 +371,10 @@
   var MAX_FOLLOWUPS = 2, MAX_SUGGESTIONS = 5;
 
   /* ================= PRICING =================
-     Wholesale from the AFM 2025 guide. Family price = wholesale x 2.5.
-     The one exception is bench installation, which carries no markup at all. */
-  var MARKUP = 2.5;
-  /* The 3D/VR model is a Healing Partners service, not a supplier line item, so
-     it is not on any wholesale sheet. Set the price here once it is decided.
-     Left null, the page says "ask your funeral director" rather than showing a
-     number nobody has agreed to. */
+     Prices come from catalogue.js, which holds the supplier's wholesale sheet
+     and turns it into retail at the Partner's markup. Nothing on this page
+     multiplies anything itself, and no wholesale figure reaches this screen.
+     The one line passed through at cost is bench installation. */
   /* The 3D/VR model is a Healing Partners service, not a supplier line item, so
      it appears on no wholesale sheet and carries no commission — the whole $50
      is Healing Partners'.
@@ -394,40 +391,74 @@
   /* Stripe sandbox links contain "test_". Surface that loudly — nobody should
      ever finish a demo believing a card was actually charged. */
   function vrIsTest(){ return /(^|\/)test_|[?&]test=1/.test(VR_UPGRADE.paymentLink||""); }
-  var BASES = {
-    upright: { label:"Upright monument", stone:"Georgia Gray", cat:"Cat 1",
-               parts:[["Die, 24×6×24",1145],["Base, 30×12×6",480],["Setting",620]] },
-    slant:   { label:"Slant marker", stone:"Colonial Rose", cat:"Cat 2",
-               parts:[["Slant, 24×16",1230],["Setting",370]] },
-    black:   { label:"Upright monument", stone:"Academy Black", cat:"Cat 2",
-               parts:[["Die, 24×6×24",1365],["Base, 30×12×6",585],["Setting",620]] }
-  };
-  /* add-on wholesale; null = no published price, must be quoted */
+  /* Every number a family sees comes out of catalogue.js, priced through
+     Catalogue.price(). This page renders RETAIL ONLY — the wholesale figure
+     each line also carries must never reach this screen. */
+  var Cat = window.RememberThem.Catalogue;
+
+  /* Add-ons, expressed as references into the catalogue rather than as a
+     second copy of its prices. "quote" means the category has a vendor but no
+     published sheet, and is flagged rather than estimated. */
   var ADDON = {
-    photo:{ w:305, label:"Porcelain portrait, 5×7 oval" },
-    words:{ w:25,  label:"Their words, custom cut" },
-    scene:{ w:25,  label:"A place they loved, custom art" },
-    work: { w:25,  label:"The work of their hands, custom art" },
-    music:{ w:25,  label:"Music, custom art" },
-    symbol:{ w:0,  label:"Faith emblem (standard art, included)" },
-    glass:{ w:null,label:"Coloured glass panel" },
-    bronze:{w:null,label:"Bronze" },
-    bench:{ w:2310, install:450, label:"Traditional bench, gray" }
+    photo: { kind:"porcelain", id:"OC-9", label:"Porcelain portrait, 5×7 oval" },
+    words: { kind:"artwork", id:"custom", label:"Their words, custom cut" },
+    scene: { kind:"artwork", id:"custom", label:"A place they loved, custom art" },
+    work:  { kind:"artwork", id:"custom", label:"The work of their hands, custom art" },
+    music: { kind:"artwork", id:"custom", label:"Music, custom art" },
+    symbol:{ kind:"artwork", id:"standard", label:"Faith emblem (standard art, included)" },
+    glass: { kind:"quote", id:"cast-glass", label:"Coloured glass panel" },
+    bronze:{ kind:"quote", id:"bronze", label:"Bronze" },
+    /* A bench is a whole memorial, not a trinket bolted to one. When the
+       family asks for a bench the second proof BECOMES the bench — see
+       specFor() — so this entry only fires if a bench is somehow wanted
+       alongside a headstone. */
+    bench: { kind:"product", product:"bench", size:"traditional", colour:"gray",
+             extras:["install"], label:"Traditional bench, gray" }
   };
-  function priceFor(baseKey, feats){
-    var b = BASES[baseKey], lines = [], total = 0;
-    b.parts.forEach(function(p){ var r=p[1]*MARKUP; total+=r; lines.push([p[0], money(r)]); });
-    var quotes = [];
+
+  function addonLine(f){
+    var a = ADDON[f];
+    if (!a) return null;
+    if (a.kind === "quote") return { quote: a.label };
+    if (a.kind === "porcelain") {
+      var pc = Cat.byId(Cat.supplier().porcelain, a.id);
+      return pc ? { label: a.label, retail: Cat.retail(pc.w) } : { quote: a.label };
+    }
+    if (a.kind === "artwork") {
+      var art = Cat.byId(Cat.supplier().artwork, a.id);
+      if (!art) return { quote: a.label };
+      if (art.w === null) return { quote: a.label };
+      if (art.w === 0) return { label: a.label, included: true };
+      return { label: a.label, retail: Cat.retail(art.w) };
+    }
+    if (a.kind === "product") {
+      var q = Cat.price({ product:a.product, size:a.size, colour:a.colour, extras:a.extras });
+      return q.ok ? { label: a.label, retail: q.retail } : { quote: a.label };
+    }
+    return null;
+  }
+
+  /* A proof spec is a catalogue order: product, size, colour. priceFor turns
+     it into the family-facing lines. Setting is included wherever the product
+     prices it — a memorial nobody installs is not a memorial. */
+  function priceFor(spec, feats){
+    var p = Cat.product(spec.product), extras = [];
+    if (p && p.extras && Cat.byId(p.extras, "install")) extras.push("install");
+
+    var q = Cat.price({ product: spec.product, size: spec.size, colour: spec.colour,
+                        extras: extras });
+    var lines = q.lines.map(function(l){ return [l.label, money(l.retail)]; });
+    var total = q.retail, quotes = q.quotes.slice();
+
     feats.forEach(function(f){
-      var a = ADDON[f]; if (!a) return;
-      if (a.w === null){ quotes.push(a.label); return; }
-      if (f === "bench"){                      // bench install carries NO markup
-        var r = a.w*MARKUP + a.install; total += r; lines.push([a.label, money(r)]); return;
-      }
-      if (a.w === 0){ lines.push([a.label, "included"]); return; }
-      var rr = a.w*MARKUP; total += rr; lines.push([a.label, money(rr)]);
+      if (f === "bench" && spec.product === "bench") return;   // already the memorial
+      var ln = addonLine(f);
+      if (!ln) return;
+      if (ln.quote){ quotes.push(ln.quote); return; }
+      if (ln.included){ lines.push([ln.label, "included"]); return; }
+      total += ln.retail; lines.push([ln.label, money(ln.retail)]);
     });
-    return { total: total, lines: lines, quotes: quotes };
+    return { total: total, lines: lines, quotes: quotes, leadTime: q.leadTime };
   }
 
   /* ================= STATE =================
@@ -707,17 +738,28 @@
   };
 
   /* ---- shapes ---- */
-  /* Drawing lives in stone.js, shared with the configurator. Each proof names
-     a stone; BASES below names the matching real granite and its category, so
-     the picture and the price always describe the same rock. */
+  /* Drawing lives in stone.js; what is being drawn lives in catalogue.js. Each
+     proof is a real catalogue order — product, size, colour — so the picture,
+     the granite named on the card and the price are guaranteed to describe the
+     same rock. There is one source for all three now. */
   var Stone = window.RememberThem.Stone;
-  var PROOF_STONE = { upright:"grey", slant:"rose", black:"black" };
 
-  function svgFor(key,form,feats,name,dates){
+  /* A bench's colour is drawn from the bench colour list, not the granite one,
+     so it has to be resolved through its render family before the renderer can
+     use it. Passing "gray" straight through would silently fall back to the
+     first granite in the catalogue. */
+  function renderStoneId(spec){
+    if (spec.product !== "bench") return spec.colour;
+    var bc = Cat.byId(Cat.supplier().benchColours, spec.colour);
+    var st = bc && Stone.byFamily(bc.family);
+    return st ? st.id : spec.colour;
+  }
+
+  function svgFor(spec,form,feats,name,dates){
     return Stone.render({
-      uid:       key+form,
+      uid:       spec.key + form,
       form:      form,
-      stone:     PROOF_STONE[key] || "grey",
+      stone:     renderStoneId(spec),
       lettering: "traditional",
       name:      name,
       dates:     dates,
@@ -726,31 +768,61 @@
   }
 
   var SETS=[
-    {key:"upright",form:"upright",title:"The traditional one",
+    {key:"upright", form:"upright", product:"die", size:"24x6x24", colour:"georgia-gray",
+     title:"The traditional one",
      why:"A shape that reads as permanent. This is what most families choose, and it's never wrong."},
-    {key:"slant",form:"slant",title:"The personal one",
+    {key:"slant", form:"slant", product:"slant", size:"24x16", colour:"colonial-rose",
+     title:"The personal one",
      why:"Warmer stone and a softer shape, so it looks less like a standard marker and more like a person."},
-    {key:"black",form:"upright",title:"The quiet one",
+    {key:"black", form:"upright", product:"die", size:"24x6x24", colour:"academy-black",
+     title:"The quiet one",
      why:"Darker and simpler, carrying only what's needed — which is often exactly right."}
   ];
+
+  /* When the family has asked for a bench, the second proof becomes the bench
+     rather than a slant with a bench charged on top of it. The old code drew a
+     bench there but priced a slant AND a bench, which overstated the estimate
+     by the whole cost of the slant. */
+  function specFor(key, feats){
+    var base = null;
+    for (var i=0;i<SETS.length;i++) if (SETS[i].key===key) base = SETS[i];
+    if (!base) return null;
+    var spec = {};
+    for (var k in base) if (base.hasOwnProperty(k)) spec[k] = base[k];
+    if (key === "slant" && feats.indexOf("bench") !== -1) {
+      spec.form = "bench"; spec.product = "bench";
+      spec.size = "traditional"; spec.colour = "gray";
+    }
+    return spec;
+  }
+
+  /* The granite line under each proof — the real colour name and its price
+     category, straight off the supplier's sheet. */
+  function stoneLine(spec){
+    if (spec.product === "bench") {
+      var bc = Cat.byId(Cat.supplier().benchColours, spec.colour);
+      return (bc ? bc.label : spec.colour) + " granite bench";
+    }
+    var c = Cat.colour(spec.colour);
+    return c ? c.label + " · Cat " + c.cat : spec.colour;
+  }
   function buildProofs(feats){
     var dates=(A.born&&A.died)?(A.born+" – "+A.died):(A.born||A.died||"");
     var nm=A.name||"Their Name";
-    var sets=SETS.map(function(p){return {key:p.key,form:p.form,title:p.title,why:p.why};});
-    if(feats.indexOf("bench")!==-1) sets[1].form="bench";
+    var sets=SETS.map(function(p){ return specFor(p.key, feats); });
     $("q6").textContent="Three ways to remember "+nm.split(" ")[0]+".";
     $("sub6").textContent="Built from what you told us. Tap a memorial to see what it costs.";
     $("proofs").innerHTML=sets.map(function(p){
-      var b=BASES[p.key], pr=priceFor(p.key,feats);
+      var pr=priceFor(p,feats);
       var names=feats.map(function(f){var it=item(f);return it?it.t:"";}).filter(Boolean).slice(0,5);
       var rows=pr.lines.map(function(l){return "<tr><td>"+esc(l[0])+"</td><td>"+esc(l[1])+"</td></tr>";}).join("");
       var q=pr.quotes.length
         ? '<tr><td colspan="2" class="quote">'+esc(pr.quotes.join(", "))+" &mdash; priced by the monument company</td></tr>" : "";
       return '<div class="proof" data-proof="'+p.key+'">'+
-        '<div class="canvas">'+svgFor(p.key,p.form,feats,nm,dates)+
+        '<div class="canvas">'+svgFor(p,p.form,feats,nm,dates)+
           '<span class="tapme">Tap for price</span></div>'+
         '<div class="meta"><h3>'+esc(p.title)+"</h3>"+
-          '<p class="stone">'+esc(b.stone)+" &middot; "+esc(b.cat)+"</p>"+
+          '<p class="stone">'+esc(stoneLine(p))+"</p>"+
           '<p class="why">'+esc(p.why)+"</p><ul>"+
           names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+"</ul></div>"+
         '<div class="price"><div class="price-in">'+
@@ -782,12 +854,10 @@
     renderChosen(); show(7);
   }
   function renderChosen(){
-    var p=null;
-    for (var i=0;i<SETS.length;i++) if (SETS[i].key===chosenKey) p=SETS[i];
+    var p = specFor(chosenKey, chosenFeats);
     if (!p) return;
-    var form=p.form;
-    if (chosenFeats.indexOf("bench")!==-1 && p.key==="slant") form="bench";
-    var b=BASES[chosenKey], pr=priceFor(chosenKey, chosenFeats);
+    var form = p.form;
+    var pr = priceFor(p, chosenFeats);
     var dates=(A.born&&A.died)?(A.born+" – "+A.died):(A.born||A.died||"");
     var nm=A.name||"Their Name";
     var names=chosenFeats.map(function(f){var it=item(f);return it?it.t:"";}).filter(Boolean);
@@ -801,12 +871,14 @@
 
     $("q7").textContent="This is "+nm.split(" ")[0]+"'s memorial.";
     $("chosen").innerHTML=
-      '<div class="canvas">'+svgFor(chosenKey,form,chosenFeats,nm,dates)+"</div>"+
+      '<div class="canvas">'+svgFor(p,form,chosenFeats,nm,dates)+"</div>"+
       "<div><h3>"+esc(p.title)+"</h3>"+
-        '<p class="stone">'+esc(b.stone)+" &middot; "+esc(b.cat)+"</p>"+
+        '<p class="stone">'+esc(stoneLine(p))+"</p>"+
         '<p class="total">'+money(total)+"</p>"+
         '<p class="est">Estimated'+(vrInTotal?", including the 3D model":"")+
-          ", including setting</p><ul>"+
+          ", including setting"+
+          (pr.leadTime ? " &middot; about "+esc(pr.leadTime.label)+" to make" : "")+
+          "</p><ul>"+
         names.map(function(n){return "<li>"+esc(n)+"</li>";}).join("")+
         (vrOn?"<li>3D model for Meta Quest 3"+
           (vrInTotal ? "" :

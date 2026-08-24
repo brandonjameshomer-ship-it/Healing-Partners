@@ -251,6 +251,13 @@ window.RememberThem.Stone = (function () {
   }
   function form(id) { return byId(FORMS, id); }
   function stone(id) { return byId(STONES, id); }
+  /* Bench colours are their own short list on the supplier's sheet — "Gray",
+     "Plum Rose" — and are not granite colour ids, so they cannot be looked up
+     with stone(). They name a render family instead, and this resolves it. */
+  function byFamily(family) {
+    for (var i = 0; i < STONES.length; i++) if (STONES[i].family === family) return STONES[i];
+    return STONES[0];
+  }
   function outline(id) { return form(id).d; }
 
   /* --------------------------------------------------------------- helpers */
@@ -554,6 +561,6 @@ window.RememberThem.Stone = (function () {
   return {
     render: render, thumb: thumb, outline: outline, wrap: wrap, shade: shade,
     STONES: STONES, FORMS: FORMS, LETTERING: LETTERING, EMBLEMS: EMBLEMS,
-    form: form, stone: stone, byId: byId
+    form: form, stone: stone, byFamily: byFamily, FAMILIES: FAMILIES, byId: byId
   };
 })();
