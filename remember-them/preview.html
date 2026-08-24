@@ -26,7 +26,21 @@
   input[type=text] { font:inherit; padding:.4rem .6rem; border:1px solid var(--line); border-radius:6px }
   footer { margin-top:3.5rem; padding-top:1.25rem; border-top:1px solid var(--line);
            color:var(--ink-3); font-size:.82rem; max-width:64ch }
+  table.cat { width:100%; border-collapse:collapse; font-size:.82rem; background:var(--card);
+              border:1px solid var(--line); border-radius:10px; overflow:hidden }
+  table.cat th, table.cat td { padding:.4rem .6rem; text-align:left; border-bottom:1px solid var(--line) }
+  table.cat th { font-weight:600; font-size:.72rem; letter-spacing:.05em; text-transform:uppercase;
+                 color:var(--ink-3) }
+  table.cat td.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  table.cat tr:last-child td { border-bottom:none }
+  table.cat td.q { color:#9A3B2C }
+  .swatch { display:inline-block; width:.9rem; height:.9rem; border-radius:3px;
+            vertical-align:-2px; margin-right:.45rem; border:1px solid rgba(0,0,0,.15) }
+  .verdict { padding:.7rem .9rem; border-radius:8px; margin:.5rem 0 1rem; font-size:.85rem }
+  .verdict.pass { background:#E8F1E9; color:#2F6B41 }
+  .verdict.fail { background:#FBE9E7; color:#9A3B2C; white-space:pre-wrap; font-family:ui-monospace,monospace }
 </style>
+<script src="catalogue.js"></script>
 <script src="stone.js"></script>
 <div class="wrap">
   <h1>Renderer preview</h1>
@@ -45,11 +59,22 @@
      black granite is the premium choice.</p>
   <div class="pair" id="cmp"></div>
 
-  <h2>Every shape, every material</h2>
-  <p class="note">Bronze is cast rather than cut, so its letters stand proud and catch light on
-     top instead of sitting in shadow. White marble gets no contrast from frosting, so the cut
-     reads as its own shadow. Both are handled separately from the granites.</p>
+  <h2>Every shape, every render family</h2>
+  <p class="note">One cell per <em>render family</em>, not per colour. AFM sells four black
+     granites at four prices; on a screen they are one dark polished rock, so the catalogue keeps
+     them apart and the renderer does not pretend to. Bronze is cast rather than cut, so its
+     letters stand proud and catch light on top instead of sitting in shadow. White marble gets no
+     contrast from frosting, so the cut reads as its own shadow.</p>
   <div class="grid" id="all"></div>
+
+  <h2>The catalogue, and what it costs</h2>
+  <p class="note">Everything below comes out of <code>catalogue.js</code> and is priced by
+     <code>Catalogue.price()</code> at run time — so if this section renders, the price engine
+     works. Wholesale is what the funeral home pays the monument company; retail is that
+     &times;&nbsp;2.5, which is a suggestion the Partner is free to change. A family never sees the
+     left column.</p>
+  <div id="verdict"></div>
+  <div id="cat"></div>
 
   <footer>
     A screen cannot reproduce stone, bronze, etching or polish, and the difference between this
@@ -61,6 +86,7 @@
 <script>
 (function () {
   var S = window.RememberThem.Stone;
+  var C = window.RememberThem.Catalogue;
 
   /* The renderer as it stood before, kept only so the comparison above is
      honest about what actually changed. */
@@ -90,7 +116,7 @@
     var dates = document.getElementById("dt").value;
 
     document.getElementById("cmp").innerHTML =
-      ["black", "grey", "bronze"].map(function (sid) {
+      ["academy-black", "barre-gray", "bronze"].map(function (sid) {
         return '<div class="cell"><span class="tag old">Before — ' + S.stone(sid).label + '</span>' +
                  legacy(sid, "upright", name, dates) + '</div>' +
                '<div class="cell"><span class="tag new">After — ' + S.stone(sid).label + '</span>' +
@@ -98,9 +124,17 @@
                             dates: dates, emblem: "rose" }) + '</div>';
       }).join("");
 
+    /* First colour of each render family — 25 colours collapse to ~11 looks,
+       and drawing the other 14 would just be the same picture again. */
+    var seen = {}, reps = [];
+    S.STONES.forEach(function (st) {
+      if (seen[st.family]) return;
+      seen[st.family] = true; reps.push(st);
+    });
+
     var out = [];
     S.FORMS.forEach(function (f) {
-      S.STONES.forEach(function (st) {
+      reps.forEach(function (st) {
         out.push('<div class="cell">' +
           S.render({ uid: f.id + st.id, form: f.id, stone: st.id, name: name, dates: dates,
                      emblem: "cross", epitaph: "She kept the porch light on." }) +
@@ -110,8 +144,181 @@
     document.getElementById("all").innerHTML = out.join("");
   }
 
+  /* ---------------------------------------------------------- catalogue
+   *
+   * This runs the price engine over every product, every size and every
+   * category. There is no test runner on this project, so the page is the
+   * test: anything that throws lands in the red box instead of the console,
+   * and a few known figures are asserted against the AFM sheet by hand so a
+   * silently-wrong total cannot pass as a right one.
+   */
+  function money(n) { return "$" + Math.round(n).toLocaleString("en-US"); }
+  function esc(x) {
+    return String(x == null ? "" : x).replace(/[&<>"]/g, function (c) {
+      return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c];
+    });
+  }
+
+  /* One representative colour per price category, so the table has a column
+     per category rather than a row per colour. */
+  function colourInCat(n) {
+    var cs = C.supplier().colours;
+    for (var i = 0; i < cs.length; i++) if (cs[i].cat === n && cs[i].origin === "us") return cs[i];
+    for (var j = 0; j < cs.length; j++) if (cs[j].cat === n) return cs[j];
+    return null;
+  }
+
+  function priceCell(productId, sizeId, colourId) {
+    var p = C.product(productId), extras = [];
+    if (p && p.extras && C.byId(p.extras, "install")) extras.push("install");
+    var q = C.price({ product: productId, size: sizeId, colour: colourId, extras: extras });
+    if (!q.ok && !q.wholesale) return '<td class="n q">quote</td>';
+    return '<td class="n">' + money(q.retail) + "<br>" +
+           '<span style="color:var(--ink-3)">' + money(q.wholesale) + "</span></td>";
+  }
+
+  function catalogueTables() {
+    var cats = [1, 2, 3, 4].map(colourInCat).filter(Boolean);
+    var html = "";
+
+    C.supplier().products.forEach(function (p) {
+      html += "<h3 style=\"font:600 .95rem/1.3 ui-serif,Georgia,serif;margin:1.75rem 0 .3rem\">" +
+              esc(p.label) + "</h3>" +
+              '<p class="note" style="margin:.1rem 0 .6rem">' + esc(p.blurb || "") + "</p>";
+
+      if (p.byColour) {
+        var bc = C.supplier().benchColours;
+        html += '<table class="cat"><tr><th>Size</th>' +
+                bc.map(function (c) { return "<th>" + esc(c.label) + "</th>"; }).join("") + "</tr>";
+        p.sizes.forEach(function (z) {
+          html += "<tr><td>" + esc(z.label) + "</td>" +
+            bc.map(function (c) {
+              var q = C.price({ product: p.id, size: z.id, colour: c.id, extras: ["install"] });
+              if (!q.wholesale) return '<td class="n q">not made</td>';
+              return '<td class="n">' + money(q.retail) + "<br>" +
+                     '<span style="color:var(--ink-3)">' + money(q.wholesale) + "</span></td>";
+            }).join("") + "</tr>";
+        });
+        html += "</table>";
+        if (p.warn) html += '<p class="note" style="margin:.4rem 0 0">' + esc(p.warn) + "</p>";
+        return;
+      }
+
+      html += '<table class="cat"><tr><th>Size</th>' +
+              cats.map(function (c) {
+                return "<th>Cat " + c.cat + "<br><span style=\"font-weight:400;text-transform:none;letter-spacing:0\">" +
+                       esc(c.label) + "</span></th>";
+              }).join("") + "</tr>";
+      p.sizes.forEach(function (z) {
+        html += "<tr><td>" + esc(z.label) + " in</td>" +
+                cats.map(function (c) { return priceCell(p.id, z.id, c.id); }).join("") + "</tr>";
+      });
+      html += "</table>";
+    });
+
+    /* The colour list itself, with the swatch the renderer will actually use,
+       so a wrong family mapping is visible rather than buried in data. */
+    html += "<h3 style=\"font:600 .95rem/1.3 ui-serif,Georgia,serif;margin:2rem 0 .5rem\">Colours</h3>" +
+            '<table class="cat"><tr><th>Colour</th><th>Category</th><th>Render family</th>' +
+            "<th>Origin</th><th>Photo etching</th><th>Lead time</th></tr>";
+    C.supplier().colours.forEach(function (c) {
+      var st = S.stone(c.id);
+      html += "<tr><td><span class=\"swatch\" style=\"background:linear-gradient(140deg," +
+                st.hi + "," + st.base + " 60%," + st.cut + ")\"></span>" + esc(c.label) + "</td>" +
+              "<td>" + (c.quoteOnly ? '<span class="q">quote only</span>' : "Cat " + c.cat) + "</td>" +
+              "<td>" + esc(c.family) + "</td>" +
+              "<td>" + esc(c.origin) + "</td>" +
+              "<td>" + (c.etchable ? "yes" : "—") + "</td>" +
+              "<td>" + esc(C.leadTimeFor(c).label) + "</td></tr>";
+    });
+    html += "</table>";
+
+    /* Categories with no sheet behind them. Half the product list is here, and
+       showing it as an explicit gap is more useful than leaving it out. */
+    html += "<h3 style=\"font:600 .95rem/1.3 ui-serif,Georgia,serif;margin:2rem 0 .5rem\">" +
+            "No published price — supplier quote required</h3>" +
+            '<table class="cat"><tr><th>Category</th><th>Vendor</th></tr>';
+    C.supplier().quoteOnly.forEach(function (q) {
+      html += "<tr><td>" + esc(q.label) + '</td><td class="q">' +
+              esc(q.vendor || "vendor not yet chosen") +
+              (q.url ? " · " + esc(q.url) : "") + "</td></tr>";
+    });
+    html += "</table>";
+    return html;
+  }
+
+  /* Spot checks against the printed sheet. Each is a figure a person can look
+     up, so a regression in priceColumn() or price() shows as a failure here
+     rather than as a plausible number on a family's estimate. */
+  function selfCheck() {
+    var fails = [];
+    function eq(what, got, want) {
+      if (got !== want) fails.push(what + ": got " + got + ", sheet says " + want);
+    }
+    /* 24x12 flat marker, Georgia Gray (Cat 1): 545 stone + 300 setting. */
+    var a = C.price({ product: "flat", size: "24x12", colour: "georgia-gray", extras: ["install"] });
+    eq("flat 24x12 Cat 1 wholesale", a.wholesale, 845);
+    eq("flat 24x12 Cat 1 retail", a.retail, Math.round(845 * 2.5));
+
+    /* 8in bevel, 24x12, Academy Black (Cat 2): 910 + 400 setting. */
+    var b = C.price({ product: "bevel8", size: "24x12", colour: "academy-black", extras: ["install"] });
+    eq("bevel8 24x12 Cat 2 wholesale", b.wholesale, 1310);
+
+    /* Upright: 24x6x24 die (Cat 2 = 1365) on base B/C. First match is base C,
+       30x12x6 at 585, whose setting is 620. */
+    var c = C.price({ product: "die", size: "24x6x24", colour: "academy-black" });
+    eq("die 24x6x24 Cat 2 + base + setting", c.wholesale, 1365 + 585 + 620);
+
+    /* A Cat 4 colour on the slant table reads the India column, because that
+       table has no numbered 4th column. The slant also brings its own base
+       (AA, 30x14x6, 1070 at Cat 4) but not its own setting — that is priced
+       from the slant table, not the base. */
+    var d2 = C.price({ product: "slant", size: "24x16", colour: "imperial-red" });
+    eq("slant 24x16 Cat 4 reads the India column", d2.lines[0].wholesale, 1560);
+    eq("slant carries a base but not the base setting", d2.wholesale, 1560 + 1070);
+    eq("slant priced as two lines, stone and base", d2.lines.length, 2);
+
+    /* Bench installation carries no markup: 2310x2.5 + 450, not 2760x2.5. */
+    var e = C.price({ product: "bench", size: "traditional", colour: "gray", extras: ["install"] });
+    eq("traditional bench retail (install at cost)", e.retail, Math.round(2310 * 2.5) + 450);
+    eq("traditional bench wholesale", e.wholesale, 2760);
+
+    /* A quote-only colour must produce no total at all. */
+    var f = C.price({ product: "flat", size: "24x12", colour: "missouri-red" });
+    if (f.ok) fails.push("Missouri Red priced instead of flagged for quote");
+
+    /* Oversize foundation adds 15% to the base setting only. */
+    var g = C.price({ product: "die", size: "24x6x24", colour: "academy-black",
+                      oversizeFoundation: true });
+    eq("oversize foundation adds 15% to setting only",
+       g.wholesale - c.wholesale, Math.round(620 * 1.15) - 620);
+
+    return fails;
+  }
+
+  function drawCatalogue() {
+    var v = document.getElementById("verdict");
+    try {
+      document.getElementById("cat").innerHTML = catalogueTables();
+      var fails = selfCheck();
+      if (fails.length) {
+        v.className = "verdict fail";
+        v.textContent = fails.length + " price check(s) failed:\n" + fails.join("\n");
+      } else {
+        v.className = "verdict pass";
+        v.textContent = "Price engine agrees with the AFM sheet on all " +
+          "spot checks, and " + C.combinationCount() +
+          " orderable combinations priced without error.";
+      }
+    } catch (err) {
+      v.className = "verdict fail";
+      v.textContent = "Catalogue threw:\n" + (err && err.stack ? err.stack : String(err));
+    }
+  }
+
   document.getElementById("nm").addEventListener("input", draw);
   document.getElementById("dt").addEventListener("input", draw);
   draw();
+  drawCatalogue();
 })();
 </script>

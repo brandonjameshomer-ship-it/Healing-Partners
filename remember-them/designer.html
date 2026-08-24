@@ -155,6 +155,30 @@
   .choice .glyph { width:1.75rem; height:1.75rem; display:block; }
   .choice .glyph svg { width:100%; height:100%; fill:currentColor; }
   .choice .shape { width:1.75rem; height:2rem; display:block; }
+  /* Twenty-odd granite colours in one flat grid is a wall. AFM's own price
+     categories are the grouping the family will meet again on the invoice,
+     so they are the honest way to break it up. */
+  .catrow { margin-bottom:.75rem; }
+  .catrow:last-child { margin-bottom:0; }
+  .catrow > h3 {
+    font-size:var(--f-xs); font-weight:600; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--ink-3); margin:0 0 .4rem;
+  }
+  .sizes { display:grid; gap:.4rem; }
+  .sizes select {
+    width:100%; padding:.55rem .65rem; border-radius:.5rem;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink);
+    font:inherit; font-size:var(--f-sm);
+  }
+  .cost table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
+  .cost td { padding:.3rem 0; color:var(--ink-2); vertical-align:top; }
+  .cost td.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;
+               color:var(--ink); }
+  .cost tr.total td { border-top:1px solid var(--line); padding-top:.55rem;
+                      font-weight:600; color:var(--ink); }
+  .cost .yours { font-size:var(--f-xs); color:var(--ink-3); }
+  .cost .quote { color:var(--accent-ink); font-size:var(--f-xs); display:block;
+                 margin-top:.5rem; }
   .choice .shape svg { width:100%; height:100%; }
 
   .saved-list { display:flex; flex-direction:column; gap:.5rem; }
@@ -261,8 +285,19 @@
     </div>
 
     <div class="group">
+      <h2>Size</h2>
+      <div class="sizes" id="sizeChoices"></div>
+    </div>
+
+    <div class="group">
       <h2>Material</h2>
-      <div class="choices" id="stoneChoices"></div>
+      <div id="stoneChoices"></div>
+    </div>
+
+    <div class="group">
+      <h2>Cost</h2>
+      <div class="cost" id="costPanel"></div>
+      <p class="fineprint" id="costNote"></p>
     </div>
 
     <div class="group">
@@ -333,6 +368,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="catalogue.js"></script>
 <script src="stone.js"></script>
 <script>
 (function () {
@@ -420,6 +456,7 @@
      them. The guided flow reads the same catalogue, so the two pages can no
      longer drift apart the way they had. */
   var Stone     = window.RememberThem.Stone;
+  var Cat       = window.RememberThem.Catalogue;
   var FORMS     = Stone.FORMS;
   var STONES    = Stone.STONES;
   var LETTERING = Stone.LETTERING;
@@ -427,8 +464,13 @@
 
   var EMBLEM_ORDER = ["none","cross","celtic","star","heart","tree","dove","rose","hands"];
 
-  var DEFAULTS = { form:"upright", stone:"grey", lettering:"traditional", emblem:"cross",
-                   name:"", born:"", died:"", epitaph:"" };
+  /* This page is the funeral director's, not the family's, so it shows both
+     numbers: what the memorial costs them and what the suggested retail is.
+     The family-facing flow shows retail only, and never a wholesale figure. */
+  var SUPPLIER = Cat.DEFAULT_SUPPLIER;
+
+  var DEFAULTS = { form:"upright", stone:"georgia-gray", size:"", lettering:"traditional",
+                   emblem:"cross", name:"", born:"", died:"", epitaph:"" };
   var d = JSON.parse(JSON.stringify(DEFAULTS));
   var designs = [];
 
@@ -442,6 +484,21 @@
     for (var i=0;i<arr.length;i++) if (arr[i].id===id) return arr[i];
     return arr[0];
   }
+  function money(n) {
+    return "$" + Math.round(n).toLocaleString("en-US");
+  }
+
+  /* The sizes available for the shape currently chosen. Empty for the shapes
+     no supplier prices — heart, cross, plaque, serpentine are custom work. */
+  function sizeOptions() { return Cat.sizesForForm(d.form, SUPPLIER); }
+
+  function currentSize() {
+    var opts = sizeOptions();
+    if (!opts.length) return null;
+    for (var i=0;i<opts.length;i++) if (opts[i].product+"/"+opts[i].size === d.size) return opts[i];
+    return opts[0];
+  }
+
   var toastTimer;
   function toast(msg) {
     var t=$("toast"); t.textContent=msg; t.classList.add("show");
@@ -469,9 +526,68 @@
       epitaph:   d.epitaph
     });
 
+    var sz = currentSize();
     $("specLine").textContent = f.label + " · " + st.label + " · " + lt.label +
       (em.path ? " · " + em.label + " emblem" : "");
-    $("dimLine").textContent = f.dims;
+    /* Prefer the size actually ordered over the shape's nominal dimensions —
+       f.dims is only a stand-in for shapes nothing prices. */
+    $("dimLine").textContent = sz ? sz.def.label + " in" : f.dims;
+
+    buildSizes();
+    renderCost();
+  }
+
+  /* ---------------- cost ----------------
+     Two columns, deliberately. The left is what the monument company charges
+     the funeral home; the right is suggested retail at the Partner's markup.
+     Agreement 6.8 leaves retail to the Partner, so 2.5 is a starting point and
+     the sheet is the only thing here that is fixed. */
+  function renderCost() {
+    var host = $("costPanel"), note = $("costNote"), st = byId(STONES, d.stone);
+    var sz = currentSize();
+
+    if (!sz) {
+      host.innerHTML = '<p class="quote">This shape is custom work — priced by the ' +
+        'monument company, not from the price sheet.</p>';
+      note.textContent = "";
+      return;
+    }
+    if (st.quoteOnly) {
+      host.innerHTML = '<p class="quote">' + esc(st.label) +
+        ' carries no published price. Ask the monument company for a quote.</p>';
+      note.textContent = "";
+      return;
+    }
+
+    var extras = [];
+    var p = Cat.product(sz.product, SUPPLIER);
+    /* Setting is not optional in practice — a memorial nobody installs is not
+       a memorial — so it is included wherever the product prices it. */
+    if (p && p.extras && Cat.byId(p.extras, "install")) extras.push("install");
+
+    var q = Cat.price({ supplier: SUPPLIER, product: sz.product, size: sz.size,
+                        colour: d.stone, extras: extras });
+
+    var rows = q.lines.map(function (ln) {
+      return "<tr><td>" + esc(ln.label) + "</td>" +
+             '<td class="n">' + money(ln.retail) + "</td></tr>";
+    }).join("");
+
+    var quotes = q.quotes.length
+      ? '<span class="quote">' + esc(q.quotes.join(", ")) +
+        " — priced by the monument company</span>" : "";
+
+    host.innerHTML =
+      "<table>" + rows +
+      '<tr class="total"><td>Suggested retail</td><td class="n">' + money(q.retail) + "</td></tr>" +
+      '<tr><td class="yours">Your cost from ' + esc(Cat.supplier(SUPPLIER).name) + "</td>" +
+      '<td class="n yours">' + money(q.wholesale) + "</td></tr>" +
+      "</table>" + quotes;
+
+    note.textContent = "Retail is your cost \u00d7 " + Cat.supplier(SUPPLIER).markup +
+      ", which is a suggestion — you set your own price. Lead time about " +
+      q.leadTime.label + ". Every figure is an estimate until " +
+      Cat.supplier(SUPPLIER).name + " confirms it.";
   }
 
   /* ---------------- choice UI ---------------- */
@@ -485,10 +601,22 @@
       return '<button class="choice" data-k="form" data-v="'+f.id+'">'+thumb(f.id)+'<span>'+f.label+'</span></button>';
     }).join("");
 
-    $("stoneChoices").innerHTML = STONES.map(function (s) {
-      return '<button class="choice" data-k="stone" data-v="'+s.id+'">' +
-             '<span class="dot" style="background:linear-gradient(140deg,'+s.hi+','+s.base+' 60%,'+s.cut+')"></span>' +
-             '<span>'+s.label.replace(" ","<br>")+'</span></button>';
+    /* Grouped by AFM price category rather than listed flat. A director
+       working to a family's budget picks the category first and the colour
+       second, which is the order the sheet itself is written in. */
+    var groups = {}, order = [];
+    STONES.forEach(function (s) {
+      var k = s.cat || "\u2014";
+      if (!groups[k]) { groups[k] = []; order.push(k); }
+      groups[k].push(s);
+    });
+    $("stoneChoices").innerHTML = order.map(function (k) {
+      return '<div class="catrow"><h3>' + esc(k === "Quote" ? "Priced on request" : k) + "</h3>" +
+        '<div class="choices">' + groups[k].map(function (s) {
+          return '<button class="choice" data-k="stone" data-v="'+s.id+'">' +
+                 '<span class="dot" style="background:linear-gradient(140deg,'+s.hi+','+s.base+' 60%,'+s.cut+')"></span>' +
+                 '<span>'+esc(s.label).replace(" ","<br>")+'</span></button>';
+        }).join("") + "</div></div>";
     }).join("");
 
     $("letterChoices").innerHTML = LETTERING.map(function (l) {
@@ -505,6 +633,45 @@
                : '<svg viewBox="-24 -24 48 48"><line x1="-13" y1="13" x2="13" y2="-13" stroke="currentColor" stroke-width="2.5"/></svg>') +
              '</span><span>'+e.label+'</span></button>';
     }).join("");
+  }
+
+  /* A <select> rather than a button grid: nine flat-marker sizes plus two
+     bevel ranges is twenty-odd options, and they are read as a list of
+     measurements, not compared as pictures. It also keeps the click budget
+     down — one control, one click. */
+  var sizesBuiltFor = null;
+  function buildSizes() {
+    var opts = sizeOptions(), host = $("sizeChoices");
+    /* render() runs on every keystroke in the inscription fields. Rebuilding
+       the <select> that often would close it mid-choice and throw away focus,
+       so it is rebuilt only when the shape it belongs to has changed. */
+    var cur0 = currentSize();
+    d.size = cur0 ? cur0.product + "/" + cur0.size : "";
+    if (sizesBuiltFor === d.form) return;
+    sizesBuiltFor = d.form;
+    if (!opts.length) {
+      host.innerHTML = '<p class="fineprint">This shape is custom work. The monument ' +
+        'company sizes and prices it to the design.</p>';
+      return;
+    }
+    var cur = currentSize(), curKey = cur ? cur.product + "/" + cur.size : "";
+    host.innerHTML = '<select id="sizeSelect" aria-label="Size">' +
+      opts.map(function (o) {
+        var k = o.product + "/" + o.size;
+        return '<option value="' + k + '"' + (k === curKey ? " selected" : "") + ">" +
+               esc(o.label) + " in</option>";
+      }).join("") + "</select>";
+    $("sizeSelect").addEventListener("change", function () {
+      d.size = this.value;
+      render();
+    });
+  }
+
+  /* Forcing the next render() to rebuild the list — called when the shape
+     changes and the previous shape's sizes no longer apply. */
+  function invalidateSizes() {
+    sizesBuiltFor = null;
+    d.size = "";
   }
 
   function syncPressed() {
@@ -563,6 +730,42 @@
     return location.origin + location.pathname + "?d=" + encodeDesign();
   }
 
+  /* The order handoff. Everything here has to be unambiguous to a monument
+     company reading it cold, which is why the size is a supplier size and the
+     finish is spelled out in words as well as in AFM's code. */
+  function specSize() {
+    var sz = currentSize();
+    if (!sz) return byId(FORMS,d.form).dims + "  (custom shape — size to be confirmed)";
+    var p = Cat.product(sz.product, SUPPLIER);
+    return sz.def.label + " in  (" + p.label + ")";
+  }
+  function specCat(s) {
+    return s.quoteOnly ? "  (no published price)" : (s.cat ? "  (" + s.cat + ")" : "");
+  }
+  function specFinish() {
+    var sz = currentSize();
+    var p  = sz ? Cat.product(sz.product, SUPPLIER) : null;
+    var fin = p && p.finish ? Cat.byId(Cat.supplier(SUPPLIER).finishes, p.finish) : null;
+    return fin ? fin.plain + "  (" + fin.code + ")" : "To be confirmed";
+  }
+  function specMoney() {
+    var sz = currentSize(), st = byId(STONES, d.stone);
+    if (!sz || st.quoteOnly) return "Price:      by quote — not on the published sheet";
+    var p = Cat.product(sz.product, SUPPLIER), extras = [];
+    if (p && p.extras && Cat.byId(p.extras, "install")) extras.push("install");
+    var q = Cat.price({ supplier: SUPPLIER, product: sz.product, size: sz.size,
+                        colour: d.stone, extras: extras });
+    var out = q.lines.map(function (ln) {
+      return "  " + ln.label + " — " + money(ln.wholesale) + " wholesale";
+    });
+    out.push("  Total wholesale: " + money(q.wholesale) +
+             "   ·   suggested retail: " + money(q.retail));
+    out.push("  Lead time: " + q.leadTime.label);
+    if (q.quotes.length) out.push("  By quote: " + q.quotes.join(", "));
+    return "Price (from " + Cat.supplier(SUPPLIER).name + ", " +
+           Cat.supplier(SUPPLIER).sheet + "):\n" + out.join("\n");
+  }
+
   function spec() {
     var f=byId(FORMS,d.form), s=byId(STONES,d.stone), l=byId(LETTERING,d.lettering);
     var em=EMBLEMS[d.emblem] || EMBLEMS.none;
@@ -570,10 +773,14 @@
       "REMEMBER THEM — memorial design",
       "Healing Partners",
       "",
-      "Form:       " + f.label + "  (" + f.dims + ")",
-      "Material:   " + s.label,
-      "Lettering:  " + l.label,
+      "Form:       " + f.label,
+      "Size:       " + specSize(),
+      "Material:   " + s.label + specCat(s),
+      "Finish:     " + specFinish(),
+      "Lettering:  " + l.label + "  (placeholder — pick the real alphabet from the book)",
       "Emblem:     " + (em.path ? em.label : "None"),
+      "",
+      specMoney(),
       "",
       "Name:       " + (d.name || "—"),
       "Born:       " + (d.born || "—"),
@@ -615,11 +822,18 @@
       var x = designs[+ld.getAttribute("data-load")];
       if (!x) return;
       Object.keys(DEFAULTS).forEach(function (k) { d[k] = (k in x) ? x[k] : DEFAULTS[k]; });
+      invalidateSizes();
+      if (x.size) d.size = x.size;
       syncInputs(); syncPressed(); render(); toast("Design opened.");
       return;
     }
     var ch = e.target.closest(".choice");
-    if (ch) { d[ch.getAttribute("data-k")] = ch.getAttribute("data-v"); syncPressed(); render(); }
+    if (ch) {
+      var k = ch.getAttribute("data-k");
+      d[k] = ch.getAttribute("data-v");
+      if (k === "form") invalidateSizes();   // a die size is meaningless on a slant
+      syncPressed(); render();
+    }
   });
 
   document.addEventListener("keydown", function (e) {
@@ -651,6 +865,7 @@
 
   $("newBtn").onclick = function () {
     d = JSON.parse(JSON.stringify(DEFAULTS));
+    invalidateSizes();
     syncInputs(); syncPressed(); render(); toast("Started a new design.");
   };
 

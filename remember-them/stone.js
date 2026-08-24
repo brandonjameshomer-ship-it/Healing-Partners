@@ -56,48 +56,124 @@ window.RememberThem.Stone = (function () {
    * frost = the colour of the cut surface itself.
    * sky   = what the polish reflects. polish = how mirror-like, 0..1.
    */
-  var STONES = [
-    { id: "black",  label: "Black granite", cat: "Cat 2",
-      base: "#26262B", hi: "#42424B", cut: "#0E0E12", lip: "#5A5A64",
-      engrave: "sandblast", frost: "#C6C8CE", sky: "#8FA6C4", polish: 0.95,
-      fleckL: "#7C7C88", fleckD: "#08080B" },
+  /* FAMILIES is keyed by the render family a catalogue colour names, not by
+   * the colour itself. AFM sells four different black granites at four
+   * different prices; on a 300px preview they are one dark polished rock, and
+   * inventing four palettes would be inventing detail we do not have. The
+   * commercial distinction is real and lives in catalogue.js, where it belongs.
+   *
+   * The honest caveat stays on the preview either way — Agreement 3.8, a
+   * screen cannot reproduce stone. The photo library is what actually closes
+   * this gap; these palettes are the floor, not the ceiling.
+   */
+  var FAMILIES = {
+    black:    { base: "#26262B", hi: "#42424B", cut: "#0E0E12", lip: "#5A5A64",
+                engrave: "sandblast", frost: "#C6C8CE", sky: "#8FA6C4", polish: 0.95,
+                fleckL: "#7C7C88", fleckD: "#08080B" },
 
-    { id: "grey",   label: "Grey granite", cat: "Cat 1",
-      base: "#84888D", hi: "#A6AAB0", cut: "#4E5257", lip: "#B6BAC0",
-      engrave: "sandblast", frost: "#DCDFE3", sky: "#A9BCD4", polish: 0.72,
-      fleckL: "#E2E5E9", fleckD: "#3A3E43" },
+    gray:     { base: "#84888D", hi: "#A6AAB0", cut: "#4E5257", lip: "#B6BAC0",
+                engrave: "sandblast", frost: "#DCDFE3", sky: "#A9BCD4", polish: 0.72,
+                fleckL: "#E2E5E9", fleckD: "#3A3E43" },
 
-    { id: "rose",   label: "Rose granite", cat: "Cat 2",
-      base: "#A2807B", hi: "#BE9B95", cut: "#6B504C", lip: "#CBAAA4",
-      engrave: "sandblast", frost: "#E6D2CC", sky: "#B9AEBE", polish: 0.7,
-      fleckL: "#EBD8D2", fleckD: "#4E3A36" },
+    /* A light speckled granite, not marble: it takes a blast cut and holds a
+     * polish, so the lettering behaves like granite even though the value is
+     * close to marble's. */
+    white:    { base: "#C3C0B8", hi: "#DEDBD3", cut: "#8A877F", lip: "#EDEAE3",
+                engrave: "sandblast", frost: "#F2F0EB", sky: "#C6D2E0", polish: 0.6,
+                fleckL: "#FFFFFF", fleckD: "#6E6B63" },
 
-    { id: "marble", label: "White marble", cat: "Cat 1",
-      base: "#DEDAD2", hi: "#F1EEE8", cut: "#A49F94", lip: "#FFFFFF",
-      engrave: "carve", frost: "#8C8679", sky: "#CFD8E2", polish: 0.22,
-      fleckL: "#FFFFFF", fleckD: "#B8B2A6" },
+    rose:     { base: "#A2807B", hi: "#BE9B95", cut: "#6B504C", lip: "#CBAAA4",
+                engrave: "sandblast", frost: "#E6D2CC", sky: "#B9AEBE", polish: 0.7,
+                fleckL: "#EBD8D2", fleckD: "#4E3A36" },
 
-    { id: "bronze", label: "Bronze", cat: "—",
-      base: "#5E4622", hi: "#7E6130", cut: "#33260F", lip: "#C9A24E",
-      engrave: "raised", frost: "#E2BE68", sky: "#9A8A5E", polish: 0.45,
-      fleckL: "#8A6C34", fleckD: "#241A0A" },
+    red:      { base: "#7E3B34", hi: "#9C5049", cut: "#4A1F1A", lip: "#B3675E",
+                engrave: "sandblast", frost: "#E4C6C0", sky: "#A895A6", polish: 0.8,
+                fleckL: "#C98A80", fleckD: "#33120E" },
 
-    { id: "blue",   label: "Blue pearl", cat: "Cat 3",
-      base: "#36415A", hi: "#4F5C7B", cut: "#1C2233", lip: "#6D7C9E",
-      engrave: "sandblast", frost: "#C8D0E0", sky: "#93A9CA", polish: 0.92,
-      fleckL: "#8FA0C6", fleckD: "#141A28" }
+    mahogany: { base: "#6E4A38", hi: "#8B6149", cut: "#3F2920", lip: "#A87A5E",
+                engrave: "sandblast", frost: "#DCC4B4", sky: "#A69488", polish: 0.74,
+                fleckL: "#B98C6C", fleckD: "#2A1810" },
+
+    blue:     { base: "#36415A", hi: "#4F5C7B", cut: "#1C2233", lip: "#6D7C9E",
+                engrave: "sandblast", frost: "#C8D0E0", sky: "#93A9CA", polish: 0.92,
+                fleckL: "#8FA0C6", fleckD: "#141A28" },
+
+    green:    { base: "#33463C", hi: "#4A6155", cut: "#1B2620", lip: "#688073",
+                engrave: "sandblast", frost: "#C6D4CB", sky: "#93B0A6", polish: 0.9,
+                fleckL: "#86A896", fleckD: "#111A15" },
+
+    /* Rainbow is banded rather than evenly flecked. The palette leans on a
+     * wide light/dark fleck spread to hint at that; it is the family most
+     * obviously waiting on a real photograph. */
+    rainbow:  { base: "#8A7F82", hi: "#ADA1A4", cut: "#544A4D", lip: "#C4B7BA",
+                engrave: "sandblast", frost: "#E4DBDD", sky: "#AEB6C6", polish: 0.78,
+                fleckL: "#F0E4E6", fleckD: "#2E2628" },
+
+    /* Not on AFM's sheet. Kept because the cut behaves differently: on white
+     * marble a frosted cut is the same value as the stone, so the letter reads
+     * as its own shadow rather than as a pale frost. */
+    marble:   { base: "#DEDAD2", hi: "#F1EEE8", cut: "#A49F94", lip: "#FFFFFF",
+                engrave: "carve", frost: "#8C8679", sky: "#CFD8E2", polish: 0.22,
+                fleckL: "#FFFFFF", fleckD: "#B8B2A6" },
+
+    /* Bronze is cast, not cut. Letters stand proud of a stippled ground; the
+     * raised faces are polished bright while the background oxidises dark. It
+     * is the inverse of everything above. Priced by Matthews, quote only. */
+    bronze:   { base: "#5E4622", hi: "#7E6130", cut: "#33260F", lip: "#C9A24E",
+                engrave: "raised", frost: "#E2BE68", sky: "#9A8A5E", polish: 0.45,
+                fleckL: "#8A6C34", fleckD: "#241A0A" }
+  };
+
+  /* Materials the supplier sheet does not carry, appended after it so the
+   * designer can still offer them and mark them for quote. */
+  var OFF_SHEET = [
+    { id: "marble", label: "White marble", family: "marble", cat: "Quote", quoteOnly: true },
+    { id: "bronze", label: "Bronze",       family: "bronze", cat: "Quote", quoteOnly: true }
   ];
 
-  var LETTERING = [
-    { id: "traditional", label: "Traditional",
-      css: 'ui-serif, "Iowan Old Style", Georgia, serif', weight: 600, track: ".02em" },
-    { id: "modern", label: "Modern",
-      css: 'system-ui, "Segoe UI", Helvetica, Arial, sans-serif', weight: 500, track: ".06em" },
-    { id: "script", label: "Script",
-      css: '"Snell Roundhand", "Segoe Script", "Brush Script MT", cursive', weight: 500, track: ".01em" },
-    { id: "gothic", label: "Gothic",
-      css: '"UnifrakturCook", "Old English Text MT", Luminari, serif', weight: 600, track: ".01em" }
-  ];
+  /* STONES is derived, not authored. Every granite colour the supplier prices
+   * becomes a renderable material; nothing here decides what is for sale. If
+   * catalogue.js has not loaded, fall back to one stone per family so the
+   * renderer still works standing alone (preview.html relies on this).
+   */
+  function buildStones() {
+    var cat = window.RememberThem && window.RememberThem.Catalogue, out = [];
+
+    function make(id, label, family, catLabel, extra) {
+      var pal = FAMILIES[family] || FAMILIES.gray, s = { id: id, label: label,
+        family: family, cat: catLabel };
+      for (var k in pal) if (pal.hasOwnProperty(k)) s[k] = pal[k];
+      if (extra) for (var j in extra) if (extra.hasOwnProperty(j)) s[j] = extra[j];
+      return s;
+    }
+
+    if (cat) {
+      cat.supplier().colours.forEach(function (c) {
+        out.push(make(c.id, c.label, c.family,
+          c.quoteOnly ? "Quote" : "Cat " + c.cat,
+          { etchable: !!c.etchable, quoteOnly: !!c.quoteOnly, origin: c.origin }));
+      });
+    } else {
+      for (var f in FAMILIES) if (FAMILIES.hasOwnProperty(f) && f !== "marble" && f !== "bronze") {
+        out.push(make(f, f.charAt(0).toUpperCase() + f.slice(1) + " granite", f, "—"));
+      }
+    }
+
+    OFF_SHEET.forEach(function (m) {
+      out.push(make(m.id, m.label, m.family, m.cat, { quoteOnly: true }));
+    });
+    return out;
+  }
+
+  var STONES = buildStones();
+
+  /* Lettering is the catalogue's, not the renderer's — "Traditional" is a
+   * placeholder standing in for a real alphabet out of the manufacturer's
+   * book. The fallback here exists only so the renderer runs standalone. */
+  var LETTERING = (window.RememberThem && window.RememberThem.Catalogue)
+    ? window.RememberThem.Catalogue.supplier().lettering
+    : [{ id: "traditional", label: "Traditional", placeholder: true,
+         css: 'ui-serif, "Iowan Old Style", Georgia, serif', weight: 600, track: ".02em" }];
 
   /* ------------------------------------------------------------ geometry
    *

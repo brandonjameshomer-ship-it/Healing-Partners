@@ -20,18 +20,47 @@ the query string so private browsing does not lose who this is. The record is ho
 hours only — these machines sit on a shared front desk, and one family's interview must never
 surface in the next family's session.
 
-## `stone.js`
+## `catalogue.js` — what can be ordered
 
-The renderer both pages draw with. Shapes, granites, lettering and emblems live here too, so the
-two pages cannot describe different catalogues.
+What is for sale, from whom, at what wholesale price, keyed by supplier. Affordable Family
+Memorials is filled in from their *Wholesale Price Guide for 2025*: twenty granite colours across
+four price categories, flat markers in nine sizes, bevels at 6" and 8", slants, ten die sizes with
+the bases they sit on, benches, sixteen porcelain portraits, vases, final inscriptions, finish
+codes and lead times.
 
-It models thickness, the polished-face/rock-pitched-side contrast, and — the part that matters
-most — how lettering catches light in each material. Sandblasting frosts the cut so it reads
-*paler* than the polish around it; cast bronze stands proud and throws its shadow down-right; on
-white marble frosting gives no contrast at all, so the cut reads as its own shadow.
+The other five suppliers — Lundgren, OMS, Pacific Coast, Matthews and Monuments.com — are declared
+as empty profiles listing exactly what is missing. That is deliberate: an empty profile makes the
+gap visible, so the ask to each vendor is a list rather than a vague request.
 
-`preview.html` renders every shape against every material for checking changes. It is a working
-page, not part of the customer flow.
+`Catalogue.price()` returns wholesale and retail side by side, plus a `quotes` list for anything
+with no published price. **Every number in the file is wholesale and none of it may be shown to a
+family.** Retail is wholesale × the Partner's markup — 2.5 is the suggested figure, but Agreement
+§6.8 makes retail the Partner's own decision, so it is a setting rather than a constant. Bench
+installation is the one line passed through at cost with no markup at all.
+
+Roughly half the product list — cast glass, glass art, granite and glass inlay, bronze, cremation
+pedestals, statuary, custom shape work — has a vendor and no price sheet behind it. Those are
+flagged for quote and are never estimated.
+
+## `stone.js` — how it is drawn
+
+The renderer both pages draw with. It models thickness, the polished-face/rock-pitched-side
+contrast, and — the part that matters most — how lettering catches light in each material.
+Sandblasting frosts the cut so it reads *paler* than the polish around it; cast bronze stands
+proud and throws its shadow down-right; on white marble frosting gives no contrast at all, so the
+cut reads as its own shadow.
+
+It no longer owns the option list. Each catalogue colour names a *render family*, and stone.js
+owns what that family looks like. Several real colours share one family — AFM sells four black
+granites at four prices, and on a screen they are one dark polished rock. The commercial
+distinction is real and lives in the catalogue; the renderer does not pretend to a precision it
+does not have.
+
+`preview.html` draws every shape against every render family, then prices every product, size and
+category through `Catalogue.price()`. There is no test runner on this project, so that page is the
+test: anything that throws lands in a red box, and a handful of figures are asserted against the
+printed sheet so a silently-wrong total cannot pass as a right one. It is a working page, not part
+of the customer flow.
 
 ## What a preview is not
 
