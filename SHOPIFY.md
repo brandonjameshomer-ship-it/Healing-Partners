@@ -75,6 +75,29 @@ is pasted in.
 
 ## Option A — Link out (do this first)
 
+## The homepage
+
+The live homepage was still the stock Ritual demo — the hero read *"Fashion for the wild at heart.
+Build your capsule collection…"* on a memorial company's site, above four products called "Example
+product" at $100 each.
+
+The replacement lives in this repo as `shopify/hp-home.liquid` and `shopify/index.json`, and is
+already uploaded to the **unpublished** Ritual theme. Shopify blocks writes to the live theme, which
+is the safety rail working as intended: nothing changed on healingpartners.us until you publish.
+
+1. Preview it: **https://healingpartners.us/?preview_theme_id=162974466266**
+2. If it looks right, **Online Store → Themes**, find the second *Ritual*, and **Publish**.
+
+The page deliberately shows no products, because the only products in the store are the four demo
+ones. It sells the subscription and sends funeral homes to the trial instead. When real products
+exist, add them as their own section rather than putting them back on this template.
+
+To change the copy later, edit `shopify/hp-home.liquid` here and upload it to the theme as
+`snippets/hp-home.liquid` — the homepage template is a one-line `{% render 'hp-home' %}`, so it
+never needs touching again.
+
+---
+
 **Ten minutes. Nothing can break.**
 
 Shopify holds the sales page; the demo opens in a new tab. Not clever, but it works on every

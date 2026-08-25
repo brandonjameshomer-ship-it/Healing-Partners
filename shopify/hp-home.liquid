@@ -1,0 +1,153 @@
+<div class="hp-h">
+<style>.hp-h{--ink:#12172B;--ink2:#454E6B;--ink3:#79819F;--line:#E2E6F0;--line2:#C9D0E2;--ground:#F7F8FC;--surf:#FFF;--night:#12172B;--brass:#A8761F;--brasslit:#E0B166;--brasssoft:#F7EEDC;--sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;position:relative;width:100vw;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;max-width:100vw;overflow-x:hidden;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.62;text-align:left;-webkit-font-smoothing:antialiased}
+.hp-h *{box-sizing:border-box}
+.hp-h p,.hp-h ul,.hp-h ol,.hp-h h1,.hp-h h2,.hp-h h3{margin:0}
+.hp-h h1,.hp-h h2,.hp-h h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.14}
+.hp-h a{color:inherit}
+.hp-h .band{padding:5rem 1.5rem}
+.hp-h .band+.band{border-top:1px solid var(--line)}
+.hp-h .in{max-width:64rem;margin:0 auto}
+.hp-h .narrow{max-width:46rem}
+.hp-h .dark{background:var(--night);color:#EDEFF8;border-top:none!important}
+.hp-h .dark h1,.hp-h .dark h2{color:#FFF}
+.hp-h .eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:0 0 .875rem}
+.hp-h .dark .eyebrow{color:var(--brasslit)}
+.hp-h .lede{font-size:1.1875rem;color:var(--ink2);margin-top:1.125rem}
+.hp-h .dark .lede{color:#B7BFDB}
+.hp-h .fine{font-size:.875rem;color:var(--ink3)}
+.hp-h h2.hd{font-size:1.875rem}
+.hp-h .cta{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:2rem}
+.hp-h .btn{display:inline-block;padding:.9375rem 1.625rem;border-radius:11px;font-size:1rem;font-weight:650;text-decoration:none;border:1px solid var(--line2);background:var(--surf);color:var(--ink);transition:transform .12s,box-shadow .12s}
+.hp-h .btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px -8px rgba(18,23,43,.35)}
+.hp-h .btn1{background:var(--brass);border-color:var(--brass);color:#22190A}
+.hp-h .dark .btn{background:transparent;border-color:#3B4468;color:#EDEFF8}
+.hp-h .dark .btn1{background:var(--brasslit);border-color:var(--brasslit);color:#22190A}
+.hp-h .hero{padding:5.5rem 1.5rem 4.5rem}
+.hp-h .hero h1{font-size:clamp(2.25rem,5.2vw,3.5rem)}
+.hp-h .hero .lede{font-size:1.3125rem;max-width:38rem}
+.hp-h .trust{display:flex;flex-wrap:wrap;gap:.5rem 1.75rem;margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #2A3252;font-size:.875rem;color:#9AA3C2}
+.hp-h .trust b{color:#DDE2F2;font-weight:600}
+.hp-h .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:2.5rem}
+.hp-h .stat{background:var(--surf);padding:1.75rem 1.5rem}
+.hp-h .stat b{display:block;font-family:var(--serif);font-size:2.125rem;line-height:1.05}
+.hp-h .stat span{display:block;font-size:.9375rem;color:var(--ink2);margin-top:.5rem}
+.hp-h .steps{list-style:none;padding:0;counter-reset:s;display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:2.5rem}
+.hp-h .steps li{counter-increment:s;background:var(--surf);padding:1.625rem 1.75rem 1.625rem 4.75rem;position:relative}
+.hp-h .steps li:before{content:counter(s);position:absolute;left:1.75rem;top:1.625rem;width:2rem;height:2rem;border-radius:50%;background:var(--brasssoft);color:var(--brass);font-family:var(--serif);font-weight:700;display:grid;place-items:center}
+.hp-h .steps h3{font-size:1.0625rem}
+.hp-h .steps p{font-size:.9688rem;color:var(--ink2);margin-top:.3125rem}
+.hp-h .plans{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:2.5rem}
+.hp-h .plan{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:2rem}
+.hp-h .plan.pick{border:2px solid var(--brass);box-shadow:0 16px 40px -24px rgba(168,118,31,.6)}
+.hp-h .flag{display:inline-block;background:var(--brasssoft);color:var(--brass);font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3125rem .625rem;border-radius:999px;margin-bottom:1rem}
+.hp-h .amt{font-family:var(--serif);font-size:3rem;line-height:1}
+.hp-h .amt small{font-family:var(--sans);font-size:1rem;font-weight:500;color:var(--ink3)}
+.hp-h .plan h3{font-size:1.0625rem;margin:.75rem 0 0}
+.hp-h .terms{list-style:none;padding:0;margin-top:1.25rem;display:grid;gap:.625rem;font-size:.9375rem;color:var(--ink2)}
+.hp-h .terms li:before{content:"·";color:var(--brass);font-weight:700;margin-right:.5rem}
+.hp-h .privacy{background:var(--surf);border:1px solid var(--line);border-left:4px solid var(--brass);border-radius:0 16px 16px 0;padding:2rem;margin-top:2rem}
+.hp-h .privacy ul{list-style:none;padding:0;display:grid;gap:.9375rem}
+.hp-h .privacy li{display:flex;gap:.75rem;font-size:.9688rem;color:var(--ink2);line-height:1.55}
+.hp-h .privacy li:before{content:"✓";color:var(--brass);font-weight:700;flex:0 0 auto}
+.hp-h .privacy b{color:var(--ink);font-weight:650}
+.hp-h .legal{padding:2.5rem 1.5rem;background:#EDEFF6;font-size:.8125rem;color:var(--ink3);line-height:1.6}
+.hp-h .legal p+p{margin-top:.75rem}
+.hp-h .legal b{color:var(--ink2)}
+@media(max-width:820px){.hp-h{font-size:16px}.hp-h .band{padding:3.5rem 1.25rem}.hp-h .hero{padding:4rem 1.25rem 3.25rem}.hp-h .plans,.hp-h .stats{grid-template-columns:1fr}.hp-h .btn{width:100%;text-align:center}.hp-h .steps li{padding:1.5rem 1.25rem 1.5rem 4.25rem}.hp-h .steps li:before{left:1.25rem;top:1.5rem}}</style>
+
+<div class="band dark hero"><div class="in">
+  <p class="eyebrow">Healing Partners &middot; Remember Them&trade;</p>
+  <h1>Show them.<br>Don't ask them to imagine.</h1>
+  <p class="lede">A family choosing a memorial is asked to picture something permanent from a catalogue photograph and a paper order form. Remember Them lets them see it instead &mdash; built with them, in the arrangement room, in about ten minutes.</p>
+  <div class="cta">
+    <a class="btn btn1" href="/pages/for-funeral-homes">For funeral homes</a>
+    <a class="btn" href="https://brandonjameshomer-ship-it.github.io/Healing-Partners/remember-them/" target="_blank" rel="noopener">See the designer</a>
+  </div>
+  <div class="trust">
+    <span><b>Designing memorials since 2008</b></span>
+    <span><b>Portland, Oregon</b></span>
+    <span><b>Built for independent homes</b> of one to three locations</span>
+  </div>
+</div></div>
+
+<div class="band"><div class="in">
+  <p class="eyebrow">What it costs you today</p>
+  <h2 class="hd">One headstone takes a working day you do not have.</h2>
+  <p class="lede narrow">Multiple meetings with the family. A paper order form. Then the proof comes back from the monument company with a date wrong or a name misspelled, and it starts again.</p>
+  <div class="stats">
+    <div class="stat"><b>2&ndash;10 hrs</b><span>Spent on one memorial order, across meetings, forms and corrections</span></div>
+    <div class="stat"><b>Every revision</b><span>Another round trip between the family, your counselor and the fabricator</span></div>
+    <div class="stat"><b>Fax &amp; catalogue</b><span>What most homes still work from, because the software was out of date the day it shipped</span></div>
+  </div>
+</div></div>
+
+<div class="band"><div class="in">
+  <p class="eyebrow">How it works</p>
+  <h2 class="hd">It asks about the person, not the product.</h2>
+  <ol class="steps">
+    <li><h3>It interviews the family about who they were</h3><p>Their stories, habits, hobbies, talents, and the ten words that describe them &mdash; drawn out the way a good biographer would, not collected on a form.</p></li>
+    <li><h3>It narrows thousands of options to a few that fit</h3><p>Instead of handing a grieving family a catalogue, it proposes what suits the person it just heard about, and helps them choose between the finalists.</p></li>
+    <li><h3>They see the memorial, priced, as it is built</h3><p>Form, stone, lettering, emblem and inscription, with the price moving as the design does. Families who can see their options usually choose more than they would have.</p></li>
+    <li><h3>You get the order written out in full</h3><p>An approved proof with a complete specification, ready for whichever monument company you use &mdash; so what comes back is what the family approved.</p></li>
+  </ol>
+</div></div>
+
+<div class="band"><div class="in">
+  <p class="eyebrow">Pricing</p>
+  <h2 class="hd">Families never pay to design. Funeral homes subscribe.</h2>
+  <p class="lede narrow">Three days free either way. There is also a share of marker sales, and it falls as your volume rises &mdash; the more you use it, the less each sale costs you.</p>
+  <div class="plans">
+    <div class="plan pick">
+      <span class="flag">Partner rate</span>
+      <div class="amt">$150 <small>/ month</small></div>
+      <h3>Six-month term</h3>
+      <ul class="terms">
+        <li>Per funeral home, automatic payment</li>
+        <li>Six-month initial term, then month to month</li>
+        <li>Leave early and the discount is recaptured &mdash; a flat $200</li>
+      </ul>
+      <div class="cta"><a class="btn btn1" href="https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02" target="_blank" rel="noopener">Start the 3-day trial</a></div>
+    </div>
+    <div class="plan">
+      <span class="flag" style="background:#EDEFF6;color:#79819F">No commitment</span>
+      <div class="amt">$350 <small>/ month</small></div>
+      <h3>Month to month</h3>
+      <ul class="terms">
+        <li>Per funeral home, no minimum term</li>
+        <li>Cancel any month with nothing further owed</li>
+        <li>Nothing you have made is deleted</li>
+      </ul>
+      <div class="cta"><a class="btn" href="https://brandonjameshomer-ship-it.github.io/Healing-Partners/pay.html" target="_blank" rel="noopener">Start month to month</a></div>
+    </div>
+  </div>
+  <p class="fine" style="margin-top:1.5rem">Full terms, the commission schedule and the insurance discount are on the <a href="https://brandonjameshomer-ship-it.github.io/Healing-Partners/pricing.html" target="_blank" rel="noopener" style="text-decoration:underline">pricing page</a>.</p>
+</div></div>
+
+<div class="band"><div class="in">
+  <p class="eyebrow">Privacy</p>
+  <h2 class="hd">The families' information stays theirs.</h2>
+  <div class="privacy"><ul>
+    <li><span><b>We do not train AI on your content or on family information.</b> Not on the stories a family tells, not on the designs you make. That is a written commitment in the Partner agreement, not a setting.</span></li>
+    <li><span><b>You are the controller of that information; we only process it for you.</b> Export it any time during your subscription and for thirty days after.</span></li>
+    <li><span><b>Designs stay in the browser while you work.</b> Nothing is uploaded while you are designing.</span></li>
+    <li><span><b>Deleted within ninety days</b> of a subscription ending.</span></li>
+  </ul></div>
+</div></div>
+
+<div class="band dark"><div class="in narrow" style="text-align:center">
+  <h2 class="hd">Try it on a real arrangement this week.</h2>
+  <p class="lede">Three days free. If it does not save you hours on the first memorial you use it for, cancel and you are not charged.</p>
+  <div class="cta" style="justify-content:center">
+    <a class="btn btn1" href="https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02" target="_blank" rel="noopener">Start the 3-day trial</a>
+    <a class="btn" href="/pages/for-funeral-homes">Read the full case</a>
+  </div>
+  <p class="fine" style="margin-top:1.75rem;color:#8C94B4">Questions: <a href="mailto:bhomer@healingpartners.us" style="text-decoration:underline">bhomer@healingpartners.us</a></p>
+</div></div>
+
+<div class="legal"><div class="in">
+  <p><b>Healing Partners LLC</b>, 111 SW 5th Avenue, Floor 5, Portland, Oregon 97204. REMEMBER THEM&trade; is a product of Healing Partners LLC.</p>
+  <p>Healing Partners is not a funeral establishment, cemetery, monument dealer, manufacturer or installer. It supplies digital memorial designs, proofs and production files. The funeral home chooses its fabricator, owns the transaction with the family, and sets its own retail price.</p>
+  <p>A screen cannot reproduce granite, bronze, etching or polish exactly. Colour and texture differences between a preview and the finished memorial are a property of the materials, not a design error. Cemetery rules vary and remain the funeral home's responsibility to confirm.</p>
+</div></div>
+
+</div>
