@@ -22,8 +22,8 @@ Healing Partners is the company. **Remember Them** is its memorial design app.
 
 Families design free and pay for the memorial they order. Funeral homes and cemeteries
 get a 3-day trial and then subscribe — $150/month on a six-month term with automatic
-payment, or $350/month with no minimum. Leaving the discounted rate early recaptures
-$200 for each month it was given. Quoting the $150 on its own understates the model.
+payment, or $350/month with no minimum. Leaving the discounted rate early recaptures a
+flat $200 — Sec. 5.2 allows $200 for each month given at the discount, but that is waived. Quoting the $150 on its own understates the model.
 A family is never shown a paywall.
 
 ## Demo links

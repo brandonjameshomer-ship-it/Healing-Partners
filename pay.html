@@ -182,22 +182,6 @@
   }
   .item .per { font-size:var(--f-sm); color:var(--ink-3); margin:.375rem 0 1.25rem; }
   .item .go .after { font-size:var(--f-xs); color:var(--ink-3); text-align:center; margin:.625rem 0 0; }
-  .calc { margin:0 0 1.25rem; }
-  .calc label { display:block; font-size:var(--f-sm); color:var(--ink-2); margin-bottom:.375rem; }
-  .calc input {
-    width:100%; padding:.5rem .625rem; border-radius:var(--radius);
-    border:1px solid var(--line-strong); background:var(--surface);
-    color:var(--ink); font:inherit; font-variant-numeric:tabular-nums;
-  }
-  .calc input:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
-  .owed {
-    margin-top:.75rem; font-size:var(--f-sm); color:var(--ink-2);
-    display:flex; align-items:baseline; gap:.5rem;
-  }
-  .owed b {
-    font-family:var(--serif); font-size:var(--f-xl); color:var(--ink);
-    font-variant-numeric:tabular-nums; margin-left:auto;
-  }
   .note {
     border-left:3px solid var(--accent); background:var(--accent-soft);
     padding:.75rem .875rem; border-radius:0 var(--radius) var(--radius) 0;
@@ -240,7 +224,7 @@
         <div class="who">Subscription &middot; discounted rate</div>
         <h2>$150 a month, six-month term</h2>
         <p>Per funeral home. Requires automatic payment and an initial term of six months. Three days free before the first charge.</p>
-        <p>Ending the term before the six months are up means the discount already taken is recaptured &mdash; $200 for each month served at the discounted rate. That is settled below, not here.</p>
+        <p>Ending the term before the six months are up means the discount already taken is recaptured. That is a flat $200, settled below rather than here.</p>
       </div>
       <div class="go">
         <div class="price">$150</div>
@@ -273,19 +257,17 @@
       <div>
         <div class="who">Settlement &middot; Sec. 5.2</div>
         <h2>Discount recapture</h2>
-        <p>Owed only when a six-month discounted term ends early. It is the difference between the two rates for the months already served at the discount &mdash; <strong>$350 &minus; $150 = $200 for each of those months</strong>. It is not a penalty and not a flat fee.</p>
+        <p>Owed only when a six-month discounted term ends early. It gives back the discount already taken &mdash; the difference between the two rates, $350 &minus; $150.</p>
         <p>Nothing is owed here if the term ran its full six months, if the Partner was on the $350 rate, or if the Partner left because of an uncured breach by Healing Partners.</p>
-        <div class="note" id="qtyNote" hidden>
-          <strong>Set the quantity to <span id="qtyEcho">1</span> at checkout.</strong>
-          The Stripe page charges $200 per unit, so one unit is one month at the discounted rate.
+        <div class="note">
+          <strong>$200 once, however many months you were on the discounted rate.</strong>
+          Sec. 5.2 entitles us to $200 for each of those months. We do not charge it that way, and
+          a Partner who leaves in month five pays the same $200 as one who leaves in month two.
         </div>
       </div>
       <div class="go">
-        <div class="calc">
-          <label for="months">Months served at the $150 rate</label>
-          <input type="number" id="months" min="1" max="5" step="1" value="1" inputmode="numeric">
-          <div class="owed"><span>Recapture owed</span> <b id="owed">$200</b></div>
-        </div>
+        <div class="price">$200</div>
+        <div class="per">once &middot; not per month</div>
         <a class="btn" data-plan="recapture"
            href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20discount%20recapture">Pay the recapture</a>
         <p class="after">A one-off charge. Nothing recurring is started.</p>
@@ -321,8 +303,8 @@
 
      TERM_LINK      $150/month, six-month initial term (Sec. 5.1).
      MONTHLY_LINK   $350/month, month to month (Sec. 5.1).
-     RECAPTURE_LINK $200 per month served at the discount (Sec. 5.2).
-                    Priced per unit, so the payer sets the quantity.
+     RECAPTURE_LINK The Sec. 5.2 discount recapture, charged as a flat
+                    $200 once. See the note below before changing it.
 
      Any one left empty falls back to the email address already on its
      button. Never leave a customer a button that goes nowhere.
@@ -331,7 +313,13 @@
   var MONTHLY_LINK   = "https://buy.stripe.com/fZu14h1BabA9bJJ5otbsc01";
   var RECAPTURE_LINK = "https://buy.stripe.com/14AfZb93C1ZzdRR6sxbsc03";
 
-  var RECAPTURE_PER_MONTH = 350 - 150;   /* Sec. 5.2 arithmetic, not a price */
+  /* Sec. 5.2 entitles Healing Partners to (350 - 150) for EACH month served
+     at the discounted rate, so an exit in month four would be $800. Brandon
+     chose to charge a flat $200 instead, whatever the number of months. That
+     is a deliberate waiver of the rest, not a miscalculation -- it undercharges
+     in Healing Partners' own favour only, so it costs the Partner nothing and
+     needs no change to the signed agreement. Do not "fix" it back to a
+     per-month figure without asking him. */
 
   /* A Partner arriving from an invoice can carry ?ref=<partner> so the
      payment can be matched back to them in Stripe. */
@@ -352,28 +340,6 @@
   wire("monthly", MONTHLY_LINK);
   wire("recapture", RECAPTURE_LINK);
 
-  /* The recapture is per month served, so a single flat charge would
-     under-collect from everyone who left after month one. Show the real
-     total and the quantity that produces it. */
-  var months = document.getElementById("months");
-  var owed   = document.getElementById("owed");
-  var note   = document.getElementById("qtyNote");
-  var echo   = document.getElementById("qtyEcho");
-
-  function recalc() {
-    var n = Math.min(5, Math.max(1, Math.round(Number(months.value) || 1)));
-    owed.textContent = "$" + (n * RECAPTURE_PER_MONTH).toLocaleString("en-US");
-    echo.textContent = n;
-    note.hidden = !RECAPTURE_LINK || n < 2;
-  }
-
-  months.addEventListener("input", recalc);
-  months.addEventListener("change", function () {
-    var n = Math.min(5, Math.max(1, Math.round(Number(months.value) || 1)));
-    months.value = n;
-    recalc();
-  });
-  recalc();
 })();
 </script>
 

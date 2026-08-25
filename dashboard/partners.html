@@ -453,12 +453,12 @@
            "recapture would be (350 &minus; 150) &times; " + p.discounted_months_served +
            ' months (Sec. 5.2)</span><span class="spacer"></span><b>' +
            money((350 - 150) * p.discounted_months_served) + "</b></div>" +
-           /* The Stripe link charges $200 per unit, so the quantity is the
-              months served. Sending it without saying that under-collects. */
-           '<div class="line" style="color:var(--ink-3)"><span>Collect at ' +
+           /* Sec. 5.2 entitles us to the figure above. Brandon charges a flat
+              $200 regardless, waiving the rest -- see the note in pay.html. */
+           '<div class="line" style="color:var(--ink-3)"><span>Collected as a flat $200 at ' +
            '<a href="../pay.html?ref=' + encodeURIComponent(p.name || "") + '" ' +
-           'target="_blank" rel="noopener">pay.html</a>, quantity ' +
-           p.discounted_months_served + ' at $200</span></div></div>';
+           'target="_blank" rel="noopener">pay.html</a>, not ' +
+           money((350 - 150) * p.discounted_months_served) + '</span></div></div>';
     }
 
     /* ---- Exhibit A-4 ---- */
