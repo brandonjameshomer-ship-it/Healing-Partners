@@ -1,7 +1,12 @@
 // Story classification — AI for understanding, deterministic code for decisions.
 //
 // Deploy:  supabase functions deploy classify-story
-// Secrets: supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
+// Secrets: supabase secrets set ANTHROPIC_API_KEY=sk-ant-... \
+//          supabase secrets set ALLOWED_ORIGINS=https://healingpartners.us,https://...
+//
+// Deployed WITH jwt verification (the default). It writes as the caller, so
+// row level security governs what it can touch. It must never hold the
+// service role key.
 //
 // Called ONCE per story, not once per interaction. The recommendation engine
 // stays in the browser and stays deterministic; this only replaces the regex
@@ -64,14 +69,26 @@ Rules:
 - Never include names of living people, addresses, medical details, or anything identifying.`;
 
 Deno.serve(async (req) => {
+  // Locked to our own origins. "*" let any site invoke this with a token it
+  // had obtained elsewhere.
+  const ALLOWED = (Deno.env.get("ALLOWED_ORIGINS") ?? "").split(",").map((o) => o.trim()).filter(Boolean);
+  const origin = req.headers.get("origin") ?? "";
   const cors = {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": ALLOWED.includes(origin) ? origin : (ALLOWED[0] ?? "null"),
     "Access-Control-Allow-Headers": "authorization, content-type",
+    "Vary": "Origin",
   };
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: cors });
 
   try {
+    // The caller's own token. Required: everything this function writes is
+    // written AS them, so RLS decides what they may touch.
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response("Unauthorized", { status: 401, headers: cors });
+    }
+
     const { story, memorial_id } = await req.json();
     if (!story || typeof story !== "string" || story.trim().length < 20) {
       // Too little to work with. Say so rather than guessing.
@@ -120,15 +137,26 @@ Deno.serve(async (req) => {
       ? Math.max(0, Math.min(1, parsed.confidence)) : 0;
 
     // Cache the tags, never the story. The story stays where the family put it.
+    //
+    // This runs on the CALLER's token, not the service role. The previous
+    // version used SUPABASE_SERVICE_ROLE_KEY against a memorial_id taken
+    // straight from the request body, which meant any signed-in user — an
+    // anonymous QR session included — could overwrite story_tags on any
+    // memorial at any funeral home, RLS bypassed entirely. Writing as the
+    // caller puts can_see_memorial() back in the path, where it belongs.
     if (memorial_id) {
       try {
         const db = createClient(
           Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+          Deno.env.get("SUPABASE_ANON_KEY")!,
+          { global: { headers: { Authorization: authHeader } } },
         );
-        await db.from("memorials").update({
+        const { error } = await db.from("memorials").update({
           story_tags: { themes, traits, places, confidence, at: new Date().toISOString() },
         }).eq("id", memorial_id);
+        // No rows updated means no permission. Not an error worth failing on —
+        // the tags still go back to the browser — but it must not look like success.
+        if (error) console.warn("Tag cache refused:", error.message);
       } catch (e) { console.warn("Tag cache failed:", e); }
     }
 

@@ -393,22 +393,38 @@
     });
   }
 
-  /* ---------- storage (best-effort; a blocked store must not break the page) ---------- */
+  /* ---------- storage (best-effort; a blocked store must not break the page) ----------
+   *
+   * Arrangement rooms run on shared computers. Everything here — the name, the
+   * dates, every story the family told — is about a real person, so it expires
+   * on the same twelve-hour clock the handoff uses and is wiped the moment the
+   * interview is handed on. An interview that survives until the next family
+   * sits down is a privacy incident, and privacy is the one objection funeral
+   * home operators actually raised.
+   */
+  var MAX_AGE = 12 * 60 * 60 * 1000;
+
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) { /* private mode */ }
+    try {
+      d.at = Date.now();
+      localStorage.setItem(KEY, JSON.stringify(d));
+    } catch (e) { /* private mode */ }
+  }
+  function clearSaved() {
+    try { localStorage.removeItem(KEY); } catch (e) {}
   }
   function load() {
     try {
       var raw = localStorage.getItem(KEY);
-      if (raw) {
-        var o = JSON.parse(raw);
-        if (o && typeof o === "object") {
-          d.name = o.name || ""; d.known = o.known || "";
-          d.born = o.born || ""; d.died = o.died || "";
-          d.answers = o.answers || {}; d.words = o.words || []; d.weights = o.weights || {};
-        }
-      }
-    } catch (e) { /* nothing stored, or storage unreadable */ }
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      if (!o || typeof o !== "object") { clearSaved(); return; }
+      if (!o.at || (Date.now() - o.at) > MAX_AGE) { clearSaved(); return; }
+      d.name = o.name || ""; d.known = o.known || "";
+      d.born = o.born || ""; d.died = o.died || "";
+      d.answers = o.answers || {}; d.words = o.words || []; d.weights = o.weights || {};
+      d.at = o.at;
+    } catch (e) { clearSaved(); }
   }
 
   /* ---------- page 2: build the questions ---------- */
@@ -632,14 +648,20 @@
     };
 
     try { localStorage.setItem(HANDOFF_KEY, JSON.stringify(record)); }
-    catch (e) { /* private mode — fall back to the query string below */ }
+    catch (e) { /* private mode — sessionStorage below carries it instead */ }
 
-    var q = new URLSearchParams();
-    q.set("from", "intake");
-    if (d.name) q.set("name", d.name);
-    if (d.born) q.set("born", d.born);
-    if (d.died) q.set("died", d.died);
-    window.location.href = "index.html?" + q.toString();
+    /* Private browsing, or a blocked store. sessionStorage survives this
+       navigation and dies with the tab.
+
+       What must NOT happen is what used to: the name and both dates went into
+       the query string. A URL is the leakiest surface on the page — it lands in
+       browser history on a shared machine, in any proxy or analytics log, in
+       the Referer header sent to third parties, and in plain sight in the
+       address bar. Name plus date of birth is a strong identity pair. */
+    try { sessionStorage.setItem(HANDOFF_KEY, JSON.stringify(record)); } catch (e) {}
+
+    clearSaved();
+    window.location.href = "index.html?from=intake";
   }
 
   /* ---------- boot ---------- */

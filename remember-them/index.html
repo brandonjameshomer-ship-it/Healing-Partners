@@ -974,6 +974,10 @@
 
     var raw = null;
     try { raw = localStorage.getItem(HANDOFF_KEY); } catch(e){}
+    /* Private browsing, or a blocked store: the intake put it in sessionStorage
+       instead, which survives the navigation and dies with the tab. The name and
+       dates are deliberately NOT in the URL — see the note in intake.html. */
+    if (!raw){ try { raw = sessionStorage.getItem(HANDOFF_KEY); } catch(e){} }
     if (raw){
       try {
         var r = JSON.parse(raw);
@@ -981,15 +985,11 @@
         if (r) clearHandoff();          /* stale, or a shape we do not know */
       } catch(e){ clearHandoff(); }
     }
-    /* Private browsing, or storage cleared between the two pages. The query
-       string still carries who this is, which is the part never to lose. */
-    var nm = q.get("name");
-    if (nm) return { v:1, name:nm, born:q.get("born")||"", died:q.get("died")||"",
-                     items:[], words:[], text:"" };
     return null;
   }
   function clearHandoff(){
     try { localStorage.removeItem(HANDOFF_KEY); } catch(e){}
+    try { sessionStorage.removeItem(HANDOFF_KEY); } catch(e){}
   }
 
   intake = readHandoff();

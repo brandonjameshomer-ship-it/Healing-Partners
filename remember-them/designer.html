@@ -930,6 +930,7 @@
     var handed = null;
     try {
       var raw = localStorage.getItem("rt.handoff.v1");
+      if (!raw) raw = sessionStorage.getItem("rt.handoff.v1");
       if (raw) {
         var r = JSON.parse(raw);
         /* Same twelve-hour window the guided flow uses: these machines are
