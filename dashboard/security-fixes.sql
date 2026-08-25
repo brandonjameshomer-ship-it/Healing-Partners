@@ -1,5 +1,6 @@
 -- Healing Partners — security fixes
--- Run AFTER access.sql. Safe to re-run.
+-- Run this NINTH, and last: it removes access paths the earlier files granted,
+-- so anything run after it may re-open them. Safe to re-run.
 --
 -- Each block states the hole it closes. Nothing here changes what a legitimate
 -- user can do; it removes paths that were never intended.

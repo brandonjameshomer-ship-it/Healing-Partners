@@ -1,5 +1,5 @@
 -- Healing Partners — subscription state for the $150/month plan
--- Run this FOURTH, after schema.sql, access.sql and payments.sql.
+-- Run this FOURTH, after schema.sql, access.sql and payments.sql. Safe to re-run.
 --
 -- Same principle as payments.sql: the browser never asserts that someone is a
 -- paying customer. Only a signature-verified Stripe webhook can say that.

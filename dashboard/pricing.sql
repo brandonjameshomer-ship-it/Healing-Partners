@@ -1,5 +1,6 @@
 -- Healing Partners — Partner pricing and Exhibit A service terms
 -- Run this FIFTH, after schema.sql, access.sql, payments.sql and subscriptions.sql.
+-- Safe to re-run.
 --
 -- Everything here comes from the Remember Them Partner User Agreement. Where a
 -- clause governs a column, the clause is named. If the agreement changes, this

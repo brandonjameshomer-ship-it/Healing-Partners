@@ -1,5 +1,5 @@
 -- Healing Partners — access control
--- Run this AFTER schema.sql, in the Supabase SQL editor.
+-- Run this SECOND, after schema.sql, in the Supabase SQL editor. Safe to re-run.
 --
 -- Four tiers:
 --   1  founder    Brandon Homer, bhomer@healingpartners.us — everything
@@ -162,49 +162,63 @@ drop policy if exists "signed in can read suppliers"  on suppliers;
 drop policy if exists "signed in can write suppliers" on suppliers;
 
 -- ---- user_profiles ----
+drop policy if exists up_self on user_profiles;
 create policy up_self   on user_profiles for select to authenticated
   using (id = auth.uid());
+drop policy if exists up_owner on user_profiles;
 create policy up_owner  on user_profiles for select to authenticated
   using (my_role() = 'owner' and funeral_home_id = my_home());
+drop policy if exists up_founder on user_profiles;
 create policy up_founder on user_profiles for all to authenticated
   using (is_founder()) with check (is_founder());
 -- TIER 2 adds and removes TIER 3, and cannot mint a founder.
+drop policy if exists up_owner_add on user_profiles;
 create policy up_owner_add on user_profiles for insert to authenticated
   with check (my_role() = 'owner' and funeral_home_id = my_home()
               and role in ('owner','counselor'));
+drop policy if exists up_owner_edit on user_profiles;
 create policy up_owner_edit on user_profiles for update to authenticated
   using  (my_role() = 'owner' and funeral_home_id = my_home() and role <> 'founder')
   with check (my_role() = 'owner' and funeral_home_id = my_home()
               and role in ('owner','counselor'));
 -- Deleting a person is really deactivating them, so the orders they created
 -- keep their author. Hard delete stays with the founder.
+drop policy if exists up_owner_remove on user_profiles;
 create policy up_owner_remove on user_profiles for delete to authenticated
   using (my_role() = 'owner' and funeral_home_id = my_home()
          and role = 'counselor');
 
 -- ---- funeral_homes ----
+drop policy if exists fh_founder on funeral_homes;
 create policy fh_founder on funeral_homes for all to authenticated
   using (is_founder()) with check (is_founder());
+drop policy if exists fh_staff on funeral_homes;
 create policy fh_staff   on funeral_homes for select to authenticated
   using (id = my_home());
+drop policy if exists fh_owner_edit on funeral_homes;
 create policy fh_owner_edit on funeral_homes for update to authenticated
   using (my_role() = 'owner' and id = my_home())
   with check (my_role() = 'owner' and id = my_home());
 
 -- ---- suppliers ---- staff read, founder maintains
+drop policy if exists sup_read on suppliers;
 create policy sup_read    on suppliers for select to authenticated using (is_staff());
+drop policy if exists sup_founder on suppliers;
 create policy sup_founder on suppliers for all    to authenticated
   using (is_founder()) with check (is_founder());
 
 -- ---- memorials ----
+drop policy if exists mem_read on memorials;
 create policy mem_read on memorials for select to authenticated
   using (can_see_memorial(id));
+drop policy if exists mem_insert on memorials;
 create policy mem_insert on memorials for insert to authenticated
   with check (
     is_founder()
     or (is_staff() and funeral_home_id = my_home())
     or (my_role() = 'family' and created_by = auth.uid())
   );
+drop policy if exists mem_update on memorials;
 create policy mem_update on memorials for update to authenticated
   using (can_see_memorial(id)) with check (can_see_memorial(id));
 
@@ -212,10 +226,13 @@ create policy mem_update on memorials for update to authenticated
 -- TIER 3 assigns and removes TIER 4 for memorials at their own funeral home.
 -- A family member can also add themselves via a QR code or share link, and can
 -- always remove themselves.
+drop policy if exists ma_read on memorial_access;
 create policy ma_read on memorial_access for select to authenticated
   using (user_id = auth.uid() or can_see_memorial(memorial_id));
+drop policy if exists ma_insert on memorial_access;
 create policy ma_insert on memorial_access for insert to authenticated
   with check (user_id = auth.uid() or can_see_memorial(memorial_id));
+drop policy if exists ma_delete on memorial_access;
 create policy ma_delete on memorial_access for delete to authenticated
   using (user_id = auth.uid()                       -- remove yourself
          or is_founder()
@@ -267,10 +284,13 @@ begin
 end; $$;
 
 -- ---- designs ---- families create and compare versions
+drop policy if exists des_read on designs;
 create policy des_read   on designs for select to authenticated
   using (can_see_memorial(memorial_id));
+drop policy if exists des_insert on designs;
 create policy des_insert on designs for insert to authenticated
   with check (can_see_memorial(memorial_id));
+drop policy if exists des_update on designs;
 create policy des_update on designs for update to authenticated
   using (can_see_memorial(memorial_id) and (created_by = auth.uid() or is_staff()))
   with check (can_see_memorial(memorial_id));
@@ -278,18 +298,23 @@ create policy des_update on designs for update to authenticated
 -- ---- orders ----
 -- Tier 4 gets NO access. A family sees designs and the retail price on them,
 -- never the order row, and never anything commission-related.
+drop policy if exists ord_founder on orders;
 create policy ord_founder on orders for all to authenticated
   using (is_founder()) with check (is_founder());
+drop policy if exists ord_owner on orders;
 create policy ord_owner   on orders for all to authenticated
   using  (my_role() = 'owner' and funeral_home_id = my_home())
   with check (my_role() = 'owner' and funeral_home_id = my_home());
 -- A counselor sees only what they created.
+drop policy if exists ord_counselor_read on orders;
 create policy ord_counselor_read on orders for select to authenticated
   using (my_role() = 'counselor' and funeral_home_id = my_home()
          and created_by = auth.uid());
+drop policy if exists ord_counselor_write on orders;
 create policy ord_counselor_write on orders for insert to authenticated
   with check (my_role() = 'counselor' and funeral_home_id = my_home()
               and created_by = auth.uid());
+drop policy if exists ord_counselor_update on orders;
 create policy ord_counselor_update on orders for update to authenticated
   using  (my_role() = 'counselor' and funeral_home_id = my_home()
           and created_by = auth.uid())

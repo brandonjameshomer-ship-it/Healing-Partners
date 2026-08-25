@@ -38,15 +38,46 @@ It takes a couple of minutes to build. Leave the tab open.
 
 Left sidebar → **SQL Editor** → **New query**.
 
-Open `dashboard/schema.sql` from this repo, copy the whole file, paste it in, and press **Run**.
+There are **nine SQL files**, and the order matters — each one builds on tables the earlier ones
+created. Open each file from this repo, copy the whole thing, paste it into a new query, press
+**Run**, then move to the next.
 
-Then **New query** again, and do the same with `dashboard/access.sql`. That one sets up the four
-access tiers. Run it second — it depends on the tables the first file creates.
+| # | File | Depends on | Adds |
+|---|---|---|---|
+| 1 | `schema.sql` | — | `funeral_homes`, `orders`, `suppliers` |
+| 2 | `access.sql` | 1 | `user_profiles`, `memorials`, `memorial_access`, `designs` |
+| 3 | `payments.sql` | 1, 2 | `payment_events` |
+| 4 | `subscriptions.sql` | 1–3 | `subscriptions`, `subscription_events` |
+| 5 | `pricing.sql` | 1–4 | Exhibit A/B terms; the insured Covered Schedule |
+| 6 | `crm.sql` | 4 | `prospects`, `prospect_notes` |
+| 7 | `emails.sql` | 6 | `email_suppressions`, `email_templates`, `email_log` |
+| 8 | `compliance.sql` | 2 | `authorized_approvers`, `cemetery_records`, `family_authorizations`, `compliance_signatures` |
+| 9 | `security-fixes.sql` | 2 | Closes access holes — run it **last** |
+
+Two of these deserve a note.
+
+**`pricing.sql` replaces the commission function.** `schema.sql` defines `commission_rate` with one
+argument and only knows the Standard Schedule. `pricing.sql` replaces it with a two-argument version
+that also knows the lower Covered Schedule for Partners carrying qualifying insurance. If you skip
+file 5, insured Partners get overcharged.
+
+**`security-fixes.sql` goes last on purpose.** It removes access paths the earlier files granted.
+Running anything after it can re-open them.
+
+**All nine are safe to re-run.** Every policy is dropped before it is recreated, so a run that fails
+partway through can simply be run again from the top — you do not have to tear the project down and
+start over.
 
 You should see *Success. No rows returned.* That's correct — you just created empty tables.
 
-Check it worked: sidebar → **Table Editor**. You should see `funeral_homes`, `orders`,
-`suppliers`, `user_profiles`, `memorials`, `memorial_access` and `designs`.
+Check it worked: sidebar → **Table Editor**. All **19 tables** should be there:
+
+`authorized_approvers`, `cemetery_records`, `compliance_signatures`, `designs`, `email_log`,
+`email_suppressions`, `email_templates`, `family_authorizations`, `funeral_homes`,
+`memorial_access`, `memorials`, `orders`, `payment_events`, `prospect_notes`, `prospects`,
+`subscription_events`, `subscriptions`, `suppliers`, `user_profiles`
+
+If one is missing, find it in the table above and re-run that file.
 
 Your own account is promoted to **founder** automatically, because the trigger matches on
 `bhomer@healingpartners.us`. Everyone else who signs up starts as **family** and has to be promoted
@@ -75,14 +106,18 @@ Sidebar → **Project Settings** → **API**. You need two values:
 
 ## Step 6 — Put them in the page
 
-Open `dashboard/index.html` and find the config block near the top of the script:
+**Two pages need them**, not one — `dashboard/index.html` (line 295) and
+`dashboard/subscriptions.html` (line 216). Each has the same config block near the top of its
+script:
 
 ```js
 var SUPABASE_URL  = "";   // paste Project URL here
 var SUPABASE_ANON = "";   // paste anon public key here
 ```
 
-Paste both values between the quotes. Save, commit, push.
+Paste both values between the quotes in **both files**. Save, commit, push. If you fill in only one,
+that page goes live and the other silently stays in demo mode — which is exactly the kind of split
+that makes the subscription queue look empty when it isn't.
 
 The page detects them automatically: with them filled in it uses the database, and without them it
 falls back to browser-only demo mode. That means it never breaks — it just changes where the data
@@ -118,7 +153,7 @@ Settings → API and rotate it immediately.
 
 **The table is empty but you added rows.** Almost always Row Level Security with no matching
 policy — the database is correctly refusing to show you rows you have no policy for. Check you're
-signed in, and check the policies from `schema.sql` ran.
+signed in, and check the policies from `access.sql` and `security-fixes.sql` ran.
 
 **"Failed to fetch."** Usually the URL is wrong, or the project is paused. Check the Supabase
 dashboard first.

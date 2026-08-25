@@ -1,5 +1,5 @@
 -- Healing Partners — payment state and audit trail
--- Run this THIRD, after schema.sql and access.sql.
+-- Run this THIRD, after schema.sql and access.sql. Safe to re-run.
 --
 -- Principle: the browser never asserts that money arrived. It can say a family
 -- was sent to Stripe; only a verified webhook can say a payment succeeded.
@@ -89,8 +89,10 @@ create index if not exists payment_events_memorial_idx on payment_events (memori
 -- founder. An audit trail that can be edited is not an audit trail.
 alter table payment_events enable row level security;
 
+drop policy if exists pe_founder_read on payment_events;
 create policy pe_founder_read on payment_events for select to authenticated
   using (is_founder());
+drop policy if exists pe_staff_read on payment_events;
 create policy pe_staff_read on payment_events for select to authenticated
   using (my_role() in ('owner','counselor')
          and exists (select 1 from memorials m

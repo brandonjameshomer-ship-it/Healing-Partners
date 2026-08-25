@@ -1,5 +1,5 @@
 -- Healing Partners — automated email: renewal notice and lapse sequence
--- Run this SIXTH, after crm.sql.
+-- Run this SEVENTH, after crm.sql. Safe to re-run.
 --
 -- Two rules shape everything here.
 --

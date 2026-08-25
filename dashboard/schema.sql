@@ -1,6 +1,7 @@
 -- Healing Partners — orders schema for Supabase (Postgres)
--- Run this in the Supabase SQL editor, then replace `Store` in dashboard/index.html
--- with the four Supabase calls noted there. Nothing else on the page changes.
+-- Run this FIRST, in the Supabase SQL editor. Safe to re-run. Then replace `Store`
+-- in dashboard/index.html with the four Supabase calls noted there. Nothing else
+-- on the page changes.
 
 create table if not exists funeral_homes (
   id            uuid primary key default gen_random_uuid(),
@@ -140,20 +141,27 @@ alter table suppliers     enable row level security;
 
 -- Start simple: any signed-in user can read and write. Tighten to per-home
 -- access once funeral home staff have their own logins.
+drop policy if exists "signed in can read orders" on orders;
 create policy "signed in can read orders"    on orders
   for select to authenticated using (true);
+drop policy if exists "signed in can write orders" on orders;
 create policy "signed in can write orders"   on orders
   for insert to authenticated with check (true);
+drop policy if exists "signed in can update orders" on orders;
 create policy "signed in can update orders"  on orders
   for update to authenticated using (true);
 
+drop policy if exists "signed in can read homes" on funeral_homes;
 create policy "signed in can read homes"     on funeral_homes
   for select to authenticated using (true);
+drop policy if exists "signed in can write homes" on funeral_homes;
 create policy "signed in can write homes"    on funeral_homes
   for all to authenticated using (true) with check (true);
 
+drop policy if exists "signed in can read suppliers" on suppliers;
 create policy "signed in can read suppliers" on suppliers
   for select to authenticated using (true);
+drop policy if exists "signed in can write suppliers" on suppliers;
 create policy "signed in can write suppliers" on suppliers
   for all to authenticated using (true) with check (true);
 

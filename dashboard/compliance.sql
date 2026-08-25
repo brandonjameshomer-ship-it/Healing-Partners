@@ -1,5 +1,5 @@
 -- Healing Partners — cemetery compliance & authorization
--- Run AFTER access.sql, in the Supabase SQL editor.
+-- Run this EIGHTH, after access.sql, in the Supabase SQL editor. Safe to re-run.
 --
 -- Spec: remember-them/specs/cemetery-compliance.md
 --
@@ -304,35 +304,45 @@ alter table family_authorizations  enable row level security;
 alter table compliance_signatures  enable row level security;
 
 -- Approvers: staff at that home read; owner and founder maintain.
+drop policy if exists aa_read on authorized_approvers;
 create policy aa_read on authorized_approvers for select to authenticated
   using (is_founder() or funeral_home_id = my_home());
+drop policy if exists aa_owner on authorized_approvers;
 create policy aa_owner on authorized_approvers for all to authenticated
   using  (is_founder() or (my_role() = 'owner' and funeral_home_id = my_home()))
   with check (is_founder() or (my_role() = 'owner' and funeral_home_id = my_home()));
 
 -- Cemetery record: the Partner's to fill in. Families may read it — the
 -- section and the rules affect what they are choosing between — but never edit.
+drop policy if exists cr_read on cemetery_records;
 create policy cr_read on cemetery_records for select to authenticated
   using (can_see_memorial(memorial_id));
+drop policy if exists cr_write on cemetery_records;
 create policy cr_write on cemetery_records for insert to authenticated
   with check (is_staff() and funeral_home_id = my_home() and created_by = auth.uid());
+drop policy if exists cr_update on cemetery_records;
 create policy cr_update on cemetery_records for update to authenticated
   using  (is_staff() and funeral_home_id = my_home())
   with check (is_staff() and funeral_home_id = my_home());
 
 -- Family authorization: declared by whoever is signing, staff or family.
+drop policy if exists fa_read on family_authorizations;
 create policy fa_read on family_authorizations for select to authenticated
   using (can_see_memorial(memorial_id));
+drop policy if exists fa_write on family_authorizations;
 create policy fa_write on family_authorizations for insert to authenticated
   with check (can_see_memorial(memorial_id) and declared_by = auth.uid());
+drop policy if exists fa_update on family_authorizations;
 create policy fa_update on family_authorizations for update to authenticated
   using  (can_see_memorial(memorial_id))
   with check (can_see_memorial(memorial_id));
 
 -- Signatures: readable by those who can see the memorial, insertable by the
 -- signer themselves. NO update. NO delete. Not for owners, not for the founder.
+drop policy if exists sig_read on compliance_signatures;
 create policy sig_read on compliance_signatures for select to authenticated
   using (can_see_memorial(memorial_id) or is_founder());
+drop policy if exists sig_insert on compliance_signatures;
 create policy sig_insert on compliance_signatures for insert to authenticated
   with check (
     signer_user_id = auth.uid()

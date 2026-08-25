@@ -1,5 +1,5 @@
 -- Healing Partners — who you have talked to, and what was said
--- Run this FIFTH, after subscriptions.sql.
+-- Run this SIXTH, after subscriptions.sql. Safe to re-run.
 --
 -- This is the part of the business that happens before Stripe ever sees anyone:
 -- the funeral homes you have called, what they said, and what you promised to do
