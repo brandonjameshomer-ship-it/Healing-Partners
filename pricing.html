@@ -226,8 +226,10 @@
         <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5L13 5"/></svg><span>Talk to someone who has designed memorials since 2008</span></li>
       </ul>
       <div class="go">
-        <a class="btn btn-primary" href="./remember-them/?plan=pro">Start the 3-day trial</a>
-        <p class="after">No card needed to start.</p>
+        <a class="btn btn-primary" data-plan="term" href="./remember-them/?plan=pro">Start the 3-day trial</a>
+        <p class="after" style="margin-bottom:.5rem">A card is needed to start the trial. Nothing is charged until the three days are up.</p>
+        <a class="btn" data-plan="monthly" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20month-to-month">Or start month to month at $350</a>
+        <p class="after">No minimum term, cancel any month.</p>
       </div>
     </div>
 
@@ -271,6 +273,35 @@
     <a class="spacer" href="https://healingpartners.us">healingpartners.us</a>
   </div>
 </footer>
+
+<script>
+  /* ------------------------------------------------------------------
+     THE TWO LINES TO EDIT — the Stripe Payment Links for the two
+     subscription rates in the Partner User Agreement.
+
+     TERM_LINK    $150/month on a six-month term with automatic payment.
+                  Leaving early recaptures $200 for each month already
+                  taken at the discount.
+     MONTHLY_LINK $350/month, month to month, no minimum term.
+
+     Both must be full URLs beginning https://buy.stripe.com/. A bare id
+     such as "price_..." is not a payment link and will not work.
+
+     Either one left empty falls back to email rather than sitting dead.
+     Never show a customer a button that goes nowhere.
+     ------------------------------------------------------------------ */
+  var TERM_LINK    = "https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02";
+  var MONTHLY_LINK = "";
+
+  (function () {
+    var plans = { term: TERM_LINK, monthly: MONTHLY_LINK };
+    Object.keys(plans).forEach(function (name) {
+      if (!plans[name]) return;
+      var b = document.querySelectorAll('[data-plan="' + name + '"]');
+      for (var i = 0; i < b.length; i++) { b[i].href = plans[name]; b[i].rel = "noopener"; }
+    });
+  })();
+</script>
 
 </body>
 </html>

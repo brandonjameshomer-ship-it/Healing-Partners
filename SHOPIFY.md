@@ -83,7 +83,8 @@ device and there is nothing to debug in front of a funeral director.
 1. **Online Store → Pages → Add page**
 2. Title: `For Funeral Homes`
 3. Click the **`< >`** button in the editor toolbar to switch to HTML view
-4. Paste this, replacing `PASTE_YOUR_STRIPE_LINK_HERE` with your Stripe payment link:
+4. Paste this. The Stripe link for the $150 six-month Partner rate is already in it — swap it only
+   if you rebuild the payment link in Stripe:
 
 ```html
 <div style="max-width:42rem;margin:0 auto;padding:2rem 0;font-size:1.0625rem;line-height:1.65">
@@ -96,7 +97,7 @@ device and there is nothing to debug in front of a funeral director.
     about ten minutes.
   </p>
   <p style="display:flex;flex-wrap:wrap;gap:.75rem">
-    <a href="PASTE_YOUR_STRIPE_LINK_HERE"
+    <a href="https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02"
        style="display:inline-block;background:#A8761F;color:#2A1E08;font-weight:600;
               padding:.875rem 1.5rem;border-radius:12px;text-decoration:none">
       Start your 3-day free trial

@@ -507,18 +507,18 @@
   /* ------------------------------------------------------------------
      THE ONE LINE TO EDIT.
 
-     Paste the Stripe Payment Link for the $150/month subscription with
-     the 3-day trial. It is a full URL and looks like this:
+     This is the Stripe Payment Link for the $150/month Partner rate on
+     the six-month term. Leaving that term early recaptures $200 for each
+     month already taken at the discount.
 
-         https://buy.stripe.com/aEU5kQ2Xy4Vd1bO288
+     It must be a full URL beginning https://buy.stripe.com/. A bare id
+     such as "profile_..." or "price_..." is NOT a payment link and will
+     not work here.
 
-     A bare id such as "profile_..." or "price_..." is NOT a payment
-     link and will not work here.
-
-     While this is empty, every trial button falls back to email instead
+     If it is ever emptied, every trial button falls back to email instead
      of sitting dead. Never show a customer a button that goes nowhere.
      ------------------------------------------------------------------ */
-  var TRIAL_LINK = "";
+  var TRIAL_LINK = "https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02";
 
   (function () {
     if (!TRIAL_LINK) return;
