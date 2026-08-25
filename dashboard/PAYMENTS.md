@@ -1,5 +1,9 @@
 # Taking payment for the 3D/VR upgrade
 
+> **Subscriptions are not set up here.** The two Partner rates and the discount recapture are
+> collected on `pay.html`, and their three Stripe Payment Links live in the comment block at the
+> bottom of that file. This page is only about the $50 family upgrade.
+
 The upgrade is **$50**. Two ways it gets paid, set per funeral home:
 
 | `vr_billing` | Who pays | What happens |

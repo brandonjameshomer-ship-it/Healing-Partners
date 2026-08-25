@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Pay for a Remember Them subscription — $150 a month on a six-month term or $350 month to month — and settle a discount recapture if a six-month term ended early.">
+<meta name="robots" content="noindex">
+<title>Remember Them Payments</title>
+<style>
+  /* Healing Partners "blue hour" tokens — keep in step with index.html */
+  :root {
+    --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --line:#DEE3EF; --line-strong:#C6CDDF;
+    --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
+    --on-accent:#2A1E08;
+    --glow:rgba(200,150,60,.30);
+    --shadow:0 1px 2px rgba(25,31,51,.05), 0 8px 24px -12px rgba(25,31,51,.18);
+    --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-xs:.75rem; --f-sm:.8125rem; --f-base:1rem; --f-lg:1.125rem;
+    --f-xl:1.375rem; --f-2xl:1.875rem; --f-3xl:2.75rem;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#101426; --surface:#181D34; --surface-2:#212740;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --line:#2A3150; --line-strong:#3A4266;
+      --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+      --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#101426; --surface:#181D34; --surface-2:#212740;
+    --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+    --line:#2A3150; --line-strong:#3A4266;
+    --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
+    --on-accent:#241A06; --glow:rgba(224,177,102,.28);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:var(--f-base); line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:62rem; margin:0 auto; padding:0 1.5rem; }
+
+  header.masthead { border-bottom:1px solid var(--line); background:var(--surface); }
+  .masthead-in {
+    max-width:62rem; margin:0 auto; padding:1.125rem 1.5rem;
+    display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+  }
+  .brand {
+    font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+    letter-spacing:-.01em; margin-right:auto; text-decoration:none; color:inherit;
+  }
+  nav { display:flex; gap:1.5rem; align-items:center; }
+  nav a {
+    color:var(--ink-2); text-decoration:none; font-size:var(--f-sm);
+    border-bottom:1px solid transparent; padding-bottom:2px;
+  }
+  nav a:hover, nav a[aria-current] { color:var(--accent); border-bottom-color:var(--accent); }
+
+  .intro { padding:4rem 0 2.5rem; max-width:34rem; }
+  .intro h1 {
+    font-family:var(--serif); font-weight:500; font-size:var(--f-3xl);
+    line-height:1.12; letter-spacing:-.025em; margin:0 0 1rem; text-wrap:balance;
+  }
+  .intro p { font-size:var(--f-lg); color:var(--ink-2); margin:0; }
+
+  /* Two audiences, two models — the split is the point of this page */
+  .plans {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));
+    gap:1.25rem; padding-bottom:3rem; align-items:start;
+  }
+  .plan {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.75rem; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; height:100%;
+  }
+  .plan.featured { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--shadow); }
+  .plan .who {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin-bottom:.75rem;
+  }
+  .plan h2 {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+    margin:0 0 .5rem; letter-spacing:-.015em;
+  }
+  .plan .lede { color:var(--ink-2); margin:0 0 1.5rem; }
+  .plan .price {
+    font-family:var(--serif); font-size:2.5rem; font-weight:600;
+    letter-spacing:-.025em; line-height:1;
+  }
+  .plan .per { font-size:var(--f-sm); color:var(--ink-3); margin:.375rem 0 1.5rem; }
+  .plan ul { list-style:none; margin:0 0 1.75rem; padding:0;
+             display:flex; flex-direction:column; gap:.625rem; }
+  .plan li { display:flex; gap:.625rem; align-items:flex-start;
+             font-size:var(--f-sm); color:var(--ink-2); }
+  .plan li svg { flex:none; width:1rem; height:1rem; margin-top:.25rem; color:var(--accent); }
+  .plan .tiers {
+    background:var(--accent-soft); border-radius:var(--radius);
+    padding:.875rem; margin:0 0 1.5rem;
+  }
+  .plan .tiers-head { font-size:var(--f-sm); color:var(--ink-2); margin-bottom:.625rem; }
+  .plan .tiers table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
+  .plan .tiers th {
+    text-align:left; font-size:var(--f-xs); text-transform:uppercase;
+    letter-spacing:.1em; color:var(--ink-3); font-weight:600;
+    padding-bottom:.375rem; border-bottom:1px solid var(--line-strong);
+  }
+  .plan .tiers th:last-child, .plan .tiers td:last-child { text-align:right; }
+  .plan .tiers td {
+    padding:.375rem 0; color:var(--ink-2);
+    font-variant-numeric:tabular-nums;
+    border-bottom:1px solid color-mix(in srgb, var(--line-strong) 45%, transparent);
+  }
+  .plan .tiers tr:last-child td { border-bottom:none; }
+  .plan .tiers td:last-child {
+    font-family:var(--serif); font-size:var(--f-lg); font-weight:600; color:var(--ink);
+  }
+  .plan .go { margin-top:auto; }
+  .btn {
+    display:block; width:100%; text-align:center; padding:.6875rem 1.125rem;
+    border-radius:var(--radius); text-decoration:none; font-size:var(--f-base);
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+    transition:background-color .15s, border-color .15s;
+  }
+  .btn:hover { background:var(--surface-2); border-color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent);
+                 color:var(--on-accent); font-weight:550; }
+  .btn-primary:hover { filter:brightness(1.06); background:var(--accent); }
+  a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .plan .after { font-size:var(--f-xs); color:var(--ink-3); text-align:center; margin:.625rem 0 0; }
+
+  .faq { border-top:1px solid var(--line); padding:3rem 0 5rem; }
+  .faq h2 {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin:0 0 1.5rem; font-weight:600;
+  }
+  .qa { max-width:38rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .qa h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0 0 .375rem; }
+  .qa p { margin:0; color:var(--ink-2); }
+
+  footer.site {
+    border-top:1px solid var(--line); background:var(--surface);
+    padding:2rem 0; font-size:var(--f-sm); color:var(--ink-3);
+  }
+  footer.site .wrap { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+  footer.site a { color:var(--ink-2); text-decoration:none; }
+  footer.site a:hover { color:var(--accent); }
+  footer.site .spacer { margin-left:auto; }
+
+  @media (max-width:34rem) { :root { --f-3xl:2.125rem; } .intro { padding:2.5rem 0 2rem; } }
+
+  /* --- pay.html only ------------------------------------------------ */
+  .items { display:flex; flex-direction:column; gap:1.25rem; padding-bottom:3rem; }
+  .item {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:1.75rem; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:1fr minmax(14rem,18rem); gap:1.75rem;
+    align-items:start;
+  }
+  .item.settle { border-color:var(--line-strong); background:var(--surface-2); }
+  .item .who {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin-bottom:.75rem;
+  }
+  .item h2 {
+    font-family:var(--serif); font-size:var(--f-xl); font-weight:600;
+    margin:0 0 .5rem; letter-spacing:-.015em;
+  }
+  .item p { color:var(--ink-2); margin:0 0 .75rem; }
+  .item p:last-child { margin-bottom:0; }
+  .item .price {
+    font-family:var(--serif); font-size:2.25rem; font-weight:600;
+    letter-spacing:-.025em; line-height:1;
+  }
+  .item .per { font-size:var(--f-sm); color:var(--ink-3); margin:.375rem 0 1.25rem; }
+  .item .go .after { font-size:var(--f-xs); color:var(--ink-3); text-align:center; margin:.625rem 0 0; }
+  .calc { margin:0 0 1.25rem; }
+  .calc label { display:block; font-size:var(--f-sm); color:var(--ink-2); margin-bottom:.375rem; }
+  .calc input {
+    width:100%; padding:.5rem .625rem; border-radius:var(--radius);
+    border:1px solid var(--line-strong); background:var(--surface);
+    color:var(--ink); font:inherit; font-variant-numeric:tabular-nums;
+  }
+  .calc input:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+  .owed {
+    margin-top:.75rem; font-size:var(--f-sm); color:var(--ink-2);
+    display:flex; align-items:baseline; gap:.5rem;
+  }
+  .owed b {
+    font-family:var(--serif); font-size:var(--f-xl); color:var(--ink);
+    font-variant-numeric:tabular-nums; margin-left:auto;
+  }
+  .note {
+    border-left:3px solid var(--accent); background:var(--accent-soft);
+    padding:.75rem .875rem; border-radius:0 var(--radius) var(--radius) 0;
+    font-size:var(--f-sm); color:var(--ink-2); margin:1rem 0 0;
+  }
+  .legal { border-top:1px solid var(--line); padding:2.5rem 0 4rem; max-width:38rem; }
+  .legal h2 {
+    font-size:var(--f-xs); text-transform:uppercase; letter-spacing:.12em;
+    color:var(--ink-3); margin:0 0 1rem; font-weight:600;
+  }
+  .legal p { color:var(--ink-2); font-size:var(--f-sm); margin:0 0 .875rem; }
+  @media (max-width:44rem) { .item { grid-template-columns:1fr; gap:1.25rem; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="brand" href="./">Healing Partners</a>
+    <nav>
+      <a href="./remember-them/">Remember Them</a>
+      <a href="./pricing.html">Pricing</a>
+      <a href="./pay.html" aria-current="page">Payments</a>
+      <a href="https://healingpartners.us">Store</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>Payments</h1>
+    <p>Everything a Partner can pay Healing Partners, in one place. Card details are entered on Stripe's own checkout, never on this page.</p>
+  </section>
+
+  <section class="items">
+
+    <!-- Sec. 5.1 — discounted rate -->
+    <div class="item">
+      <div>
+        <div class="who">Subscription &middot; discounted rate</div>
+        <h2>$150 a month, six-month term</h2>
+        <p>Per funeral home. Requires automatic payment and an initial term of six months. Three days free before the first charge.</p>
+        <p>Ending the term before the six months are up means the discount already taken is recaptured &mdash; $200 for each month served at the discounted rate. That is settled below, not here.</p>
+      </div>
+      <div class="go">
+        <div class="price">$150</div>
+        <div class="per">per month &middot; 6-month term</div>
+        <a class="btn btn-primary" data-plan="term"
+           href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20%24150%20subscription">Start the 3-day trial</a>
+        <p class="after">A card is needed to start. Nothing is charged for three days.</p>
+      </div>
+    </div>
+
+    <!-- Sec. 5.1 — standard rate -->
+    <div class="item">
+      <div>
+        <div class="who">Subscription &middot; standard rate</div>
+        <h2>$350 a month, month to month</h2>
+        <p>Per funeral home, with no minimum term. Cancel any month with nothing further owed, and nothing you have made is deleted.</p>
+        <p>Because there is no discount to take back, there is no recapture on this rate.</p>
+      </div>
+      <div class="go">
+        <div class="price">$350</div>
+        <div class="per">per month &middot; no minimum</div>
+        <a class="btn" data-plan="monthly"
+           href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20%24350%20month-to-month">Start month to month</a>
+        <p class="after">No minimum term. Cancel any month.</p>
+      </div>
+    </div>
+
+    <!-- Sec. 5.2 — discount recapture -->
+    <div class="item settle">
+      <div>
+        <div class="who">Settlement &middot; Sec. 5.2</div>
+        <h2>Discount recapture</h2>
+        <p>Owed only when a six-month discounted term ends early. It is the difference between the two rates for the months already served at the discount &mdash; <strong>$350 &minus; $150 = $200 for each of those months</strong>. It is not a penalty and not a flat fee.</p>
+        <p>Nothing is owed here if the term ran its full six months, if the Partner was on the $350 rate, or if the Partner left because of an uncured breach by Healing Partners.</p>
+        <div class="note" id="qtyNote" hidden>
+          <strong>Set the quantity to <span id="qtyEcho">1</span> at checkout.</strong>
+          The Stripe page charges $200 per unit, so one unit is one month at the discounted rate.
+        </div>
+      </div>
+      <div class="go">
+        <div class="calc">
+          <label for="months">Months served at the $150 rate</label>
+          <input type="number" id="months" min="1" max="5" step="1" value="1" inputmode="numeric">
+          <div class="owed"><span>Recapture owed</span> <b id="owed">$200</b></div>
+        </div>
+        <a class="btn" data-plan="recapture"
+           href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20discount%20recapture">Pay the recapture</a>
+        <p class="after">A one-off charge. Nothing recurring is started.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="legal">
+    <h2>About these charges</h2>
+    <p>Every figure on this page is a term of the Remember Them Partner User Agreement rather than a product decision &mdash; the two subscription rates and the six-month initial term are Sec. 5.1, and the recapture is Sec. 5.2. If a figure here disagrees with your signed agreement, the agreement governs and we would like to know about it.</p>
+    <p>Commission on memorial sales is not paid here. It is reported and remitted by the fifteenth of the following month under Sec. 6.4.</p>
+    <p>Healing Partners LLC, 111 SW 5th Avenue, Floor 5, Portland, Oregon 97204. Questions about an amount: <a href="mailto:bhomer@healingpartners.us">bhomer@healingpartners.us</a>.</p>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>&copy; Healing Partners</span>
+    <a href="mailto:bhomer@healingpartners.us">bhomer@healingpartners.us</a>
+    <a class="spacer" href="./">healingpartners.us</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------
+     THE THREE LINES TO EDIT. Each is a Stripe Payment Link and must be a
+     full URL beginning https://buy.stripe.com/ -- a bare id such as
+     "price_..." is not a payment link and will not work.
+
+     TERM_LINK      $150/month, six-month initial term (Sec. 5.1).
+     MONTHLY_LINK   $350/month, month to month (Sec. 5.1).
+     RECAPTURE_LINK $200 per month served at the discount (Sec. 5.2).
+                    Priced per unit, so the payer sets the quantity.
+
+     Any one left empty falls back to the email address already on its
+     button. Never leave a customer a button that goes nowhere.
+     ------------------------------------------------------------------ */
+  var TERM_LINK      = "https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02";
+  var MONTHLY_LINK   = "https://buy.stripe.com/fZu14h1BabA9bJJ5otbsc01";
+  var RECAPTURE_LINK = "https://buy.stripe.com/14AfZb93C1ZzdRR6sxbsc03";
+
+  var RECAPTURE_PER_MONTH = 350 - 150;   /* Sec. 5.2 arithmetic, not a price */
+
+  /* A Partner arriving from an invoice can carry ?ref=<partner> so the
+     payment can be matched back to them in Stripe. */
+  function withRef(url) {
+    var ref = new URLSearchParams(location.search).get("ref");
+    if (!ref) return url;
+    return url + (url.indexOf("?") === -1 ? "?" : "&") +
+           "client_reference_id=" + encodeURIComponent(ref.slice(0, 200));
+  }
+
+  function wire(name, url) {
+    if (!url) return;
+    var b = document.querySelectorAll('[data-plan="' + name + '"]');
+    for (var i = 0; i < b.length; i++) { b[i].href = withRef(url); b[i].rel = "noopener"; }
+  }
+
+  wire("term", TERM_LINK);
+  wire("monthly", MONTHLY_LINK);
+  wire("recapture", RECAPTURE_LINK);
+
+  /* The recapture is per month served, so a single flat charge would
+     under-collect from everyone who left after month one. Show the real
+     total and the quantity that produces it. */
+  var months = document.getElementById("months");
+  var owed   = document.getElementById("owed");
+  var note   = document.getElementById("qtyNote");
+  var echo   = document.getElementById("qtyEcho");
+
+  function recalc() {
+    var n = Math.min(5, Math.max(1, Math.round(Number(months.value) || 1)));
+    owed.textContent = "$" + (n * RECAPTURE_PER_MONTH).toLocaleString("en-US");
+    echo.textContent = n;
+    note.hidden = !RECAPTURE_LINK || n < 2;
+  }
+
+  months.addEventListener("input", recalc);
+  months.addEventListener("change", function () {
+    var n = Math.min(5, Math.max(1, Math.round(Number(months.value) || 1)));
+    months.value = n;
+    recalc();
+  });
+  recalc();
+})();
+</script>
+
+</body>
+</html>
