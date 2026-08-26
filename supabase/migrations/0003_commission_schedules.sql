@@ -14,6 +14,12 @@
 -- Counts reset monthly and the month's tier applies to every memorial in that
 -- month, so the rate is settled when the month closes, not when an order accrues.
 
+-- The monthly_commission view calls the old signature, so it is dropped here
+-- and recreated at the foot of this migration on the new schedules. Dropped
+-- explicitly rather than with `cascade`, so that an unexpected dependent stops
+-- the migration rather than silently disappearing.
+drop view if exists public.monthly_commission;
+
 -- Dropped rather than replaced: adding a defaulted argument would leave the old
 -- single-argument version in place and make commission_rate(5) ambiguous.
 drop function if exists public.commission_rate(integer);
@@ -195,3 +201,52 @@ comment on view public.commission_statement is
   'Monthly commission statement per Partner. remit_by is the 15th of the following month, per Exhibit A.';
 
 grant select on public.commission_statement to authenticated;
+
+-- Recreated on the new schedules. Semantics are otherwise unchanged from the
+-- original: a forecast across every in-flight order, grouped by the month the
+-- order was started. commission_statement above is the billable record - it
+-- counts only accrued memorials and uses memorial_sale_price as the basis.
+-- The added `schedule` column is why this is a drop-and-recreate rather than a
+-- plain replace.
+create or replace view public.monthly_commission as
+  with counted as (
+    select o.funeral_home_id,
+           date_trunc('month', o.started_at) as month,
+           count(*)      as orders,
+           sum(o.retail) as retail
+      from public.orders o
+     where o.status = any (array['submitted','proof','approved','production','set'])
+     group by o.funeral_home_id, date_trunc('month', o.started_at)
+  ),
+  rated as (
+    select c.funeral_home_id,
+           c.month,
+           c.orders,
+           c.retail,
+           f.name         as funeral_home,
+           f.subscription as subscription,
+           public.home_commission_schedule(f.id) as schedule,
+           public.commission_rate(
+             c.orders::integer,
+             public.home_commission_schedule(f.id) = 'covered'
+           ) as rate
+      from counted c
+      join public.funeral_homes f on f.id = c.funeral_home_id
+     where is_founder() or (my_role() = 'owner' and f.id = my_home())
+  )
+  select r.month,
+         r.funeral_home,
+         r.orders,
+         r.schedule,
+         r.rate,
+         r.retail,
+         round(r.retail * r.rate, 2)                  as commission,
+         r.subscription,
+         round(r.retail * r.rate + r.subscription, 2) as total_owed
+    from rated r
+   order by r.month desc, r.funeral_home;
+
+comment on view public.monthly_commission is
+  'Forecast of commission across in-flight orders, by the month each order was started. Not the billable record - see commission_statement, which counts accrued memorials against memorial_sale_price per Exhibit A.';
+
+grant select on public.monthly_commission to authenticated, service_role;
