@@ -64,6 +64,52 @@ family a completed companion memorial.
 Lowercase throughout, underscores between fields, hyphens inside a field. Keep the original file
 alongside if a shot has been cropped or corrected; the convention describes the working copy.
 
+## Motif tags — what connects a photograph to a family's answers
+
+This is the part that makes the library do work rather than just sit there.
+
+The designer reads a family's interview answers and derives **themes**. If every photograph
+carries motif tags drawn from the same vocabulary, a family who spent the interview talking about
+the river can be shown memorials that actually have water on them, instead of the same drawn
+stone everyone else sees. The join is the vocabulary below, so tag against it rather than
+inventing words per photo.
+
+**Tag what is visible on the stone, never what you infer about the person.** A fishing rod etched
+into the granite is `fishing`. Knowing the deceased fished is not a tag — that fact lives in the
+family's interview, and matching the two is the app's job, not the filer's.
+
+Two to five motifs per photograph. Most have one or two. Blank is a legitimate answer: a plain
+upright with lettering and nothing else is the most ordered memorial there is, and the library
+needs plenty of them.
+
+| Theme | Motif tags |
+|---|---|
+| `land` | `fishing` · `hunting` · `boat` · `lake` · `river` · `mountains` · `woods` · `farm` · `ranch` · `horse` · `garden` · `flowers` · `tree` · `sunset` |
+| `work` | `tools` · `truck` · `tractor` · `workbench` · `welding` · `books` · `nurse` · `teacher` · `trade-emblem` |
+| `service` | `military-emblem` · `flag` · `veteran-marker` · `fire` · `police` |
+| `faith` | `cross` · `crucifix` · `praying-hands` · `rosary` · `church` · `angel` · `dove` · `star-of-david` · `scripture` |
+| `music` | `guitar` · `piano` · `notes` · `choir` · `fiddle` · `drums` |
+| `family` | `portrait-photo` · `wedding-rings` · `children` · `hearts` · `pets` · `dog` · `cat` |
+| `sport` | `golf` · `baseball` · `football` · `hunting-dog` · `cards` · `motorcycle` · `car` |
+| *(craft elements)* | `etching` · `laser-portrait` · `porcelain-cameo` · `shape-carve` · `glass-inlay` · `bronze-inlay` · `sculpture-figure` · `vase` · `bench-attached` |
+
+Note two things about that table.
+
+**`sport` is not a theme the designer currently knows.** Neither are hobbies, talents, childhood
+or parenting, all of which the intake asks about at length. The designer reads only seven themes
+today, so those answers score nothing. Tag the photographs for the full list anyway — the
+vocabulary should describe what is actually out there in the library, and the designer should be
+made to catch up to it, not the other way round.
+
+**`humour` has no motifs, deliberately.** You cannot photograph a sense of humour. It reaches a
+memorial through the inscription — the thing they always said — which is why `words` is one of
+the concepts the designer offers. Some themes land in text, not imagery, and the library should
+not pretend otherwise.
+
+The last row is craft elements rather than a theme: what technique produced the image, not what
+it depicts. Those tags are what let the designer show a family what cast glass or a porcelain
+cameo actually looks like in daylight on real granite, which no drawing has ever managed.
+
 ## What may be committed, and what may not
 
 `Healing-Partners` is a public repository, and a photograph of a finished memorial carries a real
@@ -94,13 +140,32 @@ the few hundred good enough to show a family end up.
 without reopening every file:
 
 ```csv
-file,category,occupancy,material,variant,granite_color,supplier,has_lettering,render_ready,notes
+file,category,occupancy,material,variant,motifs,granite_color,finish,supplier,has_lettering,quality,render_ready,notes
 ```
 
+`motifs` is semicolon-separated, from the vocabulary above: `fishing;boat;etching`. It is the
+column the designer matches against, so it is the one worth being careful with.
+
 `has_lettering` is the safety gate — it is what tells you a file can never be committed.
-`render_ready` is the curation flag that decides what gets promoted to Supabase. Leave
-`granite_color` and `supplier` blank rather than guessing; a wrong colour name is worse than an
-empty cell, because the supplier catalogues use those names as order codes.
+
+`quality` is `a`, `b` or `c`, judged only on whether the photograph is usable as an example
+shown to a grieving family: **a** — straight on, whole memorial in frame, even light, no clutter;
+**b** — usable but flawed, off-angle or hard shadow; **c** — reference only, keep for the record
+but never show. Judge the photograph, not the memorial. A beautiful stone shot at dusk from
+forty-five degrees is a `c`.
+
+`render_ready` is the curation flag that decides what gets promoted to Supabase. In practice it
+should mean `quality = a` and `has_lettering = no`, or lettering that has been cropped out.
+
+Leave `granite_color` and `supplier` blank rather than guessing. A wrong colour name is worse
+than an empty cell, because the supplier catalogues use those names as order codes — an
+"Academy Black" that is really Mesabi Black becomes a wrong stone quoted at a wrong price.
+
+### Fill these while sorting, not after
+
+`motifs`, `has_lettering` and `quality` all require looking at the photograph. If they are left
+for later, every one of a thousand files has to be opened a second time. Category, occupancy and
+material you can read off the filename afterwards; these three you cannot.
 
 ## On findagrave.com
 
