@@ -14,6 +14,7 @@ Each file is idempotent where Postgres allows it (`if not exists`,
 | `0001_partner_retail_markup.sql` | Makes the 2.5x retail multiplier a Partner setting, per agreement s6.8 | yes |
 | `0002_proof_approvals.sql` | Records proof approval as formal evidence and gates order status on it, per s3.3-s3.4 | yes |
 | `0003_commission_schedules.sql` | Replaces the superseded overlapping commission bands with the agreement's two schedules | **no** |
+| `0004_memorial_media.sql` | Records photographs and proofs stored in Cloudflare R2, and points proof approvals at a durable object rather than an expiring URL | **no** |
 
 ## Applying
 
@@ -28,7 +29,8 @@ fetch the whole directory, not just the outstanding file:
 
 ```sh
 mkdir -p ~/supabase/migrations && cd ~/supabase/migrations
-for f in 0001_partner_retail_markup 0002_proof_approvals 0003_commission_schedules; do
+for f in 0001_partner_retail_markup 0002_proof_approvals 0003_commission_schedules \
+         0004_memorial_media; do
   gh api -H "Accept: application/vnd.github.raw" \
     repos/brandonjameshomer-ship-it/Healing-Partners/contents/supabase/migrations/$f.sql > $f.sql
 done
@@ -53,6 +55,18 @@ halts the migration instead of being deleted silently. Anything else calling
 
 After applying, `monthly_commission` gains a `schedule` column and its `rate`
 reflects the Covered schedule where a Partner qualifies.
+
+## Notes on 0004
+
+The bytes live in Cloudflare R2, not in Supabase: a scanned portrait is 4-20MB
+and the free tier gives 1GB total with a 50MB per-file cap, so photographs would
+exhaust it within weeks and bloat every backup. R2 also charges nothing for
+downloads, which matters because the same portrait is fetched every time a
+family opens the designer. See `dashboard/MEDIA.md` for the bucket setup.
+
+It also redefines `proof_approvals_guard()` from 0002 to cover the new
+`proof_media_id`. Without that, an approval could be re-pointed at a different
+file after signing, which is precisely what the guard exists to prevent.
 
 ## Still open
 

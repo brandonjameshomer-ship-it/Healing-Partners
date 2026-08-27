@@ -1,5 +1,4 @@
--- Healing Partners — media records
--- Run this AFTER access.sql, in the Supabase SQL editor. Safe to re-run.
+-- 0004_memorial_media.sql
 --
 -- WHERE THE BYTES ACTUALLY LIVE
 --
@@ -138,3 +137,87 @@ $$;
 
 comment on function media_due_for_deletion is
   'Founder only. Pending rows older than a day are abandoned uploads — a URL was issued and never used.';
+
+-- ============================================================
+-- Proof approvals point at an object, not at a URL
+-- ============================================================
+-- 0002 gave proof_approvals a proof_file_url. A signed R2 URL expires in
+-- fifteen minutes, so storing one as evidence produces a dead link on the
+-- day anybody needs to check what the family actually approved.
+--
+-- proof_media_id is the durable reference. The URL column stays for the
+-- Exhibit C route, where the file may genuinely live somewhere else.
+
+alter table public.proof_approvals
+  add column if not exists proof_media_id uuid references memorial_media(id);
+
+comment on column public.proof_approvals.proof_media_id is
+  'The stored proof file. Preferred over proof_file_url, which cannot hold a signed URL: those expire.';
+
+-- The guard in 0002 makes every evidential field immutable. The new column
+-- has to join that list, or an approval could be re-pointed at a different
+-- file after the fact — which is the whole thing the guard exists to stop.
+create or replace function public.proof_approvals_guard()
+returns trigger
+language plpgsql
+security definer
+set search_path to 'public'
+as $$
+begin
+  if tg_op = 'DELETE' then
+    raise exception 'proof approvals are permanent evidence and cannot be deleted (agreement s3.4)';
+  end if;
+
+  if new.id is distinct from old.id
+     or new.design_id is distinct from old.design_id
+     or new.memorial_id is distinct from old.memorial_id
+     or new.order_id is distinct from old.order_id
+     or new.method is distinct from old.method
+     or new.approver_id is distinct from old.approver_id
+     or new.approver_name is distinct from old.approver_name
+     or new.approver_email is distinct from old.approver_email
+     or new.approver_title is distinct from old.approver_title
+     or new.approver_relationship is distinct from old.approver_relationship
+     or new.proof_version is distinct from old.proof_version
+     or new.proof_file_hash is distinct from old.proof_file_hash
+     or new.proof_file_url is distinct from old.proof_file_url
+     or new.proof_media_id is distinct from old.proof_media_id
+     or new.attestation_confirmed is distinct from old.attestation_confirmed
+     or new.checklist is distinct from old.checklist
+     or new.ip_address is distinct from old.ip_address
+     or new.user_agent is distinct from old.user_agent
+     or new.approved_at is distinct from old.approved_at
+     or new.created_at is distinct from old.created_at then
+    raise exception 'proof approval fields are immutable; record a revocation instead';
+  end if;
+
+  if old.revoked_at is not null then
+    raise exception 'proof approval % is already revoked', old.id;
+  end if;
+
+  return new;
+end;
+$$;
+
+-- A proof file an approval points at cannot be retired, whatever the media
+-- policies say. Belt and braces over the same rule.
+--
+-- UPDATE only, deliberately. Row level security already grants nobody a delete,
+-- so a guard on DELETE would catch only one caller: the cascade from
+-- memorials. Blocking that would make a memorial undeletable and put s9's
+-- 90-day deletion obligation out of reach.
+create or replace function public.memorial_media_guard()
+returns trigger language plpgsql security definer set search_path to 'public' as $$
+begin
+  if new.status = 'deleted' and old.status <> 'deleted' and exists (
+       select 1 from public.proof_approvals
+       where proof_media_id = old.id and revoked_at is null) then
+    raise exception 'that file is the proof an approval rests on (agreement s3.4)';
+  end if;
+  return new;
+end; $$;
+
+drop trigger if exists med_guard on memorial_media;
+create trigger med_guard
+  before update on memorial_media
+  for each row execute function public.memorial_media_guard();

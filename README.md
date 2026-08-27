@@ -18,7 +18,7 @@ Healing Partners is the company. **Remember Them** is its memorial design app.
 | `remember-them/designer.html` | Direct configurator |
 | `remember-them/stone.js` | The shared renderer both pages draw with |
 | `remember-them/media.js` | Photograph and proof uploads, straight from the browser to R2 |
-| `dashboard/MEDIA.md` | Setting up Cloudflare R2 — where the files themselves live |
+| `dashboard/MEDIA.md` | Setting up Cloudflare R2 — where photographs and proofs actually live |
 
 ## Two audiences, two models
 

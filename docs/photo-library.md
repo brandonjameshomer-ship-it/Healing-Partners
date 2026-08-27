@@ -128,11 +128,22 @@ identifiable and leave it out.
 
 Keep the master library in **Google Drive**, where the working files already are, and where a
 Chromebook is not paying for the storage. Push only the curated, app-facing images — the ones the
-designer actually renders — into a **private Supabase Storage bucket** on the Remember Them
-project, so they sit behind the same row level security as the rest of the data.
+designer actually renders — into the **private Cloudflare R2 bucket**, `remember-them-media`,
+described in `dashboard/MEDIA.md`.
 
-Two stages, in other words: Drive is where a thousand photographs get sorted, Supabase is where
-the few hundred good enough to show a family end up.
+Two stages, in other words: Drive is where a thousand photographs get sorted, R2 is where the few
+hundred good enough to show a family end up.
+
+R2 rather than Supabase Storage, which this document previously named. Supabase's free tier is 1GB
+total with a 50MB cap per file, and a few hundred scanned memorials at 4–20MB each does not fit;
+R2 gives 10GB and charges nothing for downloads, which matters when the same reference photograph
+is fetched on every designer session. The access rule is unchanged — the bucket is private, and
+`memorial_media` rows sit behind the same row level security as the rest of the data, so a signed
+URL is only ever minted for someone `can_see_memorial()` already allows.
+
+Library reference photographs are not a family's own upload: they belong to no one memorial. File
+them under a `library/` key prefix rather than `memorials/`, and keep them out of `memorial_media`,
+which is keyed to a memorial by design.
 
 ## The manifest
 

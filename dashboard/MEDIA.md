@@ -90,8 +90,9 @@ anything.
 
 ## Step 5 — Create the table
 
-Open the Supabase **SQL editor**, paste `dashboard/media.sql`, run it. Safe to re-run.
-It needs `schema.sql` and `access.sql` to have run first.
+`supabase/migrations/0004_memorial_media.sql`, applied the same way as the others — see
+`supabase/migrations/README.md`. It needs `schema.sql`, `access.sql` and `0002_proof_approvals.sql`
+to have run first.
 
 ## Step 6 — Wire up a page
 
