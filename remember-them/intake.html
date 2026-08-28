@@ -184,6 +184,45 @@
   button.btn.primary:hover { filter:brightness(1.06); }
   button.btn.ghost { border-color:transparent; background:none; color:var(--ink-2); }
 
+  /* ---------- the interview thread ---------- */
+  .turn {
+    border-left:2px solid var(--line-strong); padding:0 0 0 1rem;
+    margin-bottom:1.25rem;
+  }
+  .turn .t-q {
+    font-size:var(--f-sm); color:var(--ink-3); margin:0 0 .25rem;
+  }
+  .turn .t-a {
+    margin:0; white-space:pre-wrap; color:var(--ink);
+  }
+  .turn button.t-edit {
+    margin-top:.4rem; padding:0; border:0; background:none; cursor:pointer;
+    font:inherit; font-size:var(--f-xs); color:var(--ink-3);
+    text-decoration:underline; text-underline-offset:2px;
+  }
+  .turn button.t-edit:hover { color:var(--accent-ink); }
+
+  .ask-cat {
+    font-size:var(--f-xs); letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-3); margin:0 0 .5rem;
+  }
+  .ask-actions {
+    display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; margin-top:.75rem;
+  }
+  .ask-hint {
+    font-size:var(--f-xs); color:var(--ink-3); margin:0;
+  }
+  .thinking {
+    display:flex; align-items:center; gap:.6rem;
+    font-size:var(--f-sm); color:var(--ink-3); padding:.5rem 0;
+  }
+  .thinking i {
+    width:.5rem; height:.5rem; border-radius:50%; background:var(--accent);
+    animation:pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity:.25 } 50% { opacity:1 } }
+  @media (prefers-reduced-motion: reduce) { .thinking i { animation:none; opacity:.7 } }
+
   /* ---------- privacy + legal ---------- */
   .privacy {
     background:var(--surface-2); border:1px solid var(--line);
@@ -258,12 +297,16 @@
   <section class="page" id="p2" aria-labelledby="h2">
     <h1 class="lede" id="h2">Tell us about <span id="nameEcho">them</span>.</h1>
     <p class="sub">
-      Answer whichever of these you want to — skip anything that does not fit, and there is no such
-      thing as too much. One specific thing beats ten kind words: a stranger walking past the finished
-      memorial should get something true about who this person was.
+      However it comes out — a story, a list, the thing you would say at the service. There is no wrong
+      way, and you cannot tell us too much. One specific thing beats ten kind words: a stranger walking
+      past the finished memorial should get something true about who this person was.
     </p>
 
-    <div id="qHost"></div>
+    <!-- what has been said so far, oldest first -->
+    <div id="thread"></div>
+
+    <!-- the question on the table -->
+    <div id="askHost"></div>
 
     <p class="section-label">Personality</p>
     <div class="card">
@@ -327,7 +370,7 @@
      behaviour rather than character, ask about the ordinary rather than
      the milestone, one question at a time.
      ------------------------------------------------------------------ */
-  var QUESTIONS = [
+  var FALLBACK = [
     { group:"Stories", id:"childhood", cat:"Childhood",
       q:"What were they like as a child?",
       why:"A place, a day, or the trouble they got into — not what kind of child they were.",
@@ -382,8 +425,47 @@
   var MAX_WORDS = 10;
   var KEY = "rt.intake.v1";
 
+  /* ------------------------------------------------------------------
+     Talking to the interview function.
+
+     Blank until configured, exactly like media.js — the project ref and
+     the session token do not belong in a public repository. Call this once
+     the Supabase client has a session:
+
+       RememberThem.interview.configure({
+         functionsUrl: SUPABASE_URL + "/functions/v1",
+         getToken: function () { return session.access_token; }
+       });
+
+     Unconfigured is a supported state, not a broken one. The fixed
+     questions below carry the interview on their own.
+     ------------------------------------------------------------------ */
+  var CFG = { functionsUrl:"", getToken:null };
+
+  window.RememberThem = window.RememberThem || {};
+  window.RememberThem.interview = {
+    configure: function (o) {
+      if (o && o.functionsUrl) CFG.functionsUrl = String(o.functionsUrl).replace(/\/+$/, "");
+      if (o && o.getToken) CFG.getToken = o.getToken;
+      if (page === 2) advance();
+    }
+  };
+
+  function live() {
+    try { return !!(CFG.functionsUrl && CFG.getToken && CFG.getToken()); }
+    catch (e) { return false; }
+  }
+
+  /* The question currently on the table, or null while one is being fetched. */
+  var pending = null;
+  var busy = false;
+
   /* ------------------------------------------------------------------ */
-  var d = { name:"", known:"", born:"", died:"", answers:{}, words:[], weights:{} };
+  /* turns: [{ id, area, label, q, a }] — one per question the family answered,
+     in the order they were asked. Replaces the old fixed `answers` map, which
+     could only ever hold the ten questions this file happened to ship with. */
+  var d = { name:"", known:"", born:"", died:"", turns:[], words:[], weights:{},
+            done:false, enoughHint:false };
   var page = 1;
 
   function $(id) { return document.getElementById(id); }
@@ -422,36 +504,186 @@
       if (!o.at || (Date.now() - o.at) > MAX_AGE) { clearSaved(); return; }
       d.name = o.name || ""; d.known = o.known || "";
       d.born = o.born || ""; d.died = o.died || "";
-      d.answers = o.answers || {}; d.words = o.words || []; d.weights = o.weights || {};
+      d.words = o.words || []; d.weights = o.weights || {};
+      d.done = o.done === true;
+      d.turns = Array.isArray(o.turns) ? o.turns : [];
+      /* A save written by the fixed-form version. Carry it forward rather than
+         making someone mid-interview start again. */
+      if (!d.turns.length && o.answers) {
+        FALLBACK.forEach(function (q) {
+          var a = (o.answers[q.id] || "").trim();
+          if (a) d.turns.push({ id:q.id, area:q.id, label:q.cat, q:q.q, a:a });
+        });
+      }
       d.at = o.at;
     } catch (e) { clearSaved(); }
   }
 
-  /* ---------- page 2: build the questions ---------- */
-  function buildQuestions() {
-    var html = "", lastGroup = "";
-    QUESTIONS.forEach(function (q) {
-      if (q.group !== lastGroup) {
-        html += '<p class="section-label">' + esc(q.group) + "</p>";
-        lastGroup = q.group;
-      }
-      html += '<div class="card">' +
-                '<p class="q">' + esc(q.q) + "</p>" +
-                '<p class="q-why">' + esc(q.why) + "</p>" +
-                '<label class="visually-hidden" for="a-' + q.id + '" style="position:absolute;left:-9999px">' + esc(q.q) + "</label>" +
-                '<textarea id="a-' + q.id + '" data-q="' + q.id + '" placeholder="' + esc(q.ph) + '"></textarea>' +
-              "</div>";
-    });
-    $("qHost").innerHTML = html;
+  /* ==================================================================
+     PAGE 2 — the interview
 
-    QUESTIONS.forEach(function (q) {
-      var el = $("a-" + q.id);
-      el.value = d.answers[q.id] || "";
-      el.addEventListener("input", function () {
-        d.answers[q.id] = this.value;
-        save();
-      });
+     A biographer, not a form. The interview guide this product is built
+     on is explicit about it: start wide and unstructured, follow the
+     energy, ask one question at a time, do not run a checklist. A fixed
+     column of ten questions cannot follow the energy — it asks about a
+     marriage straight after being told he never married.
+
+     So the next question comes from the model, which has read what the
+     family actually said. When the model is unreachable the fixed list
+     takes over. That fallback is not a nicety: this runs in an
+     arrangement room with a family sitting at the table, and an outage
+     must never end the conversation.
+     ================================================================== */
+
+  /* ---- what has been said, oldest first ---- */
+  function renderThread() {
+    $("thread").innerHTML = d.turns.map(function (t, i) {
+      return '<div class="turn">' +
+               '<p class="t-q">' + esc(t.q) + "</p>" +
+               '<p class="t-a">' + esc(t.a) + "</p>" +
+               '<button type="button" class="t-edit" data-edit="' + i + '">Change this answer</button>' +
+             "</div>";
+    }).join("");
+  }
+
+  $("thread").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-edit]") : null;
+    if (!b) return;
+    var i = Number(b.getAttribute("data-edit"));
+    var t = d.turns[i];
+    if (!t) return;
+    /* Put it back on the table. Anything asked after it still stands —
+       the family is correcting one answer, not restarting. */
+    d.turns.splice(i, 1);
+    pending = { id:t.id, area:t.area, label:t.label, q:t.q, why:"", ph:"", prefill:t.a };
+    d.done = false;
+    save(); renderThread(); renderAsk();
+  });
+
+  /* ---- the question on the table ---- */
+  function renderAsk() {
+    if (busy) {
+      $("askHost").innerHTML =
+        '<div class="card"><p class="thinking"><i></i>Thinking about what to ask next…</p></div>';
+      return;
+    }
+    if (d.done || !pending) {
+      $("askHost").innerHTML = d.turns.length
+        ? '<div class="privacy" style="margin-bottom:0"><strong>That is enough to design from.</strong> ' +
+          'Add more whenever you want to — or carry on to say what matters most.</div>'
+        : "";
+      return;
+    }
+
+    $("askHost").innerHTML =
+      '<div class="card">' +
+        '<p class="ask-cat">' + esc(pending.label || "Their story") + "</p>" +
+        '<p class="q">' + esc(pending.q) + "</p>" +
+        (pending.why ? '<p class="q-why">' + esc(pending.why) + "</p>" : "") +
+        '<label for="answer" style="position:absolute;left:-9999px">' + esc(pending.q) + "</label>" +
+        '<textarea id="answer" placeholder="' + esc(pending.ph || "") + '"></textarea>' +
+        '<div class="ask-actions">' +
+          '<button type="button" class="btn primary" id="ansNext">Next question</button>' +
+          '<button type="button" class="btn ghost" id="ansEnough">I have said enough</button>' +
+          '<p class="ask-hint">' +
+            (d.enoughHint
+              ? "There is already enough here to design from — carry on only if you want to."
+              : "Ctrl + Enter also moves on") +
+          "</p>" +
+        "</div>" +
+      "</div>";
+
+    var ta = $("answer");
+    ta.value = pending.prefill || "";
+    ta.focus();
+    ta.addEventListener("keydown", function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); commit(); }
     });
+    /* Wrapped, not passed by reference: a listener is handed the click event,
+       and `commit(event)` reads that truthy object as "stop the interview". */
+    $("ansNext").addEventListener("click", function () { commit(false); });
+    $("ansEnough").addEventListener("click", function () { commit(true); });
+  }
+
+  /* ---- bank the answer, then ask the next thing ---- */
+  function commit(stop) {
+    var ta = $("answer");
+    var a = ta ? ta.value.trim() : "";
+    if (a && pending) {
+      d.turns.push({ id:pending.id, area:pending.area, label:pending.label, q:pending.q, a:a });
+    }
+    pending = null;
+    if (stop) { d.done = true; save(); renderThread(); renderAsk(); return; }
+    save(); renderThread();
+    advance();
+  }
+
+  /* ---- decide what to ask next ---- */
+  function advance() {
+    if (d.done || pending || busy) { renderAsk(); return; }
+
+    if (!live()) { pending = nextFallback(); renderThread(); renderAsk(); return; }
+
+    busy = true; renderAsk();
+    askServer(function (q) {
+      busy = false;
+      /* Any failure at all lands on the fixed list. The family sees a
+         question either way and is never told the machine broke. */
+      pending = q || nextFallback();
+      renderAsk();
+    });
+  }
+
+  /* The fixed list, in order, skipping anything already covered. */
+  function nextFallback() {
+    var used = {};
+    d.turns.forEach(function (t) { used[t.area] = true; });
+    for (var i = 0; i < FALLBACK.length; i++) {
+      var q = FALLBACK[i];
+      if (!used[q.id]) {
+        return { id:q.id, area:q.id, label:q.cat, q:q.q, why:q.why, ph:q.ph };
+      }
+    }
+    d.done = true;
+    return null;
+  }
+
+  function askServer(done) {
+    var xhr = new XMLHttpRequest();
+    var settled = false;
+    function finish(q) { if (!settled) { settled = true; done(q); } }
+
+    try {
+      xhr.open("POST", CFG.functionsUrl + "/interview", true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", "Bearer " + CFG.getToken());
+      /* A grieving family will not wait. Past this, the fixed list is kinder
+         than a spinner. */
+      xhr.timeout = 12000;
+      xhr.onload = function () {
+        var o = null;
+        try { o = JSON.parse(xhr.responseText); } catch (e) {}
+        if (xhr.status < 200 || xhr.status >= 300 || !o || !o.question) { finish(null); return; }
+        /* The model's read on whether a designer could already work from
+           this. It is a suggestion shown to the family, never a decision —
+           only they end the interview. */
+        d.enoughHint = o.enough === true;
+        finish({
+          id: "t" + d.turns.length,
+          area: o.area || null,
+          label: o.label || "Their story",
+          q: o.question,
+          why: o.why || "",
+          ph: o.placeholder || ""
+        });
+      };
+      xhr.onerror = function () { finish(null); };
+      xhr.ontimeout = function () { finish(null); };
+      xhr.send(JSON.stringify({
+        known: d.known || d.name.split(/\s+/)[0] || "",
+        turns: d.turns.map(function (t) { return { q:t.q, a:t.a, area:t.area }; })
+      }));
+    } catch (e) { finish(null); }
   }
 
   /* ---------- page 2: personality words ---------- */
@@ -500,10 +732,10 @@
      Only what they actually said gets rated. Rating a blank question
      would be busywork, and the click budget does not allow for it. */
   function weighItems() {
-    var items = QUESTIONS.filter(function (q) {
-      return (d.answers[q.id] || "").trim().length > 0;
-    }).map(function (q) {
-      return { id:q.id, cat:q.cat, text:d.answers[q.id].trim() };
+    var items = d.turns.filter(function (t) {
+      return (t.a || "").trim().length > 0;
+    }).map(function (t) {
+      return { id:t.id, cat:t.label || "Their story", text:t.a.trim() };
     });
     if (d.words.length) {
       items.push({ id:"__words", cat:"Personality", text:d.words.join(" · ") });
@@ -600,6 +832,7 @@
     $("next").textContent = n === 3 ? "See the designs" : "Continue";
     if (n === 2) {
       $("nameEcho").textContent = d.known || d.name.split(/\s+/)[0] || "them";
+      advance();
     }
     if (n === 3) buildWeights();
     window.scrollTo({ top:0, behavior:"smooth" });
@@ -676,7 +909,7 @@
       save();
     });
   });
-  buildQuestions();
+  renderThread();
   renderWords();
   show(1);
 })();

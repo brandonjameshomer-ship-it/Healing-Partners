@@ -10,15 +10,56 @@ out the other end.
 
 | Page | What happens |
 |---|---|
-| `intake.html` | Three pages. Who died; then a biographer-style interview covering stories by life stage, habits, hobbies, talents and ten words for their personality; then the family rates every answer 1–10 for how much it should shape the design. |
+| `intake.html` | Three pages. Who died; then the interview; then the family rates every answer 1–10 for how much it should shape the design. |
 | `index.html` | Reads that record. Suggests design elements scored by the family's own ratings, compares the level ones side by side, and builds three proofs. |
 | `designer.html` | Direct configurator, for when the design is already settled and someone just needs to draw it. |
 | `thank-you.html` | After the order is placed. |
 
-The intake hands over through `localStorage` under `rt.handoff.v1`, with the name and dates also in
-the query string so private browsing does not lose who this is. The record is honoured for twelve
-hours only — these machines sit on a shared front desk, and one family's interview must never
+The intake hands over through `localStorage` under `rt.handoff.v1`, falling back to `sessionStorage`
+when the store is blocked. **Nothing about the person goes in the query string** — a URL lands in
+browser history on a shared machine, in proxy logs, and in the `Referer` header sent to third
+parties, and a name plus a date of birth is a strong identity pair. The record is honoured for
+twelve hours only: these machines sit on a shared front desk, and one family's interview must never
 surface in the next family's session.
+
+## The interview — page two
+
+A biographer, not a form. The interview guide the product is built on is explicit about it: start
+wide and unstructured, follow the energy, ask one question at a time, do not run a checklist. A
+fixed column of questions cannot follow the energy — it asks about a marriage straight after being
+told he never married.
+
+So the next question comes from `supabase/functions/interview`, which has read what the family
+actually said. It covers the same ground the spec calls for — stories across the life stages, then
+habits, hobbies and talents, then ten words for their personality — but as a map of where the
+conversation has been rather than a queue to work through. A life with no sport in it never gets
+asked about sport.
+
+Three things about that function are load-bearing:
+
+- **It writes nothing down.** The transcript shapes one question and is gone. `classify-story`
+  caches its tags because tags are not the story; a transcript *is* the story, and it stays in the
+  browser where the family put it. Nothing here trains a model (Agreement §8.4, DPA D-11).
+- **Only the familiar name and the transcript leave the browser** — never the full legal name, and
+  emails, phone numbers, addresses and government identifiers are redacted before the call.
+- **Every failure falls back to the fixed question set**, silently. Unconfigured, offline, timed
+  out, unparseable — the family sees a real question and is never told the machine broke. This runs
+  in an arrangement room with a family at the table.
+
+The page is unconfigured by default; the project ref and session token do not belong in a public
+repository. Wire it up once the Supabase client has a session:
+
+```js
+RememberThem.interview.configure({
+  functionsUrl: SUPABASE_URL + "/functions/v1",
+  getToken: function () { return session.access_token; }
+});
+```
+
+Until that call is made the fixed questions carry the interview on their own, which is why the page
+is worth demoing before any backend exists.
+
+Tests are in `tests/` — see the README there.
 
 ## `catalogue.js` — what can be ordered
 
