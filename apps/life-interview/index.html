@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Life Interview</title>
+<!-- ============================================================
+     The Life Interview — a minimal biographer.
+
+     Carries the decisions the memorial designer arrived at, in a form a
+     person can use on their own device:
+
+       · A biographer, not a form. One question at a time, and the question
+         asked next depends on what has already been said.
+       · Nothing is transmitted. There is no backend, no account, no network
+         call of any kind. The story lives in this browser until it is
+         exported or erased.
+       · Every keystroke is banked. These are words nobody can retype.
+       · Nothing is destroyed to correct it. An answer being edited stays in
+         storage; it is only lifted off the page.
+       · Two ways in. Answer questions, or write the whole thing straight
+         through. The same story underneath either way.
+
+     Plain ES5, one file, no build step. Opens from a USB stick.
+     ============================================================ -->
+<style>
+  :root {
+    --ground:#FBFAF7; --surface:#FFFFFF; --surface-2:#F1EFE9;
+    --ink:#1C1B18; --ink-2:#46443E; --ink-3:#5F5C53;
+    --line:#E0DDD4; --line-strong:#C9C5B8;
+    --accent:#7A5C2E; --accent-soft:#F3EADA;
+    --danger:#8C3A2B;
+    --shadow:0 1px 2px rgba(28,27,24,.05), 0 10px 30px -18px rgba(28,27,24,.4);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#16150F; --surface:#1E1D16; --surface-2:#272620;
+      --ink:#F0EDE4; --ink-2:#C3BFB2; --ink-3:#A29E90;
+      --line:#33312A; --line-strong:#454338;
+      --accent:#D6B274; --accent-soft:#2A2317;
+      --danger:#E0897A;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#16150F; --surface:#1E1D16; --surface-2:#272620;
+    --ink:#F0EDE4; --ink-2:#C3BFB2; --ink-3:#A29E90;
+    --line:#33312A; --line-strong:#454338;
+    --accent:#D6B274; --accent-soft:#2A2317;
+    --danger:#E0897A;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing:border-box }
+  html { color-scheme:light dark }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font:17px/1.65 ui-serif, "Iowan Old Style", Georgia, "Times New Roman", serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:44rem; margin:0 auto; padding:2rem 1.25rem 6rem }
+
+  header { border-bottom:1px solid var(--line); padding-bottom:1.25rem; margin-bottom:2rem }
+  h1 { font-size:1.6rem; font-weight:600; letter-spacing:-.01em; margin:0 0 .4rem }
+  .sub { color:var(--ink-3); font-size:.95rem; margin:0 }
+  .sans { font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif }
+
+  .card {
+    background:var(--surface); border:1px solid var(--line); border-radius:6px;
+    padding:1.4rem 1.5rem; box-shadow:var(--shadow); margin-bottom:1.25rem;
+  }
+  .stage {
+    font-family:ui-sans-serif, system-ui, sans-serif; font-size:.7rem;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
+    margin:0 0 .5rem;
+  }
+  .q { font-size:1.3rem; line-height:1.35; margin:0 0 .5rem; font-weight:500 }
+  .why { color:var(--ink-3); font-size:.95rem; margin:0 0 1rem; font-style:italic }
+
+  label.vh { position:absolute; left:-9999px }
+  textarea {
+    width:100%; min-height:9rem; resize:vertical; padding:.85rem .9rem;
+    font:inherit; color:var(--ink); background:var(--surface-2);
+    border:1px solid var(--line-strong); border-radius:4px;
+  }
+  textarea:focus-visible, button:focus-visible, a:focus-visible {
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  #whole { min-height:24rem }
+
+  .actions { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin-top:.9rem }
+  button {
+    font:inherit; font-family:ui-sans-serif, system-ui, sans-serif; font-size:.95rem;
+    padding:.5rem 1rem; min-height:2.5rem; border-radius:4px; cursor:pointer;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+  }
+  button.primary { background:var(--accent); border-color:var(--accent); color:var(--ground) }
+  button.quiet { border-color:transparent; background:none; color:var(--ink-3) }
+  button.quiet:hover { color:var(--ink) }
+  button.danger { border-color:transparent; background:none; color:var(--danger) }
+  .hint { color:var(--ink-3); font-size:.85rem; margin:0 }
+
+  .told { margin:2rem 0 0 }
+  .told h2 {
+    font-family:ui-sans-serif, system-ui, sans-serif; font-size:.72rem;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);
+    font-weight:600; margin:0 0 .8rem;
+  }
+  .turn { border-left:2px solid var(--line-strong); padding:.1rem 0 .1rem 1rem; margin-bottom:1.4rem }
+  .turn .t-q { color:var(--ink-3); font-size:.92rem; margin:0 0 .3rem }
+  .turn .t-a { margin:0 0 .4rem; white-space:pre-wrap }
+  .turn button {
+    font-size:.82rem; padding:.25rem .5rem; min-height:1.9rem;
+    border-color:transparent; background:none; color:var(--accent);
+  }
+  .turn button.take { color:var(--ink-3) }
+  .turn button.take:hover { color:var(--danger) }
+
+  .modes { display:flex; gap:.5rem; margin-bottom:1.5rem; flex-wrap:wrap }
+  .modes button[aria-pressed="true"] { background:var(--accent-soft); border-color:var(--accent) }
+
+  .count { font-family:ui-sans-serif, system-ui, sans-serif; font-size:.82rem; color:var(--ink-3) }
+  .privacy {
+    background:var(--accent-soft); border-radius:4px; padding:.9rem 1.1rem;
+    font-size:.9rem; color:var(--ink-2); margin-bottom:1.5rem;
+  }
+  footer { margin-top:3rem; padding-top:1.25rem; border-top:1px solid var(--line);
+           color:var(--ink-3); font-size:.85rem }
+  .skipped {
+    display:flex; flex-wrap:wrap; gap:.5rem; align-items:baseline;
+    color:var(--ink-3); font-size:.9rem; margin:0 0 .6rem;
+  }
+  .skipped button { font-size:.82rem; padding:.25rem .6rem; min-height:2rem }
+  .turn.priv { border-left-color:var(--accent) }
+  .tag {
+    font-family:ui-sans-serif, system-ui, sans-serif; font-size:.68rem;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+    background:var(--accent-soft); padding:.1rem .4rem; border-radius:3px;
+  }
+  [hidden] { display:none !important }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>The Life Interview</h1>
+    <p class="sub">One question at a time, in whatever order the story wants to come.</p>
+  </header>
+
+  <p class="privacy">
+    <strong>This stays on your device.</strong> There is no account and nothing is sent anywhere —
+    the page has no network connection of any kind. Your words are saved in this browser as you
+    type, and they are yours to export or erase whenever you want.
+  </p>
+
+  <div class="modes sans">
+    <button type="button" id="m-ask" aria-pressed="true">Answer questions</button>
+    <button type="button" id="m-write" aria-pressed="false">Write it straight through</button>
+  </div>
+
+  <!-- ---------------- interview mode ---------------- -->
+  <section id="askMode">
+    <div class="card" id="askHost"></div>
+    <div class="told">
+      <h2 id="toldHead" hidden>What you have told it so far</h2>
+      <div id="thread"></div>
+    </div>
+    <div class="told" id="withheld" aria-live="polite"></div>
+  </section>
+
+  <!-- ---------------- long-form mode ---------------- -->
+  <section id="writeMode" hidden>
+    <div class="card">
+      <p class="stage">Your own words, your own order</p>
+      <p class="q">Write it straight through.</p>
+      <p class="why">
+        Anything you answered as a question is already below, in the order you said it. Edit it,
+        rearrange it, keep going. Nothing here overwrites your answers — this is the same story
+        with the questions taken out.
+      </p>
+      <label class="vh" for="whole">Your life story</label>
+      <textarea id="whole" placeholder="Start anywhere. The beginning is rarely the best place."></textarea>
+      <div class="actions">
+        <button type="button" class="quiet" id="pullIn">Pull in my answers</button>
+        <p class="hint" id="pullMsg" role="status" aria-live="polite"></p>
+        <p class="hint count" id="wordcount">0 words</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions" style="margin-top:2rem">
+    <button type="button" class="primary sans" id="export">Save a copy to my computer</button>
+    <button type="button" class="danger sans" id="erase">Erase everything</button>
+  </div>
+
+  <footer>
+    <p>Saved in this browser only. Export before clearing your browsing data, changing device, or
+    handing this machine to anyone else.</p>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var KEY = "life.interview.v1";
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     The question bank.
+
+     Grouped by where in a life they sit, not by the order they are asked.
+     `needs` names what must already have been said before a question is
+     worth asking — this is what stops it enquiring about a marriage
+     straight after being told there never was one.
+     ------------------------------------------------------------------ */
+  var BANK = [
+    { id:"open", stage:"Anywhere",
+      q:"What do you want said about you?",
+      qp:"What would they have wanted said about them?",
+      why:"Not the summary. The thing you would mind being left out.",
+      ph:"Take as long as you like. Nobody is waiting." },
+
+    { id:"place", stage:"Beginnings",
+      q:"Where were you a child?",
+      qp:"Where were they a child?",
+      why:"The house, the street, the country — whichever one can still be walked through.",
+      ph:"The kitchen had…" },
+    { id:"people", stage:"Beginnings",
+      q:"Who was in charge of you, and were they any good at it?",
+      qp:"Who was in charge of them, and were they any good at it?",
+      why:"Parents, grandparents, an aunt, whoever it actually was." },
+    { id:"trouble", stage:"Beginnings",
+      q:"What did you get in trouble for, more than once?",
+      qp:"What did they get in trouble for, more than once?",
+      why:"Repeat offences say more than achievements do." },
+
+    { id:"work", stage:"The middle",
+      q:"What takes up your days?",
+      qp:"What took up their days?",
+      why:"Paid or not. The thing that uses the hours." },
+    { id:"skill", stage:"The middle",
+      q:"What can you do that the people around you can't?",
+      qp:"What could they do that nobody else in the family could?",
+      why:"It does not have to be impressive. It has to be theirs.",
+      ph:"Could fix anything with a screwdriver and patience…" },
+    { id:"love", stage:"The middle",
+      q:"Who matters most, and how did you meet?",
+      qp:"Who mattered most, and how did they meet?",
+      why:"A partner, a friend, a sibling. Whoever the answer actually is." },
+    { id:"kids", stage:"The middle",
+      q:"Tell me about the people who came after you.",
+      qp:"Tell me about the people who came after them.",
+      why:"Children, nieces, students, anyone there was a hand in.",
+      skipIf:[{ any:["no children","never had children","no kids","never had kids",
+                     "childless","couldn't have children","could not have children",
+                     "couldn't have kids","we never had any"],
+                unless:["adopted","stepchildren","step-children","but we","then we had",
+                        "except","apart from"],
+                because:"there were no children" }] },
+    { id:"hard", stage:"The middle",
+      q:"What was the hardest stretch, and what got you through it?",
+      qp:"What was the hardest stretch, and what got them through it?",
+      why:"Take the room this needs." },
+
+    { id:"joy", stage:"What you are like",
+      q:"What makes you laugh, reliably?",
+      qp:"What made them laugh, reliably?",
+      why:"The specific thing. Not \u201ca good sense of humour\u201d." },
+    { id:"habit", stage:"What you are like",
+      q:"What do you always do, that people tease you about?",
+      qp:"What did they always do, that people teased them about?",
+      why:"The routine, the superstition, the way the tea gets made." },
+    { id:"belief", stage:"What you are like",
+      q:"What do you believe that you would argue about?",
+      qp:"What did they believe that they would argue about?",
+      why:"Faith, politics, the right way to load a dishwasher. Whichever is truest." },
+
+    /* Practical wishes. A person setting their affairs in order has these and
+       the first version of this app refused to take them. */
+    { id:"service", stage:"What you want done",
+      q:"What should happen when you die \u2014 and what should not?",
+      qp:"What did they want to happen \u2014 and what did they not want?",
+      why:"Burial, cremation, a service, no service. The \u201cnot\u201d matters as much." },
+    { id:"music", stage:"What you want done",
+      q:"Is there music?",
+      qp:"Was there music they would have wanted?",
+      why:"A hymn, a record, or silence. Silence is an answer.",
+      skipIf:[{ any:["no service","no funeral","don't want a service","do not want a service",
+                     "didn't want a service","no ceremony","nothing at all","no fuss"],
+                unless:["but ","just a","only a","except"],
+                because:"there is to be no service" }] },
+    { id:"voices", stage:"What you want done",
+      q:"Who should speak, and who would rather not be asked?",
+      qp:"Who should speak, and who would rather not be asked?",
+      why:"Naming the second is a kindness to them.",
+      skipIf:[{ any:["no service","no funeral","don't want a service","do not want a service",
+                     "didn't want a service","no ceremony","nothing at all","no fuss"],
+                unless:["but ","just a","only a","except"],
+                because:"there is to be no service" }] },
+
+    { id:"advice", stage:"What to leave",
+      q:"What do you know now that you wish you had known at twenty?",
+      qp:"What did they know that they wanted passed on?",
+      why:"Say it the way you would say it to them, not the way it looks on a card." },
+
+    /* Private by construction. Estrangement lands here, and it must not be
+       thanked and moved past into an epitaph question. */
+    { id:"unsaid", stage:"Not for the funeral", priv:true,
+      q:"Is there something you want said to one person, that has not been said?",
+      qp:"Was there something they wanted said to one person?",
+      why:"This one is kept apart. It is not read out, it is not in the main copy, and it exports on its own page \u2014 addressed to whoever you name.",
+      ph:"To \u2014\u2014, and only to them:" },
+
+    { id:"last", stage:"What to leave",
+      q:"How would you like to be remembered \u2014 in one sentence?",
+      qp:"How should they be remembered \u2014 in one sentence?",
+      why:"One sentence. Everything above is what it rests on." }
+  ];
+
+  /* ------------------------------------------------------------------
+     State. draft/pendingId/editing exist so that a refresh, a closed lid
+     or a flat battery cannot take words that cannot be retyped.
+     ------------------------------------------------------------------ */
+  var d = { turns:[], whole:"", draft:"", pendingId:null, editing:null, mode:"ask",
+            pulled:[], subject:null, withheld:[], asked:[], at:0 };
+  var pending = null;
+
+  function save() {
+    try { d.at = Date.now(); localStorage.setItem(KEY, JSON.stringify(d)); }
+    catch (e) { /* private mode: the page still works, it just forgets */ }
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return;
+      d.turns   = Array.isArray(o.turns) ? o.turns : [];
+      d.whole   = typeof o.whole === "string" ? o.whole : "";
+      d.draft   = typeof o.draft === "string" ? o.draft : "";
+      d.pendingId = o.pendingId || null;
+      d.editing = (typeof o.editing === "number" && o.editing >= 0) ? o.editing : null;
+      d.mode    = o.mode === "write" ? "write" : "ask";
+      d.pulled  = Array.isArray(o.pulled) ? o.pulled : [];
+      d.subject = (o.subject === "me" || o.subject === "them") ? o.subject : null;
+      d.withheld = Array.isArray(o.withheld) ? o.withheld : [];
+      d.asked    = Array.isArray(o.asked) ? o.asked : [];
+    } catch (e) { /* a corrupt save is not worth losing the session over */ }
+  }
+
+  /* Past tense aimed at a living person ends their life on their behalf. The
+     bank carries both forms and the subject decides which is asked. */
+  function ask(q) { return (d.subject === "them" && q.qp) ? q.qp : q.q; }
+
+  function byId(id) {
+    for (var i = 0; i < BANK.length; i++) if (BANK[i].id === id) return BANK[i];
+    return null;
+  }
+  /* ------------------------------------------------------------------
+     skipIf — the honest offline version of "follow the energy".
+
+     A rule reads what has already been said and withholds a question the
+     answers have already made unkind: it does not ask about children after
+     being told there were none, nor who should speak at a service the person
+     has just said they do not want.
+
+     Three properties a small local model would not have. It is inspectable —
+     every phrase is in this file and can be read. It is conservative — an
+     `unless` phrase vetoes the skip, because asking a question that does not
+     apply is a smaller injury than withholding one that does. And it is never
+     silent: every withheld question is listed under the thread with its
+     reason and a control to ask it anyway. The person owns the interview.
+     ------------------------------------------------------------------ */
+  function corpus() {
+    return d.turns.map(function (t) { return String(t.a || ""); }).join("  ").toLowerCase();
+  }
+  function hit(list, text) {
+    for (var i = 0; i < list.length; i++) if (text.indexOf(list[i]) !== -1) return list[i];
+    return null;
+  }
+  function skipReason(q) {
+    if (!q.skipIf || q.forced || !d.turns.length) return null;
+    var text = corpus();
+    for (var i = 0; i < q.skipIf.length; i++) {
+      var r = q.skipIf[i];
+      if (!hit(r.any, text)) continue;
+      if (r.unless && hit(r.unless, text)) continue;   /* the veto */
+      return r.because || "of something said earlier";
+    }
+    return null;
+  }
+  function noteSkip(q, why) {
+    for (var i = 0; i < d.withheld.length; i++) if (d.withheld[i].id === q.id) return;
+    d.withheld.push({ id:q.id, why:why });
+  }
+
+  function answered(id) {
+    for (var i = 0; i < d.turns.length; i++) if (d.turns[i].id === id) return d.turns[i];
+    return null;
+  }
+
+  /* The next question: the first unanswered one whose prerequisite has been
+     met. Following the energy properly wants a model reading the transcript;
+     this is the honest offline version of it, and it never asks about a
+     marriage that was already said not to exist. */
+  function nextQuestion() {
+    for (var i = 0; i < BANK.length; i++) {
+      var q = BANK[i];
+      if (answered(q.id)) continue;
+      if (d.asked.indexOf(q.id) !== -1) continue;
+      if (q.needs && !answered(q.needs)) continue;
+      var why = skipReason(q);
+      if (why) { noteSkip(q, why); continue; }
+      return q;
+    }
+    return null;
+  }
+
+  /* ---------------- interview rendering ---------------- */
+
+  function renderAsk() {
+    if (!d.subject) {
+      $("askHost").innerHTML =
+        '<p class="stage">Before anything else</p>' +
+        '<p class="q">Who is this for?</p>' +
+        '<p class="why">It only changes how the questions are worded. Nothing else.</p>' +
+        '<div class="actions">' +
+          '<button type="button" class="primary" id="s-me">It is about me</button>' +
+          '<button type="button" id="s-them">It is about someone who has died</button>' +
+        "</div>";
+      $("s-me").addEventListener("click", function () { setSubject("me"); });
+      $("s-them").addEventListener("click", function () { setSubject("them"); });
+      return;
+    }
+    if (!pending) {
+      $("askHost").innerHTML =
+        '<p class="stage">Enough to be going on with</p>' +
+        '<p class="q">That is the whole set.</p>' +
+        '<p class="why">Change any answer below, or switch to writing it straight through. ' +
+        'Save a copy before you close this.</p>';
+      return;
+    }
+    $("askHost").innerHTML =
+      '<p class="stage">' + esc(pending.stage) + "</p>" +
+      '<p class="q">' + esc(ask(pending)) + "</p>" +
+      (pending.why ? '<p class="why">' + esc(pending.why) + "</p>" : "") +
+      '<label class="vh" for="answer">' + esc(ask(pending)) + "</label>" +
+      '<textarea id="answer" placeholder="' + esc(pending.ph || "") + '"></textarea>' +
+      '<div class="actions">' +
+        '<button type="button" class="primary" id="next">Next question</button>' +
+        '<button type="button" class="quiet" id="skip">Skip this one</button>' +
+        '<p class="hint">You do not have to finish this. Every word is already saved.</p>' +
+      "</div>";
+
+    var ta = $("answer");
+    var prior = d.editing !== null && d.turns[d.editing] ? d.turns[d.editing].a : "";
+    ta.value = prior || d.draft || "";
+    ta.focus();
+    /* Banked on every keystroke. This is the only thing here nobody can
+       reconstruct from memory. */
+    ta.addEventListener("input", function () { d.draft = ta.value; save(); });
+    ta.addEventListener("keydown", function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); commit(); }
+    });
+    $("next").addEventListener("click", function () { commit(); });
+    $("skip").addEventListener("click", function () { commit(true); });
+  }
+
+  function commit(skip) {
+    var ta = $("answer");
+    var a = ta ? ta.value.trim() : "";
+    if (!skip && a && pending) {
+      if (d.editing !== null && d.turns[d.editing]) {
+        /* A correction goes back where it came from, so the order things were
+           said in survives. The wording being replaced is kept: "nothing is
+           destroyed to correct it" has to mean the words too, not only the
+           turn they sat in. */
+        var t0 = d.turns[d.editing];
+        if (t0.a !== a) {
+          t0.rev = t0.rev || [];
+          t0.rev.push({ a:t0.a, at:Date.now() });
+        }
+        t0.a = a;
+      } else {
+        d.turns.push({ id:pending.id, stage:pending.stage, q:ask(pending),
+                       a:a, priv:!!pending.priv });
+      }
+    }
+    d.editing = null;
+    d.draft = "";
+    if (skip && pending) d.asked.push(pending.id);
+    pending = skip && pending ? afterSkipping(pending.id) : nextQuestion();
+    d.pendingId = pending ? pending.id : null;
+    save(); renderThread(); renderWithheld(); renderAsk();
+  }
+
+  /* Skipping does not answer the question, so `nextQuestion` would hand back
+     the same one. Step past it without recording anything. */
+  function afterSkipping(id) {
+    var seen = false;
+    for (var i = 0; i < BANK.length; i++) {
+      var q = BANK[i];
+      if (q.id === id) { seen = true; continue; }
+      if (!seen) continue;
+      if (answered(q.id)) continue;
+      if (d.asked.indexOf(q.id) !== -1) continue;
+      if (q.needs && !answered(q.needs)) continue;
+      var why2 = skipReason(q);
+      if (why2) { noteSkip(q, why2); continue; }
+      return q;
+    }
+    return null;
+  }
+
+  /* Nothing is withheld quietly: the reason is named and the question is one
+     click away, so a rule guessing wrong costs the person nothing. */
+  function renderWithheld() {
+    d.withheld = d.withheld.filter(function (w) {
+      return !answered(w.id) && d.asked.indexOf(w.id) === -1;
+    });
+    if (!d.withheld.length) { $("withheld").innerHTML = ""; return; }
+    $("withheld").innerHTML =
+      "<h2>Not asked</h2>" +
+      d.withheld.map(function (w) {
+        var q = byId(w.id);
+        return '<p class="skipped">' +
+                 "<span>Left out because " + esc(w.why) + ": &ldquo;" +
+                 esc(q ? ask(q) : w.id) + "&rdquo;</span> " +
+                 '<button type="button" data-unskip="' + esc(w.id) + '">Ask it anyway</button>' +
+               "</p>";
+      }).join("");
+  }
+
+  function renderThread() {
+    $("toldHead").hidden = d.turns.length === 0;
+    $("thread").innerHTML = d.turns.map(function (t, i) {
+      if (i === d.editing) return "";
+      return '<div class="turn' + (t.priv ? " priv" : "") + '">' +
+               '<p class="t-q">' + esc(t.q) +
+                 (t.priv ? ' <span class="tag">kept apart</span>' : "") + "</p>" +
+               '<p class="t-a">' + esc(t.a) + "</p>" +
+               '<button type="button" data-edit="' + i + '">Change this answer</button>' +
+               '<button type="button" class="take" data-take="' + i + '">Take this back</button>' +
+             "</div>";
+    }).join("");
+  }
+
+  $("withheld").addEventListener("click", function (e) {
+    var b = e.target && e.target.closest ? e.target.closest("button[data-unskip]") : null;
+    if (!b) return;
+    var q = byId(b.getAttribute("data-unskip"));
+    if (!q) return;
+    /* Asked on request, and the rule does not get to withhold it again. */
+    q.forced = true;
+    d.withheld = d.withheld.filter(function (w) { return w.id !== q.id; });
+    pending = q;
+    d.pendingId = q.id;
+    d.draft = "";
+    save(); renderWithheld(); renderAsk();
+    var ta = $("answer"); if (ta) ta.focus();
+  });
+
+  /* ------------------------------------------------------------------
+     Taking something back.
+
+     Revision history protects against the accident — a lid closing, a slip,
+     a flat battery. It was never meant to overrule intent. Someone who
+     strikes a sentence about their son has made a decision about their own
+     record, and a product that quietly keeps it has taken their last
+     editorial authority away. Worse: a family reading the export later finds
+     words that were deliberately withdrawn.
+
+     So this removes the words themselves — the answer, every earlier wording
+     of it, and the copy that may already have been pulled into the long-form
+     draft. It is the one control here that is meant to be irreversible.
+     ------------------------------------------------------------------ */
+  $("thread").addEventListener("click", function (e) {
+    var tb = e.target && e.target.closest ? e.target.closest("button[data-take]") : null;
+    if (tb) {
+      var j = Number(tb.getAttribute("data-take"));
+      var gone = d.turns[j];
+      if (!gone) return;
+      if (!window.confirm("Take this back permanently?\n\nThis removes the words themselves, " +
+                          "not just the answer. It cannot be undone, and nobody will see them.")) return;
+      /* Out of the long-form draft too, if it was ever pulled in. */
+      if (gone.a && d.whole.indexOf(gone.a) !== -1) {
+        d.whole = d.whole.split(gone.a).join("").replace(/\n{3,}/g, "\n\n");
+      }
+      d.pulled = d.pulled.filter(function (id) { return id !== gone.id; });
+      d.turns.splice(j, 1);
+      if (d.editing === j) { d.editing = null; pending = null; d.pendingId = null; }
+      else if (d.editing !== null && d.editing > j) { d.editing -= 1; }
+      if (!pending) { pending = nextQuestion(); d.pendingId = pending ? pending.id : null; }
+      save(); renderThread(); renderWithheld(); renderWhole(); renderAsk();
+      return;
+    }
+    var b = e.target && e.target.closest ? e.target.closest("button[data-edit]") : null;
+    if (!b) return;
+    var i = Number(b.getAttribute("data-edit"));
+    var t = d.turns[i];
+    if (!t) return;
+    /* The turn stays in storage. Only `editing` lifts it off the page, so an
+       interrupted correction cannot destroy the answer being corrected. */
+    d.editing = i;
+    d.draft = "";
+    pending = byId(t.id) || { id:t.id, stage:t.stage, q:t.q, why:"", ph:"" };
+    d.pendingId = pending.id;
+    save(); renderThread(); renderWithheld(); renderAsk();
+    var ta = $("answer"); if (ta) ta.focus();
+  });
+
+  /* ---------------- long-form mode ---------------- */
+
+  function renderWhole() {
+    $("whole").value = d.whole;
+    countWords();
+  }
+  function countWords() {
+    var n = $("whole").value.trim() ? $("whole").value.trim().split(/\s+/).length : 0;
+    $("wordcount").textContent = n + (n === 1 ? " word" : " words");
+  }
+  $("whole").addEventListener("input", function () {
+    d.whole = $("whole").value; countWords(); save();
+  });
+
+  /* Answers flow into the long-form draft, never the other way. Writing is
+     additive; nothing a person typed is replaced by a machine. */
+  $("pullIn").addEventListener("click", function () {
+    if (!d.turns.length) return;
+    /* Only what has not been pulled in already. A person will click this
+       twice, and the old version doubled their life story when they did. */
+    var fresh = d.turns.filter(function (t) {
+      return !t.priv && d.pulled.indexOf(t.id) === -1;
+    });
+    if (!fresh.length) {
+      $("pullMsg").textContent = "Everything you have answered is already below.";
+      return;
+    }
+    var stage = "", out = [];
+    fresh.forEach(function (t) {
+      if (t.stage !== stage) { stage = t.stage; out.push("\n\n## " + stage + "\n"); }
+      out.push(t.a);
+      d.pulled.push(t.id);
+    });
+    var block = out.join("\n\n").replace(/^\s+/, "");
+    d.whole = d.whole.trim() ? d.whole.replace(/\s+$/, "") + "\n\n" + block : block;
+    $("pullMsg").textContent = "Added " + fresh.length + (fresh.length === 1 ? " answer." : " answers.");
+    renderWhole(); save();
+    $("whole").focus();
+  });
+
+  /* ---------------- modes ---------------- */
+
+  function setMode(m) {
+    d.mode = m;
+    $("askMode").hidden = m !== "ask";
+    $("writeMode").hidden = m !== "write";
+    $("m-ask").setAttribute("aria-pressed", m === "ask" ? "true" : "false");
+    $("m-write").setAttribute("aria-pressed", m === "write" ? "true" : "false");
+    save();
+    if (m === "write") { renderWhole(); }
+  }
+  function setSubject(v) {
+    d.subject = v;
+    pending = nextQuestion();
+    d.pendingId = pending ? pending.id : null;
+    save(); renderAsk();
+  }
+
+  $("m-ask").addEventListener("click", function () { setMode("ask"); });
+  $("m-write").addEventListener("click", function () { setMode("write"); });
+
+  /* ---------------- export and erase ---------------- */
+
+  $("export").addEventListener("click", function () {
+    var lines = ["# A life, in their own words", ""];
+    var priv = [];
+    if (d.turns.length) {
+      var stage = "";
+      d.turns.forEach(function (t) {
+        if (t.priv) { priv.push(t); return; }
+        if (t.stage !== stage) { stage = t.stage; lines.push("", "## " + stage, ""); }
+        lines.push("**" + t.q + "**", "", t.a, "");
+      });
+    }
+    if (d.whole.trim()) { lines.push("", "## Written straight through", "", d.whole.trim()); }
+    /* Kept apart, after a page break, and labelled so nobody reads it out. */
+    if (priv.length) {
+      lines.push("", "\\pagebreak", "", "---", "",
+                 "## Not for the funeral", "",
+                 "_This page is not part of the reading. It was set down separately and is meant " +
+                 "for the person it names._", "");
+      priv.forEach(function (t) { lines.push("**" + t.q + "**", "", t.a, ""); });
+    }
+    var blob = new Blob([lines.join("\n")], { type:"text/markdown;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "life-interview.md";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  });
+
+  /* Erasing is the one irreversible control here, so it asks twice and says
+     what it is about to take. */
+  $("erase").addEventListener("click", function () {
+    var n = d.turns.length + (d.whole.trim() ? 1 : 0);
+    if (!n) return;
+    if (!window.confirm("Erase everything on this device? " + d.turns.length +
+        " answer(s) and anything written straight through. Save a copy first if you want to keep it.")) return;
+    if (!window.confirm("Last check — this cannot be undone.")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    d = { turns:[], whole:"", draft:"", pendingId:null, editing:null, mode:"ask",
+          pulled:[], subject:null, withheld:[], asked:[], at:0 };
+    pending = nextQuestion();
+    renderThread(); renderWithheld(); renderWhole(); renderAsk(); setMode("ask");
+  });
+
+  /* ---------------- start ---------------- */
+
+  load();
+  pending = (d.pendingId && byId(d.pendingId)) || nextQuestion();
+  if (d.editing !== null && d.turns[d.editing]) {
+    pending = byId(d.turns[d.editing].id) || pending;
+  }
+  renderThread();
+  renderWithheld();
+  renderAsk();
+  renderWhole();
+  setMode(d.mode);
+})();
+</script>
+</body>
+</html>
