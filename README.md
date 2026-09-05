@@ -28,6 +28,24 @@ payment, or $350/month with no minimum. Leaving the discounted rate early recapt
 flat $200 — Sec. 5.2 allows $200 for each month given at the discount, but that is waived. Quoting the $150 on its own understates the model.
 A family is never shown a paywall.
 
+## Test drive on the hub page
+
+`index.html` carries a four-panel preview of where the product goes, behind one
+picker. Each panel deep-links, so you can send someone straight to the one you
+mean:
+
+| Link | Shows |
+|---|---|
+| `index.html#design` | The live stone — granite and shape, no price quoted |
+| `index.html#vr` | The turntable with a 5&prime;9&Prime; figure for scale |
+| `index.html#voice` | The narrowing conversation, 4,120 options down to 3 |
+| `index.html#plot` | Picking a space in an invented cemetery section |
+
+Three of the four are marked **In development** in the panel itself, not only in
+the caption, so the claim survives a screenshot. Nothing in them quotes a price
+and nothing holds a plot — both have to come from the real sheet and the real
+cemetery.
+
 ## Demo links
 
 Send these to a prospective client to walk through the whole flow:
