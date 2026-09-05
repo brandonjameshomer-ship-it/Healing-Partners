@@ -13,7 +13,7 @@
      ============================================================ */
   :root {
     --ground:#F6F7FB; --surface:#FFFFFF; --surface-2:#EDF0F7;
-    --ink:#191F33; --ink-2:#4A5473; --ink-3:#7C85A0;
+    --ink:#191F33; --ink-2:#4A5473; --ink-3:#5F6884;
     --line:#DEE3EF; --line-strong:#C6CDDF;
     --accent:#A8761F; --accent-ink:#6F4C10; --accent-soft:#F6EBD3;
     --on-accent:#2A1E08;
@@ -29,7 +29,7 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --ground:#101426; --surface:#181D34; --surface-2:#212740;
-      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#79819F;
+      --ink:#E8EBF6; --ink-2:#A6AECA; --ink-3:#8C94B2;
       --line:#2A3150; --line-strong:#3A4266;
       --accent:#E0B166; --accent-ink:#F0CD93; --accent-soft:#33291A;
       --on-accent:#241A06;
@@ -464,8 +464,12 @@
   /* turns: [{ id, area, label, q, a }] — one per question the family answered,
      in the order they were asked. Replaces the old fixed `answers` map, which
      could only ever hold the ten questions this file happened to ship with. */
+  /* draft/pendingQ/editing exist so a refresh, a closed tab or a flat battery
+     cannot take words the family cannot retype. draft is the answer still in
+     the box; pendingQ is the question it belongs to; editing is the index of
+     the turn being corrected, which stays in `turns` while it is off-thread. */
   var d = { name:"", known:"", born:"", died:"", turns:[], words:[], weights:{},
-            done:false, enoughHint:false };
+            done:false, enoughHint:false, draft:"", pendingQ:null, editing:null };
   var page = 1;
 
   function $(id) { return document.getElementById(id); }
@@ -507,6 +511,9 @@
       d.words = o.words || []; d.weights = o.weights || {};
       d.done = o.done === true;
       d.turns = Array.isArray(o.turns) ? o.turns : [];
+      d.draft = typeof o.draft === "string" ? o.draft : "";
+      d.pendingQ = (o.pendingQ && typeof o.pendingQ === "object") ? o.pendingQ : null;
+      d.editing = (typeof o.editing === "number" && o.editing >= 0) ? o.editing : null;
       /* A save written by the fixed-form version. Carry it forward rather than
          making someone mid-interview start again. */
       if (!d.turns.length && o.answers) {
@@ -538,6 +545,7 @@
   /* ---- what has been said, oldest first ---- */
   function renderThread() {
     $("thread").innerHTML = d.turns.map(function (t, i) {
+      if (i === d.editing) return "";
       return '<div class="turn">' +
                '<p class="t-q">' + esc(t.q) + "</p>" +
                '<p class="t-a">' + esc(t.a) + "</p>" +
@@ -553,9 +561,16 @@
     var t = d.turns[i];
     if (!t) return;
     /* Put it back on the table. Anything asked after it still stands —
-       the family is correcting one answer, not restarting. */
-    d.turns.splice(i, 1);
+       the family is correcting one answer, not restarting.
+
+       The turn stays in `turns`; only `editing` takes it off the thread. It
+       used to be spliced out and held in memory, which meant a refresh while
+       correcting an answer destroyed it, and a second click spliced a
+       different turn because the indices had shifted underneath. */
+    d.editing = i;
+    d.draft = "";
     pending = { id:t.id, area:t.area, label:t.label, q:t.q, why:"", ph:"", prefill:t.a };
+    d.pendingQ = pending;
     d.done = false;
     save(); renderThread(); renderAsk();
   });
@@ -594,8 +609,11 @@
       "</div>";
 
     var ta = $("answer");
-    ta.value = pending.prefill || "";
+    ta.value = pending.prefill || d.draft || "";
     ta.focus();
+    /* Banked on every keystroke, like the identity fields above. These are
+       paragraphs nobody can retype from memory. */
+    ta.addEventListener("input", function () { d.draft = ta.value; save(); });
     ta.addEventListener("keydown", function (e) {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); commit(); }
     });
@@ -610,8 +628,17 @@
     var ta = $("answer");
     var a = ta ? ta.value.trim() : "";
     if (a && pending) {
-      d.turns.push({ id:pending.id, area:pending.area, label:pending.label, q:pending.q, a:a });
+      if (d.editing !== null && d.turns[d.editing]) {
+        /* A correction goes back where it came from, so the order the family
+           said things in survives. An emptied box leaves the original alone. */
+        d.turns[d.editing].a = a;
+      } else {
+        d.turns.push({ id:pending.id, area:pending.area, label:pending.label, q:pending.q, a:a });
+      }
     }
+    d.editing = null;
+    d.draft = "";
+    d.pendingQ = null;
     pending = null;
     if (stop) { d.done = true; save(); renderThread(); renderAsk(); return; }
     save(); renderThread();
@@ -622,7 +649,7 @@
   function advance() {
     if (d.done || pending || busy) { renderAsk(); return; }
 
-    if (!live()) { pending = nextFallback(); renderThread(); renderAsk(); return; }
+    if (!live()) { pending = nextFallback(); d.pendingQ = pending; save(); renderThread(); renderAsk(); return; }
 
     busy = true; renderAsk();
     askServer(function (q) {
@@ -630,6 +657,7 @@
       /* Any failure at all lands on the fixed list. The family sees a
          question either way and is never told the machine broke. */
       pending = q || nextFallback();
+      d.pendingQ = pending; save();
       renderAsk();
     });
   }
@@ -899,6 +927,9 @@
 
   /* ---------- boot ---------- */
   load();
+  /* Put the family back on the question they were answering, so the draft
+     below lands under the words that prompted it. */
+  if (d.pendingQ && !d.done) pending = d.pendingQ;
   $("f-first").value = d.name;
   $("f-known").value = d.known;
   $("f-born").value  = d.born;
