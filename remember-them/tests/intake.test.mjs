@@ -4,6 +4,7 @@ import fs from "fs";
 const html = fs.readFileSync(new URL("../intake.html", import.meta.url), "utf8");
 let fail = 0;
 const ok = (c, m) => { console.log((c ? "  PASS  " : "  FAIL  ") + m); if (!c) fail++; };
+const eq = (m, got, want) => ok(got === want, m + " (got " + got + ", expected " + want + ")");
 
 const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://example.test/intake.html" });
 const { window } = dom;
@@ -45,6 +46,37 @@ ok($("answer").value.startsWith("The creek"), "the previous words are still ther
 type($("answer"), "The creek behind the house, every summer until she was twelve.");
 click($("ansNext"));
 ok(doc.querySelectorAll("#thread .turn").length === 1, "the correction lands back in the thread");
+
+console.log("\n--- words nobody can retype ---");
+
+/* The answer still in the box is the only thing on this page that cannot be
+   reconstructed from memory. It has to survive a refresh, a closed lid and a
+   flat battery, not only a committed click. */
+const store = () => JSON.parse(doc.defaultView.localStorage.getItem("rt.intake.v1"));
+type($("answer"), "He proposed on the platform at Union Station, in the rain.");
+ok(store().draft && store().draft.indexOf("Union Station") !== -1,
+   "an uncommitted answer is banked on every keystroke");
+ok(store().pendingQ && store().pendingQ.q,
+   "and the question it belongs under is banked with it, so it comes back in place");
+
+console.log("\n--- a correction interrupted halfway ---");
+
+/* Correcting an answer used to splice it out of storage and keep the only copy
+   in memory, so a refresh mid-correction destroyed it and a second click
+   destroyed a different turn, the indices having shifted underneath. */
+const beforeEdit = store().turns.length;
+click(doc.querySelector("#thread button[data-edit]"));
+eq("the turn being corrected is still in storage", store().turns.length, beforeEdit);
+eq("it is marked off-thread rather than deleted", store().editing, 0);
+eq("while the family still sees it lifted off the thread",
+   doc.querySelectorAll("#thread .turn").length, beforeEdit - 1);
+ok($("answer").value.startsWith("The creek"), "and the words are in the box to correct");
+
+click($("ansNext"));
+eq("committing writes it back in place rather than appending", store().turns.length, beforeEdit);
+ok(store().turns[0].a.indexOf("every summer until she was twelve") !== -1,
+   "with the text intact");
+ok(store().editing === null && !store().draft, "and the edit state cleared behind it");
 
 console.log("\n--- ending the interview ---");
 type($("answer"), "Thirty-one years teaching third grade at the same school.");
