@@ -225,6 +225,10 @@
   .vr.added .tag { background:var(--surface); color:var(--yes); }
   .vh { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);
         white-space:nowrap; }
+  /* Touch screens: the entry links are the primary path in, so give them a 44px target. */
+  @media (pointer:coarse) {
+    .masthead-in .skip { display:inline-flex; align-items:center; min-height:2.75rem; }
+  }
 </style>
 </head>
 <body>

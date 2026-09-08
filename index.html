@@ -306,6 +306,13 @@
   footer.site .spacer { margin-left:auto; }
 
   @media (max-width:34rem) { :root { --f-3xl:2.25rem; } .hero { padding:3.5rem 0 3rem; } }
+  /* Touch screens: 44px minimum on the test-drive controls (Apple HIG / WCAG 2.5.8).
+     The plot grid is excluded on purpose: eight 44px plots plus the path do not fit
+     in 320px, and the plots already clear the 24px AA floor. */
+  @media (pointer:coarse) {
+    .chip, .ahead-pick { min-height:2.75rem; }
+    .panel-go { display:inline-flex; align-items:center; min-height:2.75rem; }
+  }
 </style>
 </head>
 <body>
@@ -368,10 +375,12 @@
       <div class="ahead-head">
         <label class="ahead-label" for="aheadPick">Test drive what&rsquo;s coming</label>
         <select class="ahead-pick" id="aheadPick">
-          <option value="design">Design and pricing &mdash; available now</option>
-          <option value="vr">Explore in VR and AR &mdash; in development</option>
-          <option value="voice">Guided by voice &mdash; in development</option>
-          <option value="plot">Grave site and niche selection &mdash; in development</option>
+          <!-- Status first: the closed control clips its tail at 320px, and
+               the tail was carrying the only warning in the picker. -->
+          <option value="design">Available now &mdash; Design and pricing</option>
+          <option value="vr">In development &mdash; Explore in VR and AR</option>
+          <option value="voice">In development &mdash; Guided by voice</option>
+          <option value="plot">In development &mdash; Grave site and niche selection</option>
         </select>
       </div>
 

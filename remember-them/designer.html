@@ -168,7 +168,8 @@
   .sizes select {
     width:100%; padding:.55rem .65rem; border-radius:.5rem;
     border:1px solid var(--line); background:var(--surface); color:var(--ink);
-    font:inherit; font-size:var(--f-sm);
+    /* never below 16px: iOS Safari zooms the page when a smaller control takes focus */
+    font:inherit; font-size:max(1rem, var(--f-sm));
   }
   .cost table { width:100%; border-collapse:collapse; font-size:var(--f-sm); }
   .cost td { padding:.3rem 0; color:var(--ink-2); vertical-align:top; }
@@ -258,6 +259,10 @@
     z-index:10; max-width:90vw; text-align:center;
   }
   .toast.show { opacity:1; }
+  /* Touch screens: a 44px minimum on the small controls (Apple HIG / WCAG 2.5.8). */
+  @media (pointer:coarse) {
+    .btn-quiet { min-height:2.75rem; }
+  }
 </style>
 </head>
 <body>
