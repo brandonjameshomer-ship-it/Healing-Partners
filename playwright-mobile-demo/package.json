@@ -1,0 +1,23 @@
+{
+  "name": "playwright-mobile-demo",
+  "version": "1.0.0",
+  "description": "Cross-device browser tests for the Healing Partners hub page and Remember Them",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:desktop": "playwright test --project=\"Desktop Chrome\" --project=\"Desktop Firefox\" --project=\"Desktop Safari\"",
+    "test:phones": "playwright test --project=\"iPhone SE\" --project=\"Galaxy S9+\" --project=\"Galaxy S24\" --project=\"iPhone 15\" --project=\"Pixel 8\" --project=\"iPhone 16 Pro Max\"",
+    "test:tablets": "playwright test --project=\"iPad (gen 7)\" --project=\"iPad Pro 11 landscape\"",
+    "test:hub": "playwright test tests/hub.spec.js",
+    "test:remember-them": "playwright test tests/remember-them.spec.js",
+    "report": "playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.5.0"
+  }
+}
