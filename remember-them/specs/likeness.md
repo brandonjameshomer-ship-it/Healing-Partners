@@ -188,10 +188,30 @@ guarantee.
 Kept because the constraints are real and the decision above may be revisited by someone who does
 not have this document.
 
-**Licensing rules out the obvious route.** SAM and Lifespan Age Transformation Synthesis sit on
-StyleGAN2/FFHQ weights under NVIDIA's non-commercial terms, and LATS is CC BY-NC-SA. Shipping them
-in a paid product is a licence violation before it is a design question. LATS is also 256px across
-six discrete age buckets, and neither supports conditioning on other faces.
+**Licensing rules out the obvious route, but not for the reason first given.** Checked against the
+licence files themselves in September 2026:
+
+| Project | Code licence | The binding constraint |
+|---|---|---|
+| SAM (Alaluf, SIGGRAPH 2021) | MIT | Weights trained on FFHQ-Aging |
+| Lifespan Age Transformation Synthesis | CC BY-NC-SA 4.0 | The repository licence itself |
+| FADING (BMVC 2023) | no licence file | Unlicensed means all rights reserved |
+| PhotoMaker | Apache-2.0, code and weights | Base model SDXL, OpenRAIL++-M |
+| insightface models | code MIT | *"models trained with these data are available for non-commercial research purposes only"* |
+
+SAM's own licence is MIT, and so is the StyleGAN2 implementation it builds on. What blocks it is
+**FFHQ, which is CC BY-NC-SA 4.0**, and that flows into any weights trained on the dataset. The
+distinction matters: a permissively licensed reimplementation of the architecture solves nothing,
+because the restriction lives in the training data rather than in the code.
+
+FFHQ carries a second condition that has nothing to do with money and may reach further. The dataset
+*"is not intended for, and should not be used for, development or improvement of facial recognition
+technologies."* Whether an identity-conditioned aging pipeline falls inside that sentence is a
+question for a lawyer and not for this document.
+
+On maintenance: LATS shows no activity since August 2020 and documents its own Google Drive quota
+failures, so assume its weights are unreliable. Neither SAM nor LATS supports conditioning on other
+faces, and LATS is bucketed into discrete age classes.
 
 **The licensed path** is PhotoMaker (Apache-2.0) on SDXL (OpenRAIL++-M), whose stacked-ID embedding
 averages the identities of its inputs — so two or three photographs of the child plus one or two of
