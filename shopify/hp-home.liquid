@@ -36,7 +36,7 @@
 .hp-h .steps li:before{content:counter(s);position:absolute;left:1.75rem;top:1.625rem;width:2rem;height:2rem;border-radius:50%;background:var(--brasssoft);color:var(--brass);font-family:var(--serif);font-weight:700;display:grid;place-items:center}
 .hp-h .steps h3{font-size:1.0625rem}
 .hp-h .steps p{font-size:.9688rem;color:var(--ink2);margin-top:.3125rem}
-.hp-h .plans{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:2.5rem}
+.hp-h .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1.25rem;margin-top:2.5rem}
 .hp-h .plan{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:2rem}
 .hp-h .plan.pick{border:2px solid var(--brass);box-shadow:0 16px 40px -24px rgba(168,118,31,.6)}
 .hp-h .flag{display:inline-block;background:var(--brasssoft);color:var(--brass);font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3125rem .625rem;border-radius:999px;margin-bottom:1rem}
@@ -95,40 +95,55 @@
 <div class="band"><div class="in">
   <p class="eyebrow">Pricing</p>
   <h2 class="hd">Families never pay to design. Funeral homes subscribe.</h2>
-  <p class="lede narrow">Three days free either way. There is also a share of marker sales, and it falls as your volume rises &mdash; the more you use it, the less each sale costs you.</p>
+  <p class="lede narrow">Start at $75 a month, pay $2 a design if you go over, and never pay more than $325 in any month however many you make. No commission on anything you sell, and no minimum term.</p>
   <div class="plans">
     <div class="plan pick">
-      <span class="flag">Partner rate</span>
-      <div class="amt">$150 <small>/ month</small></div>
-      <h3>Six-month term</h3>
+      <span class="flag">Start here</span>
+      <div class="amt">$75 <small>/ month</small></div>
+      <h3>Essentials &mdash; up to 50 designs</h3>
       <ul class="terms">
-        <li>Per funeral home, automatic payment</li>
-        <li>Six-month initial term, then month to month</li>
-        <li>Leave early and the discount is recaptured &mdash; a flat $200</li>
+        <li>A single-location home doing two or three markers a month</li>
+        <li>$2 for each design beyond 50</li>
+        <li>Month to month, no minimum term</li>
       </ul>
-      <div class="cta"><a class="btn btn1" href="https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02" target="_blank" rel="noopener">Start the 3-day trial</a></div>
+      <div class="cta"><a class="btn btn1" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20beta">Ask about the beta</a></div>
     </div>
     <div class="plan">
-      <span class="flag" style="background:#EDEFF6;color:#79819F">No commitment</span>
-      <div class="amt">$350 <small>/ month</small></div>
-      <h3>Month to month</h3>
+      <span class="flag" style="background:#EDEFF6;color:#79819F">More volume</span>
+      <div class="amt">$225 <small>/ month</small></div>
+      <h3>Professional &mdash; 51 to 200 designs</h3>
       <ul class="terms">
-        <li>Per funeral home, no minimum term</li>
-        <li>Cancel any month with nothing further owed</li>
-        <li>Nothing you have made is deleted</li>
+        <li>A busy home or a small monument dealer</li>
+        <li>$2 for each design beyond 200</li>
+        <li>Month to month, no minimum term</li>
       </ul>
-      <div class="cta"><a class="btn" href="https://brandonjameshomer-ship-it.github.io/Healing-Partners/pay.html" target="_blank" rel="noopener">Start month to month</a></div>
+      <div class="cta"><a class="btn" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20beta">Ask about the beta</a></div>
+    </div>
+    <div class="plan">
+      <span class="flag" style="background:#EDEFF6;color:#79819F">No counting</span>
+      <div class="amt">$325 <small>/ month</small></div>
+      <h3>Unlimited &mdash; no design limit</h3>
+      <ul class="terms">
+        <li>A regional dealer, or anyone whose months are uneven</li>
+        <li>No allotment and no overage &mdash; stop thinking about it</li>
+        <li>Month to month, no minimum term</li>
+      </ul>
+      <div class="cta"><a class="btn" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20beta">Ask about the beta</a></div>
     </div>
   </div>
-  <p class="fine" style="margin-top:1.5rem">Full terms, the commission schedule and the insurance discount are on the <a href="https://brandonjameshomer-ship-it.github.io/Healing-Partners/pricing.html" target="_blank" rel="noopener" style="text-decoration:underline">pricing page</a>.</p>
-</div></div>
-
+  <p class="fine" style="margin-top:1.5rem">
+    Beta rates, which are half the standard $149 / $449 / $649 and are held for the whole beta.
+    Your first account &mdash; the owner or administrator &mdash; is included; each additional person is
+    $75 a month during the beta. The first seven days, or your first three memorials, whichever ends
+    later, are free, and designs made in that time do not count. Thirty days&rsquo; notice to leave,
+    either way, and you can export everything for sixty days afterwards.
+  </p>
 <div class="band"><div class="in">
   <p class="eyebrow">Privacy</p>
   <h2 class="hd">The families' information stays theirs.</h2>
   <div class="privacy"><ul>
     <li><span><b>We do not train AI on your content or on family information.</b> Not on the stories a family tells, not on the designs you make. That is a written commitment in the Partner agreement, not a setting.</span></li>
-    <li><span><b>You are the controller of that information; we only process it for you.</b> Export it any time during your subscription and for thirty days after.</span></li>
+    <li><span><b>You are the controller of that information; we only process it for you.</b> Export it any time during your subscription and for sixty days after.</span></li>
     <li><span><b>Designs stay in the browser while you work.</b> Nothing is uploaded while you are designing.</span></li>
     <li><span><b>Deleted within ninety days</b> of a subscription ending.</span></li>
   </ul></div>
@@ -136,9 +151,9 @@
 
 <div class="band dark"><div class="in narrow" style="text-align:center">
   <h2 class="hd">Try it on a real arrangement this week.</h2>
-  <p class="lede">Three days free. If it does not save you hours on the first memorial you use it for, cancel and you are not charged.</p>
+  <p class="lede">Seven days free, or your first three memorials &mdash; whichever ends later. If it does not save you hours on the first memorial you use it for, walk away and nothing is charged.</p>
   <div class="cta" style="justify-content:center">
-    <a class="btn btn1" href="https://buy.stripe.com/bJeaER6Vu47H3ddbMRbsc02" target="_blank" rel="noopener">Start the 3-day trial</a>
+    <a class="btn btn1" href="mailto:bhomer@healingpartners.us?subject=Remember%20Them%20beta">Ask about the beta</a>
     <a class="btn" href="/pages/for-funeral-homes">Read the full case</a>
   </div>
   <p class="fine" style="margin-top:1.75rem;color:#8C94B4">Questions: <a href="mailto:bhomer@healingpartners.us" style="text-decoration:underline">bhomer@healingpartners.us</a></p>
