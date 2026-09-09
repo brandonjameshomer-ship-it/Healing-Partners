@@ -263,9 +263,33 @@
   @media (pointer:coarse) {
     .btn-quiet { min-height:2.75rem; }
   }
+
+  /* ---- site chrome: the designer had neither a way out nor a footer ---- */
+  .sitenav { border-bottom:1px solid var(--line); background:var(--surface); }
+  .sitenav .in { max-width:78rem; margin:0 auto; padding:.6rem 1rem;
+                 display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; }
+  .sitenav .spacer { flex:1 1 auto; }
+  .sitenav a { color:var(--ink-2); text-decoration:none; font-size:.9rem; }
+  .sitenav a:hover { color:var(--ink); text-decoration:underline; }
+  .sitenav .brand { font-weight:600; color:var(--ink); }
+  .sitenav .brand span { font-weight:400; color:var(--ink-3); }
+  .sitefoot { border-top:1px solid var(--line); margin-top:2.5rem; background:var(--surface); }
+  .sitefoot .in { max-width:78rem; margin:0 auto; padding:1.75rem 1rem 2.5rem; }
+  .sitefoot .note { color:var(--ink-3); font-size:.82rem; max-width:60ch; margin:0 0 .75rem; }
+  .sitefoot .links { display:flex; flex-wrap:wrap; gap:1.25rem; margin:0 0 1rem; }
+  .sitefoot .links a { color:var(--ink-2); font-size:.88rem; }
+  @media (pointer:coarse) { .sitenav a, .sitefoot .links a { min-height:2.75rem; display:inline-flex; align-items:center; } }
 </style>
 </head>
 <body>
+<nav class="sitenav" aria-label="Site">
+  <div class="in">
+    <a class="brand" href="../index.html">Healing&nbsp;Partners <span>&middot; Remember&nbsp;Them</span></a>
+    <span class="spacer"></span>
+    <a href="index.html">Start over</a>
+    <a href="../index.html">Home</a>
+  </div>
+</nav>
 <div class="trialbar" id="trialbar">
   <div class="in">
     <span id="trialText"></span>
@@ -361,13 +385,13 @@
 <div class="paywall" id="paywall" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
   <div class="paywall-card">
     <div class="lamp" aria-hidden="true"></div>
-    <h2 id="pwTitle">Your trial has ended</h2>
-    <p>You had three days with Remember Them. To keep designing for the families you serve, continue with a professional subscription.</p>
-    <div class="price">$150</div>
-    <div class="per">per month · cancel any time</div>
-    <a class="btn btn-primary" id="pwSubscribe" href="../pricing.html">Continue for $150/month</a>
+    <h2 id="pwTitle">Your free trial has ended</h2>
+    <p>Your free trial has ended. To keep designing for the families you serve, continue with a subscription.</p>
+    <div class="price">$75</div>
+    <div class="per">per month during the beta &middot; up to 50 designs &middot; no minimum term</div>
+    <a class="btn btn-primary" id="pwSubscribe" href="https://healingpartners.us/pages/for-funeral-homes#pricing">See the plans</a>
     <a class="btn" id="pwTalk" href="#">Talk to us first</a>
-    <p class="fineprint">Every design you made is still saved and will be waiting when you subscribe.</p>
+    <p class="fineprint">Every design you made is still kept on this device. Once you subscribe, email us and we will unlock it here &mdash; nothing you made is lost.</p>
   </div>
 </div>
 
@@ -892,7 +916,7 @@
       if (n <= 2) bar.classList.add("urgent");
       $("trialText").innerHTML = "<strong>Professional trial</strong> — " +
         (n === 1 ? "last day" : n + " days left") + ".";
-      $("trialCta").textContent = n <= 2 ? "Subscribe for $150/month" : "See plans";
+      $("trialCta").textContent = n <= 2 ? "See the plans" : "See plans";
     } else if (a.mode === "expired") {
       wall.classList.add("on");
       document.body.classList.add("locked");
@@ -956,5 +980,20 @@
   if (fromLink) toast("Design opened from a link.");
 })();
 </script>
+
+<footer class="sitefoot">
+  <div class="in">
+    <p class="note">A screen cannot reproduce stone, bronze, etching or polish &mdash; the finished
+      memorial will differ, and that is not a design error (Partner User Agreement &sect;3.8).</p>
+    <p class="links">
+      <a href="../index.html">Home</a>
+      <a href="index.html">Start a new design</a>
+      <a href="https://healingpartners.us/pages/for-funeral-homes">For funeral homes</a>
+      <a href="mailto:bhomer@healingpartners.us">bhomer@healingpartners.us</a>
+    </p>
+    <p class="note">Healing Partners LLC supplies designs, proofs and production files. It does not
+      engrave, fabricate, transport, set or sell physical memorials.</p>
+  </div>
+</footer>
 </body>
 </html>

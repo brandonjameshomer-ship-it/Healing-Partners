@@ -1,0 +1,170 @@
+{%- comment -%}
+  About Healing Partners — /pages/about
+
+  Rendered through a custom-liquid section, the same way hp-home is, which is
+  what allows {% form 'contact' %} to work inside a page. The form posts to
+  Shopify and arrives at whatever address is set under
+  Settings → Notifications → Customer service email. Set that to
+  bhomer@healingpartners.us or the messages go nowhere useful.
+{%- endcomment -%}
+
+<div class="hp-a">
+<style>
+.hp-a{--ink:#12172B;--ink2:#454E6B;--ink3:#79819F;--line:#E2E6F0;--line2:#C9D0E2;
+  --ground:#F7F8FC;--surf:#FFF;--night:#12172B;--brass:#A8761F;--brasslit:#E0B166;--brasssoft:#F7EEDC;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  position:relative;width:100vw;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;
+  max-width:100vw;overflow-x:hidden;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.62;text-align:left;-webkit-font-smoothing:antialiased}
+.hp-a *{box-sizing:border-box}
+.hp-a p,.hp-a ul,.hp-a h1,.hp-a h2,.hp-a h3,.hp-a label{margin:0}
+.hp-a h1,.hp-a h2,.hp-a h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.14}
+.hp-a a{color:inherit}
+.hp-a .band{padding:5rem 1.5rem}
+.hp-a .band+.band{border-top:1px solid var(--line)}
+.hp-a .in{max-width:64rem;margin:0 auto}
+.hp-a .narrow{max-width:46rem}
+.hp-a .dark{background:var(--night);color:#EDEFF8;border-top:none!important}
+.hp-a .dark h1,.hp-a .dark h2{color:#FFF}
+.hp-a .eyebrow{font-family:var(--sans);font-size:.75rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--brass);margin-bottom:.875rem}
+.hp-a .dark .eyebrow{color:var(--brasslit)}
+.hp-a .hd{font-size:clamp(1.9rem,4vw,2.6rem)}
+.hp-a .lede{font-size:1.1875rem;color:var(--ink2);margin-top:1.125rem}
+.hp-a .dark .lede{color:#B7BFDB}
+.hp-a .star{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1.3;
+  max-width:34ch;margin:0 auto;text-align:center}
+.hp-a .star em{font-style:italic;color:var(--brasslit)}
+.hp-a .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:2rem;margin-top:2.5rem}
+.hp-a .col h3{font-size:1.0625rem}
+.hp-a .col p{color:var(--ink2);font-size:.9375rem;margin-top:.5rem}
+
+/* ---- the form ---- */
+.hp-a form{margin-top:2rem;max-width:42rem}
+.hp-a .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem;margin-bottom:1rem}
+.hp-a .f{display:flex;flex-direction:column;gap:.375rem}
+.hp-a label{font-size:.8125rem;font-weight:600;color:var(--ink2)}
+.hp-a label .opt{font-weight:400;color:var(--ink3)}
+.hp-a input,.hp-a textarea{font:inherit;font-size:1rem;color:var(--ink);background:var(--surf);
+  border:1px solid var(--line2);border-radius:8px;padding:.7rem .8rem;width:100%}
+.hp-a textarea{min-height:9rem;resize:vertical}
+.hp-a input:focus-visible,.hp-a textarea:focus-visible,.hp-a button:focus-visible{
+  outline:2px solid var(--brass);outline-offset:2px}
+.hp-a button{font:inherit;font-family:var(--sans);font-size:1rem;font-weight:600;cursor:pointer;
+  background:var(--brass);color:#FFF;border:1px solid var(--brass);border-radius:999px;
+  padding:.75rem 1.6rem;min-height:2.75rem}
+.hp-a button:hover{background:#8F6318;border-color:#8F6318}
+.hp-a .fine{font-size:.85rem;color:var(--ink3);margin-top:1rem;max-width:52ch}
+.hp-a .ok{background:var(--brasssoft);border:1px solid var(--brasslit);border-radius:10px;
+  padding:1rem 1.2rem;margin-bottom:1.5rem;color:var(--ink)}
+.hp-a .err{background:#FBEAE7;border:1px solid #D9A79E;border-radius:10px;
+  padding:1rem 1.2rem;margin-bottom:1.5rem;color:#7A2E22}
+.hp-a .err ul{padding-left:1.1rem;margin-top:.4rem}
+@media (pointer:coarse){.hp-a button{min-height:2.75rem}}
+</style>
+
+<div class="band dark"><div class="in narrow" style="text-align:center">
+  <p class="eyebrow">Healing Partners</p>
+  <h1 class="hd">Why this exists</h1>
+  <p class="lede">Designing memorials since 2008, in Portland, Oregon &mdash; and building the tools
+    I wanted on the other side of the desk.</p>
+</div></div>
+
+<div class="band"><div class="in">
+  <p class="star">Healing Transformation: to create <em>environments and tools</em> that influence
+    positive growth in healing transformation.</p>
+</div></div>
+
+<div class="band"><div class="in narrow">
+  <p class="eyebrow">What that means in practice</p>
+  <h2 class="hd">A memorial is the last thing a family decides together.</h2>
+  <p class="lede">It is permanent, it is expensive, and it is chosen in the worst week of their
+    lives &mdash; usually from a catalogue photograph and a paper order form. Most of what goes
+    wrong is not bad intention. It is a process that asks people to imagine something they have
+    never seen, and then hands them a proof weeks later with a date wrong.</p>
+  <div class="cols">
+    <div class="col">
+      <h3>Environments</h3>
+      <p>The arrangement room is where the decision actually happens. Anything we build has to work
+        in that room, on the machine that is already in it, with a director who is not a
+        technologist and a family who has not slept.</p>
+    </div>
+    <div class="col">
+      <h3>Tools</h3>
+      <p>Show them; don&rsquo;t ask them to imagine. The software interviews the family about the
+        person, narrows thousands of options to a few that fit, and draws the memorial as it is
+        built &mdash; so what comes back from the monument company is what they approved.</p>
+    </div>
+    <div class="col">
+      <h3>Positive growth</h3>
+      <p>Nothing here is designed to hurry a family or to sell them more. No countdown, no
+        scarcity, no pressure. Families never pay to design, and we take no share of what a funeral
+        home sells.</p>
+    </div>
+  </div>
+</div></div>
+
+<div class="band"><div class="in narrow">
+  <p class="eyebrow">Get in touch</p>
+  <h2 class="hd">Tell me what you are working with.</h2>
+  <p class="lede">Funeral director, monument dealer, or a family who wants to ask their director
+    about Remember Them &mdash; all of it reaches me directly.</p>
+
+  {% form 'contact' %}
+    {% if form.posted_successfully? %}
+      <p class="ok"><b>Thank you &mdash; that reached me.</b> I answer these myself, usually within
+        a day.</p>
+    {% endif %}
+    {% if form.errors %}
+      <div class="err">
+        <b>That didn&rsquo;t send.</b>
+        <ul>
+          {% for field in form.errors %}
+            <li>{{ form.errors.messages[field] }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="f">
+        <label for="c-name">Your name</label>
+        <input id="c-name" type="text" name="contact[name]" autocomplete="name" required
+               value="{{ form.name }}">
+      </div>
+      <div class="f">
+        <label for="c-company">Funeral home or company <span class="opt">(optional)</span></label>
+        <input id="c-company" type="text" name="contact[Company]" autocomplete="organization">
+      </div>
+    </div>
+    <div class="row">
+      <div class="f">
+        <label for="c-email">Email</label>
+        <input id="c-email" type="email" name="contact[email]" autocomplete="email" required
+               value="{{ form.email }}">
+      </div>
+      <div class="f">
+        <label for="c-phone">Phone <span class="opt">(optional)</span></label>
+        <input id="c-phone" type="tel" name="contact[Phone]" autocomplete="tel">
+      </div>
+    </div>
+    <div class="f" style="margin-bottom:1rem">
+      <label for="c-body">Message</label>
+      <textarea id="c-body" name="contact[body]" required>{{ form.body }}</textarea>
+    </div>
+    <button type="submit">Send it</button>
+    <p class="fine">Goes straight to Brandon. Nothing is added to a mailing list, and nothing about
+      a family you are arranging for should be put in this box &mdash; it is ordinary email.</p>
+  {% endform %}
+</div></div>
+
+<div class="band"><div class="in narrow">
+  <p class="fine" style="margin-top:0">Healing Partners LLC, 111 SW 5th Avenue, Floor 5, Portland,
+    Oregon 97204. Healing Partners is not a funeral establishment, cemetery, monument dealer,
+    manufacturer or installer. It supplies digital memorial designs, proofs and production files;
+    the funeral home chooses its fabricator, owns the transaction with the family, and sets its own
+    retail price.</p>
+</div></div>
+
+</div>
