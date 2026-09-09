@@ -134,7 +134,7 @@ device and there is nothing to debug in front of a funeral director.
     </a>
   </p>
   <p style="color:#7C85A0;font-size:.9375rem">
-    Three days free. $150 a month after that. Cancel any time.
+    Three days free. $150 a month after that on a six-month term, or $350 month to month.
   </p>
 </div>
 ```
