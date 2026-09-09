@@ -52,18 +52,23 @@ Send these to a prospective client to walk through the whole flow:
 
 | Link | Shows |
 |---|---|
-| `remember-them/` | What a family sees — no trial, no wall |
-| `remember-them/?plan=pro` | Starts a 3-day professional trial |
-| `remember-them/?trial=expired` | Jumps straight to the lock screen |
-| `remember-them/?unlock=1` | Behaves as a paying subscriber |
-| `remember-them/?trial=reset` | Puts the three days back |
+| `remember-them/` | What a family sees — nothing in their way |
+| `remember-them/?plan=pro` | Marks the browser as a funeral home's: the professional strip appears |
+| `remember-them/designer.html?demo=remind` | Brings up the subscribe card |
+| `remember-them/designer.html?demo=subscribed` | The strip as a subscriber sees it |
+| `remember-them/designer.html?demo=reset` | Forgets all of the above |
 
-## Important: the trial is not security
+## Important: the designer does not enforce payment
 
-The trial clock lives in the visitor's own browser. Clearing browser data or opening a
-private window resets it. This is good enough to *demonstrate* the product; it will not
-*enforce* payment. Enforcing it needs accounts, a server, and a payment processor —
-see `Access.state()` in the designer, which is the single function to replace.
+The designer has no sign-in, so it cannot tell who a visitor is or whether they pay.
+What it remembers lives in the visitor's own browser and is gone the moment site data is
+cleared or a private window is opened. It therefore never locks anything and never counts
+down to a deadline: the subscribe card asks, and closing it is always allowed. Saying
+otherwise on the page would be a claim the code cannot keep.
+
+The real three-day trial is Stripe's. It starts on the payment link, it takes a card, and
+Stripe enforces it. If the designer itself ever needs to gate, that needs accounts and a
+server — see `Access.state()` in the designer, which is the single function to replace.
 
 ## Saving your work
 

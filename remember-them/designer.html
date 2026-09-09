@@ -198,7 +198,7 @@
   .actions .btn { width:100%; text-align:center; text-decoration:none; display:block; }
   .fineprint { font-size:var(--f-xs); color:var(--ink-3); margin:.75rem 0 0; line-height:1.5; }
 
-  /* ---- Trial strip ---- */
+  /* ---- Professional strip ---- */
   .trialbar {
     display:none; align-items:center; gap:.75rem; flex-wrap:wrap;
     background:var(--accent-soft); border-bottom:1px solid var(--accent);
@@ -214,12 +214,11 @@
     border-bottom:1px solid currentColor;
   }
   .trialbar .cta a:hover { color:var(--ink); }
-  .trialbar.urgent { background:var(--accent); border-bottom-color:var(--accent-ink); }
-  .trialbar.urgent, .trialbar.urgent strong { color:var(--on-accent); }
-  .trialbar.urgent .cta a { color:var(--on-accent); }
 
-  /* ---- Expired lock ---- */
-  .locked .studio { filter:blur(5px) saturate(.55); pointer-events:none; user-select:none; }
+  /* ---- Subscribe card ----
+     A card that asks, over a page that still works. It is never a lock: this
+     page has no sign-in and cannot tell who is paying, so it must not pretend
+     to take anything away. Closing it is always available. */
   .paywall {
     display:none; position:fixed; inset:0; z-index:20;
     background:color-mix(in srgb, var(--ground) 82%, transparent);
@@ -385,13 +384,17 @@
 <div class="paywall" id="paywall" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
   <div class="paywall-card">
     <div class="lamp" aria-hidden="true"></div>
-    <h2 id="pwTitle">Your free trial has ended</h2>
-    <p>Your free trial has ended. To keep designing for the families you serve, continue with a subscription.</p>
-    <div class="price">$75</div>
-    <div class="per">per month during the beta &middot; up to 50 designs &middot; no minimum term</div>
+    <h2 id="pwTitle">Still designing?</h2>
+    <p>You have been using the designer for a few days now. It is a paid tool for the
+      funeral homes we work with &mdash; if it is earning its keep, please subscribe.</p>
+    <div class="price">$150</div>
+    <div class="per">per month on a six-month term &middot; unlimited designs &middot; or $350 month to month</div>
     <a class="btn btn-primary" id="pwSubscribe" href="https://healingpartners.us/pages/for-funeral-homes#pricing">See the plans</a>
     <a class="btn" id="pwTalk" href="#">Talk to us first</a>
-    <p class="fineprint">Every design you made is still kept on this device. Once you subscribe, email us and we will unlock it here &mdash; nothing you made is lost.</p>
+    <button class="btn btn-quiet" id="pwDismiss" type="button">Keep designing</button>
+    <p class="fineprint">Nothing here is locked and nothing is taken away. This page has no
+      sign-in, so it cannot tell who you are or whether you subscribe &mdash; we are asking,
+      not enforcing. Your designs stay in this browser either way.</p>
   </div>
 </div>
 
@@ -409,33 +412,42 @@
   /* ------------------------------------------------------ */
 
   /* ==========================================================================
-     ACCESS / TRIAL — the seam
+     ACCESS — the seam
      --------------------------------------------------------------------------
-     Decides whether the designer is usable. Today it reads this browser's own
-     storage, so a determined visitor can bypass it by clearing their data or
-     opening a private window. That is fine for showing the product to a
-     prospect; it is NOT security.
+     Decides how loudly, if at all, this page mentions that the designer is a
+     paid tool. It decides nothing else. There is no sign-in here, so the page
+     cannot know who you are or whether you pay: everything below lives in this
+     browser's own storage and is gone the moment site data is cleared or a
+     private window is opened.
 
-     When real billing exists, replace the body of Access.state() with a call
-     to your server:
+     So it must never claim to lock, expire, or take anything away, and it must
+     never count down to a deadline it cannot enforce. The real three-day trial
+     belongs to Stripe — it starts on the payment link, with a card, and Stripe
+     is what enforces it. This page's job is to ask.
+
+     When there is a sign-in and a server to ask, replace the body of
+     Access.state() with a call to it:
          var r = await fetch("/api/access", {credentials:"include"});
-         return await r.json();     // -> {mode:"trial", daysLeft:4}
+         return await r.json();     // -> {mode:"subscribed"}
      Nothing else needs to change — the rest of the app only reads .mode.
 
      Modes:
-       "open"        a family — unrestricted, no trial, never walled
-       "trial"       professional trial running, .daysLeft set
-       "expired"     professional trial finished — designer locked
-       "subscribed"  paying professional — unrestricted
+       "open"        a family — nothing shown, nothing in their way
+       "pro"         a funeral home's browser — the quiet strip along the top
+       "remind"      time to ask again — the strip, plus the subscribe card
+       "subscribed"  they have said they subscribe — the strip says so
 
-     Demo links, for showing a prospect the whole flow:
-       ?plan=pro          start a professional trial now
-       ?trial=reset       put the three days back
-       ?trial=expired     jump straight to the lock screen
-       ?unlock=1          behave as a paying subscriber
+     Demo links, for walking a prospect through it. Everything that changes
+     what is shown needs an explicit ?demo=, so that nobody arrives at one of
+     these by guessing a URL:
+       ?plan=pro          mark this browser as a funeral home's
+       ?demo=remind       bring up the subscribe card now
+       ?demo=subscribed   show the strip the way a subscriber sees it
+       ?demo=reset        forget all of the above
      ========================================================================== */
   var Access = (function () {
-    var TRIAL_DAYS = 3;
+    var ASK_AFTER = 3;   /* days of use before the card comes up at all */
+    var ASK_AGAIN = 7;   /* and how long we leave them alone after they close it */
     var TKEY = "healing-partners.remember-them.access.v1";
     var DAY  = 86400000;
 
@@ -451,16 +463,15 @@
       try { q = new URLSearchParams(location.search); }
       catch (e) { q = { get: function () { return null; } }; }
 
-      if (q.get("trial") === "reset") {
+      var demo = q.get("demo");
+      if (demo === "reset") {
         try { localStorage.removeItem(TKEY); } catch (e) {}
       }
-      if (q.get("trial") === "expired") {
-        write({ plan:"pro", started: Date.now() - (TRIAL_DAYS + 1) * DAY, subscribed:false });
+      if (demo === "remind") {
+        write({ plan:"pro", started: Date.now() - (ASK_AFTER + 1) * DAY, subscribed:false });
       }
-      if (q.get("unlock") === "1") {
-        var cur = read() || { plan:"pro", started: Date.now() };
-        cur.subscribed = true;
-        write(cur);
+      if (demo === "subscribed") {
+        write({ plan:"pro", started: Date.now(), subscribed:true });
       }
 
       var rec = read();
@@ -471,12 +482,23 @@
       if (!rec) return { mode:"open" };
       if (rec.subscribed) return { mode:"subscribed" };
 
-      var left = TRIAL_DAYS - Math.floor((Date.now() - rec.started) / DAY);
-      if (left <= 0) return { mode:"expired", daysLeft:0 };
-      return { mode:"trial", daysLeft:left };
+      /* Ask after a few days, then only every ASK_AGAIN days after they have
+         closed the card. Someone in the middle of a family's memorial should
+         not meet the same card every time the page reloads. */
+      var due = (rec.askedAt ? rec.askedAt + ASK_AGAIN * DAY
+                             : rec.started + ASK_AFTER * DAY);
+      return { mode: (Date.now() >= due ? "remind" : "pro") };
     }
 
-    return { state:state, TRIAL_DAYS:TRIAL_DAYS };
+    /* They read the card and closed it. */
+    function asked() {
+      var rec = read();
+      if (!rec) return;
+      rec.askedAt = Date.now();
+      write(rec);
+    }
+
+    return { state:state, asked:asked, ASK_AFTER:ASK_AFTER };
   })();
 
   var KEY = "healing-partners.remember-them.designs.v2";
@@ -904,33 +926,46 @@
 
   function applyAccess() {
     var a = Access.state();
-    var bar = $("trialbar"), wall = $("paywall");
+    var bar = $("trialbar"), card = $("paywall");
 
-    bar.classList.remove("on","urgent");
-    wall.classList.remove("on");
-    document.body.classList.remove("locked");
+    bar.classList.remove("on");
+    card.classList.remove("on");
 
-    if (a.mode === "trial") {
-      var n = a.daysLeft;
-      bar.classList.add("on");
-      if (n <= 2) bar.classList.add("urgent");
-      $("trialText").innerHTML = "<strong>Professional trial</strong> — " +
-        (n === 1 ? "last day" : n + " days left") + ".";
-      $("trialCta").textContent = n <= 2 ? "See the plans" : "See plans";
-    } else if (a.mode === "expired") {
-      wall.classList.add("on");
-      document.body.classList.add("locked");
-      $("pwSubscribe").focus();
-    } else if (a.mode === "subscribed") {
+    if (a.mode === "subscribed") {
       bar.classList.add("on");
       $("trialText").innerHTML = "<strong>Professional</strong> — subscription active.";
       $("trialCta").textContent = "Manage";
+    } else if (a.mode === "pro" || a.mode === "remind") {
+      bar.classList.add("on");
+      $("trialText").innerHTML = "<strong>Professional</strong> — the designer is a paid " +
+        "tool for funeral homes, $150 a month.";
+      $("trialCta").textContent = "See plans";
     }
-    /* mode "open" — a family. No bar, no wall, nothing in their way. */
+    /* mode "open" — a family. No strip, no card, nothing in their way. */
+
+    if (a.mode === "remind") {
+      card.classList.add("on");
+      $("pwDismiss").focus();
+    }
   }
+
+  /* Closing the card is always allowed — it asks, it does not gate. */
+  function closeSubscribeCard() {
+    var card = $("paywall");
+    if (!card.classList.contains("on")) return;
+    card.classList.remove("on");
+    Access.asked();
+  }
+
+  $("pwDismiss").onclick = closeSubscribeCard;
+  $("paywall").onclick = function (e) { if (e.target === this) closeSubscribeCard(); };
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeSubscribeCard();
+  });
 
   $("pwTalk").onclick = function (e) {
     e.preventDefault();
+    closeSubscribeCard();
     window.location.href = "mailto:" + encodeURIComponent(ORDER_EMAIL) +
       "?subject=" + encodeURIComponent("Remember Them — question about the professional plan");
   };

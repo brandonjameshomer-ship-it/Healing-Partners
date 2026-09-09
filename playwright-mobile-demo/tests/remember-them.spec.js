@@ -67,19 +67,34 @@ test.describe('remember them · flows', () => {
     expect(errors).toEqual([]);
   });
 
-  test('designer trial gate: trial bar, expiry wall, reset', async ({ page }, testInfo) => {
+  test('designer asks for a subscription without locking anything', async ({ page }, testInfo) => {
     await page.goto('/remember-them/designer.html?plan=pro');
     await expect(page.locator('#trialbar')).toHaveClass(/\bon\b/);
-    await expect(page.locator('#trialText')).toContainText(/days left|last day/);
+    await expect(page.locator('#trialText')).toContainText(/paid tool for funeral homes/);
+    /* No countdown: the page cannot enforce a deadline, so it must not show one. */
+    await expect(page.locator('#trialText')).not.toContainText(/days left|last day|trial/i);
+    await expect(page.locator('#paywall')).not.toHaveClass(/\bon\b/);
 
-    await page.goto('/remember-them/designer.html?trial=expired');
+    await page.goto('/remember-them/designer.html?demo=remind');
     await expect(page.locator('#paywall')).toHaveClass(/\bon\b/);
-    await expect(page.locator('body')).toHaveClass(/\blocked\b/);
-    await expect(page.locator('#pwSubscribe')).toBeFocused();
-    await expectNoHorizontalScroll(page, 'paywall');
-    await shot(page, testInfo, 'designer-paywall');
+    await expect(page.locator('#pwDismiss')).toBeFocused();
+    await expectNoHorizontalScroll(page, 'subscribe card');
+    await shot(page, testInfo, 'designer-subscribe-card');
 
-    await page.goto('/remember-them/designer.html?trial=reset');
+    /* The studio underneath is still the real thing, not a blurred hostage. */
+    await expect(page.locator('body')).not.toHaveClass(/\blocked\b/);
+
+    /* Closing it is always allowed, and it stays closed on the next visit. */
+    await page.locator('#pwDismiss').click();
+    await expect(page.locator('#paywall')).not.toHaveClass(/\bon\b/);
+    await page.locator('#f-name').fill('Ellen Ruth Mercer');
+    await expect(page.locator('#f-name')).toHaveValue('Ellen Ruth Mercer');
+
+    await page.goto('/remember-them/designer.html');
+    await expect(page.locator('#paywall')).not.toHaveClass(/\bon\b/);
+    await expect(page.locator('#trialbar')).toHaveClass(/\bon\b/);
+
+    await page.goto('/remember-them/designer.html?demo=reset');
     await expect(page.locator('#paywall')).not.toHaveClass(/\bon\b/);
     await expect(page.locator('#trialbar')).not.toHaveClass(/\bon\b/);
   });
