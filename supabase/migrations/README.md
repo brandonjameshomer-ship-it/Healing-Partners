@@ -15,6 +15,11 @@ Each file is idempotent where Postgres allows it (`if not exists`,
 | `0002_proof_approvals.sql` | Records proof approval as formal evidence and gates order status on it, per s3.3-s3.4 | yes |
 | `0003_commission_schedules.sql` | Replaces the superseded overlapping commission bands with the agreement's two schedules | **no** |
 | `0004_memorial_media.sql` | Records photographs and proofs stored in Cloudflare R2, and points proof approvals at a durable object rather than an expiring URL | **no** |
+| `0005_claude_archive.sql` | An `archive` schema for Claude Code transcripts — metadata and searchable text here, the verbatim `.jsonl` in R2. Kept out of `public` because transcripts can carry live credentials | **no** |
+
+`archive` must stay **off** the exposed-schemas list in the project's API
+settings. It holds engineering logs that may contain secrets, and the whole
+point of the separate schema is that PostgREST cannot reach it.
 
 ## Applying
 
