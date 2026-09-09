@@ -13,27 +13,29 @@ Each file is idempotent where Postgres allows it (`if not exists`,
 |---|---|---|
 | `0001_partner_retail_markup.sql` | Makes the 2.5x retail multiplier a Partner setting, per agreement s6.8 | yes |
 | `0002_proof_approvals.sql` | Records proof approval as formal evidence and gates order status on it, per s3.3-s3.4 | yes |
-| `0003_commission_schedules.sql` | Replaces the superseded overlapping commission bands with the agreement's two schedules | **no** |
-| `0004_memorial_media.sql` | Records photographs and proofs stored in Cloudflare R2, and points proof approvals at a durable object rather than an expiring URL | **no** |
+| `0003_commission_schedules.sql` | Replaces the superseded overlapping commission bands with the agreement's two schedules | yes |
+| `0004_memorial_media.sql` | Records photographs and proofs stored in Cloudflare R2, and points proof approvals at a durable object rather than an expiring URL | yes |
+| `0005_close_review_findings.sql` | Closes the September 2026 review: reporting views obey RLS, money columns are webhook/founder-only, `release_blockers()` is no longer anon-callable, the Sec. 5.2 recapture gets its own event type, and the model-backed functions get a per-user call budget | yes (2026-09-08) |
 
 ## Applying
 
-The CLI is linked to the project and authenticates without a database password:
+The repo itself is the CLI project (`supabase/config.toml`, created with
+`supabase init`; the link state lives in the git-ignored `supabase/.temp/`).
+From the repo root:
 
 ```sh
-cd ~ && supabase db push --linked
+supabase login                                       # once per machine; browser approval
+supabase link --project-ref zhtjgigkgpzrzeaqjwsv     # once per checkout; asks for the DB password
+supabase db push --linked                            # applies whatever is pending, in order
+supabase migration list --linked                     # Local and Remote columns should match
 ```
 
-`db push` needs every remote version present locally before it will run, so
-fetch the whole directory, not just the outstanding file:
+Edge functions deploy from the same place, with each function's `verify_jwt`
+pinned in `config.toml` (off for `stripe-webhook`, whose Stripe signature is
+its authentication; on for the rest):
 
 ```sh
-mkdir -p ~/supabase/migrations && cd ~/supabase/migrations
-for f in 0001_partner_retail_markup 0002_proof_approvals 0003_commission_schedules \
-         0004_memorial_media; do
-  gh api -H "Accept: application/vnd.github.raw" \
-    repos/brandonjameshomer-ship-it/Healing-Partners/contents/supabase/migrations/$f.sql > $f.sql
-done
+supabase functions deploy stripe-webhook interview classify-story media-sign
 ```
 
 The alternative is the SQL editor at

@@ -88,6 +88,24 @@ Deno.serve(async (req) => {
     if (!authHeader.startsWith("Bearer ")) {
       return new Response("Unauthorized", { status: 401, headers: cors });
     }
+    // A bearer header alone is not authorization: the public anon key is a
+    // valid JWT too. Require a signed-in user and ask the database for a call
+    // budget before spending model tokens (migration 0005). A refusal is a
+    // soft reply — the browser falls back to keyword tagging.
+    if (!jwtClaims(authHeader)?.sub) {
+      return new Response("Unauthorized", { status: 401, headers: cors });
+    }
+    {
+      const gate = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } },
+      );
+      const { data: allowed, error: gateErr } =
+        await gate.rpc("allow_model_call", { p_kind: "classify", p_per_hour: 30 });
+      if (gateErr) { console.warn("call budget unavailable:", gateErr.message); return json({ themes: [], traits: [], places: [], confidence: 0, reason: "unavailable" }, cors); }
+      if (!allowed) return json({ themes: [], traits: [], places: [], confidence: 0, reason: "rate_limited" }, cors);
+    }
 
     const { story, memorial_id } = await req.json();
     if (!story || typeof story !== "string" || story.trim().length < 20) {
@@ -114,7 +132,7 @@ Deno.serve(async (req) => {
           content:
             `Allowed themes: ${ALLOWED_THEMES.join(", ")}\n` +
             `Allowed traits: ${ALLOWED_TRAITS.join(", ")}\n\n` +
-            `Account:\n${redact(story)}`,
+            `Account:\n${redact(String(story).slice(0, 6000))}`,
         }],
       }),
     });
@@ -169,6 +187,14 @@ Deno.serve(async (req) => {
   }
 });
 
+/* The gateway has already verified the signature; this only reads the claims. */
+function jwtClaims(header: string): { sub?: string; role?: string } | null {
+  try {
+    const part = header.slice(7).split(".")[1];
+    const pad = part + "=".repeat((4 - part.length % 4) % 4);
+    return JSON.parse(atob(pad.replace(/-/g, "+").replace(/_/g, "/")));
+  } catch { return null; }
+}
 function arr(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
 }

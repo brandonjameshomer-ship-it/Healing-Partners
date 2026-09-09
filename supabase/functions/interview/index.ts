@@ -4,7 +4,11 @@
 // Secrets: supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 //          supabase secrets set ALLOWED_ORIGINS=https://healingpartners.us,https://...
 //
-// Deployed WITH jwt verification (the default), same as classify-story.
+// Deployed WITH jwt verification (the default), same as classify-story. The
+// gateway checks the signature; this file checks there is a signed-in user
+// behind it and asks the database for a call budget (migration 0005).
+//
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //
 // ---------------------------------------------------------------------------
 // Why this exists
@@ -134,6 +138,24 @@ Deno.serve(async (req) => {
     if (!authHeader.startsWith("Bearer ")) {
       return new Response("Unauthorized", { status: 401, headers: cors });
     }
+    // A bearer header alone is not authorization: the public anon key is a
+    // valid JWT too. Require a signed-in user (anonymous share-link sessions
+    // qualify) and ask the database for a call budget before spending model
+    // tokens. A refusal is a soft reply — the browser carries on without the model.
+    if (!jwtClaims(authHeader)?.sub) {
+      return new Response("Unauthorized", { status: 401, headers: cors });
+    }
+    {
+      const gate = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } },
+      );
+      const { data: allowed, error: gateErr } =
+        await gate.rpc("allow_model_call", { p_kind: "interview", p_per_hour: 60 });
+      if (gateErr) { console.warn("call budget unavailable:", gateErr.message); return json({ reason: "unavailable" }, cors); }
+      if (!allowed) return json({ reason: "rate_limited" }, cors);
+    }
 
     const body = await req.json();
     const known = typeof body?.known === "string" ? body.known.slice(0, 60) : "";
@@ -149,7 +171,7 @@ Deno.serve(async (req) => {
     // the model needs the family's own words to follow the energy.
     const transcript = turns
       .filter((t) => typeof t.a === "string" && (t.a as string).trim())
-      .map((t) => `Q: ${String(t.q ?? "").slice(0, 300)}\nA: ${redact(String(t.a))}`)
+      .map((t) => `Q: ${String(t.q ?? "").slice(0, 300)}\nA: ${redact(String(t.a).slice(0, 4000))}`)
       .join("\n\n");
 
     const covered = turns
@@ -230,6 +252,14 @@ Deno.serve(async (req) => {
   }
 });
 
+/* The gateway has already verified the signature; this only reads the claims. */
+function jwtClaims(header: string): { sub?: string; role?: string } | null {
+  try {
+    const part = header.slice(7).split(".")[1];
+    const pad = part + "=".repeat((4 - part.length % 4) % 4);
+    return JSON.parse(atob(pad.replace(/-/g, "+").replace(/_/g, "/")));
+  } catch { return null; }
+}
 function str(v: unknown, max: number): string {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }
