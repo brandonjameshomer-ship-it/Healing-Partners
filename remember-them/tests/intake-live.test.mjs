@@ -41,7 +41,29 @@ async function run(mode, reply) {
   });
   click($("next"));
   await tick();
+
+  /* Turn one is answered locally — identical for every family, so the model
+     has nothing to add and is not asked. Commit an answer to reach the first
+     question the model actually writes. */
+  type($("answer"), "She kept the creek in her pocket and never said why.");
+  click($("ansNext"));
+  await tick();
+
   return { doc, $, click, type, state, window };
+}
+
+console.log("\n--- turn one never reaches the model ---");
+{
+  const r = await run("ok", {
+    question: "Should not be used for turn one.",
+    why: "", placeholder: "", area: "habits", label: "Habits", enough: false
+  });
+  /* run() commits one answer, so exactly one request should have been made:
+     the one for turn TWO. */
+  ok(r.state.sent.length === 1,
+     "one request after one committed answer — the opener cost nothing (got " + r.state.sent.length + ")");
+  ok(r.state.sent[0].body.turns.length === 1,
+     "and it carries the answer the family gave to the local opener");
 }
 
 console.log("\n--- live: the model's question is what the family sees ---");
@@ -72,8 +94,11 @@ console.log("\n--- live: the model's question is what the family sees ---");
   r.click(r.$("ansNext"));
   await tick();
   const req2 = r.state.sent[1];
-  ok(req2.body.turns.length === 1, "the previous turn is sent back for context");
-  ok(req2.body.turns[0].area === "habits", "the area is carried so coverage is tracked");
+  /* Two turns now: the answer to the local opener, then the answer to the
+     model's own question. */
+  ok(req2.body.turns.length === 2, "every previous turn is sent back for context (got " + req2.body.turns.length + ")");
+  ok(req2.body.turns[0].area === "open", "the opener is carried as an open turn, not as a covered area");
+  ok(req2.body.turns[1].area === "habits", "the model's area is carried so coverage is tracked");
 }
 
 console.log("\n--- live: 'enough' is a hint to the family, never a lock ---");

@@ -400,6 +400,58 @@
      behaviour rather than character, ask about the ordinary rather than
      the milestone, one question at a time.
      ------------------------------------------------------------------ */
+  /* ------------------------------------------------------------------
+     Turn one never needs the model.
+
+     Every family's first request is identical but for the name — there is
+     no transcript to read, so there is no energy to follow yet. Asking the
+     server for it costs a call, and costs it at the worst moment: the
+     family is watching the screen and nothing has happened.
+
+     These are openers, not the fixed list below. They stay wide and
+     unstructured, which is what the guide asks of a first question, and
+     one is chosen at random so two families in the same week do not get
+     word-for-word the same sentence from the same director.
+     ------------------------------------------------------------------ */
+  var OPENERS = [
+    { q:"Tell me about NAME.",
+      why:"Start anywhere. Whatever comes first is usually worth having.",
+      ph:"She was the one who…" },
+    { q:"What do you want said about NAME?",
+      why:"Not the summary — the thing you would mind being left out.",
+      ph:"That she never once…" },
+    { q:"What was NAME like, on an ordinary day?",
+      why:"Ordinary days say more than the big occasions do.",
+      ph:"He was up before anyone, and…" },
+    { q:"If someone never met NAME, what would you want them to know first?",
+      why:"The first thing, not the most impressive thing.",
+      ph:"You would have heard her before you saw her…" },
+    { q:"What will you miss about NAME that nobody else would think to mention?",
+      why:"The small specific thing. That is usually the true one.",
+      ph:"The way he…" },
+    { q:"Where should we start with NAME?",
+      why:"Anywhere at all. We can come back to the rest.",
+      ph:"Probably the workshop…" },
+    { q:"What kind of person was NAME, to the people who knew them best?",
+      why:"Not a list of virtues — one moment that shows it.",
+      ph:"Her sister would say…" },
+    { q:"Tell me something about NAME that made you laugh.",
+      why:"It does not have to be dignified. It has to be theirs.",
+      ph:"He once…" }
+  ];
+
+  /* The opener, with the name the family actually uses put back in. */
+  function openingQuestion() {
+    var o = OPENERS[Math.floor(Math.random() * OPENERS.length)];
+    var name = d.known || (d.name || "").split(/\s+/)[0] || "them";
+    return {
+      id: "open", area: "open", label: "Their story",
+      q: o.q.split("NAME").join(name),
+      why: o.why,
+      ph: o.ph
+    };
+  }
+
   var FALLBACK = [
     { group:"Stories", id:"childhood", cat:"Childhood",
       q:"What were they like as a child?",
@@ -678,6 +730,15 @@
   /* ---- decide what to ask next ---- */
   function advance() {
     if (d.done || pending || busy) { renderAsk(); return; }
+
+    /* Turn one, before any question of whether we are configured or online.
+       Identical input for every family, so the model has nothing to add and
+       the family gets a question the instant the page is ready. */
+    if (!d.turns.length) {
+      pending = openingQuestion();
+      d.pendingQ = pending; save(); renderThread(); renderAsk();
+      return;
+    }
 
     if (!live()) { pending = nextFallback(); d.pendingQ = pending; save(); renderThread(); renderAsk(); return; }
 
