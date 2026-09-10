@@ -34,8 +34,8 @@ function ts(seconds: number | null | undefined): string | null {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /* record_payment takes a uuid. A client_reference_id is free text — pay.html
-   sends a partner slug with the recapture — and a non-uuid used to make the
-   RPC throw, return 500, and have Stripe retry for three days. */
+   sends a partner slug on subscription checkouts — and a non-uuid used to make
+   the RPC throw, return 500, and have Stripe retry for three days. */
 function memorialRef(v: unknown): string | null {
   return typeof v === "string" && UUID.test(v) ? v : null;
 }
@@ -219,11 +219,14 @@ Deno.serve(async (req) => {
 
         const memorialId = memorialRef(s.client_reference_id) ?? memorialRef(s.metadata?.memorial_id);
         const amount = (s.amount_total ?? 0) / 100;   // Stripe works in cents
-        // No memorial and the Sec. 5.2 amount: a Partner settling the discount
-        // recapture from pay.html, not a family buying a VR model.
-        const isRecapture = !memorialId && amount === 200;
-        if (!memorialId && !isRecapture) {
-          // Nothing to attach it to. Record it anyway so it is never invisible.
+        if (!memorialId) {
+          // A subscription payment, or something with no memorial to attach to.
+          // Recorded either way so it is never invisible.
+          //
+          // This used to read any $200 payment without a memorial as the Sec. 5.2
+          // discount recapture. Agreement Rev. 13 removed the six-month term, so
+          // there is no discount left to recapture — and the amount test would
+          // have quietly misfiled any future $200 payment as one.
           console.warn("Paid session with no memorial reference:", s.id);
         }
 
@@ -234,7 +237,7 @@ Deno.serve(async (req) => {
           p_memorial_id: memorialId,
           p_stripe_ref: s.id,
           p_amount: amount,
-          p_event_type: isRecapture ? "recapture" : "payment_succeeded",
+          p_event_type: "payment_succeeded",
           p_metadata: {
             email: s.customer_details?.email ?? null,
             name: s.customer_details?.name ?? null,
