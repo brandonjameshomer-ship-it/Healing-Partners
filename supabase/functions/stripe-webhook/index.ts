@@ -32,6 +32,31 @@ function ts(seconds: number | null | undefined): string | null {
   return typeof seconds === "number" ? new Date(seconds * 1000).toISOString() : null;
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/* record_payment takes a uuid. A client_reference_id is free text — pay.html
+   sends a partner slug with the recapture — and a non-uuid used to make the
+   RPC throw, return 500, and have Stripe retry for three days. */
+function memorialRef(v: unknown): string | null {
+  return typeof v === "string" && UUID.test(v) ? v : null;
+}
+
+/* Who is paying. A Payment Link never sets subscription metadata, so the
+   email and name live on the customer; without this the onboarding queue was
+   a list of blanks. */
+async function contactFor(sub: Stripe.Subscription): Promise<{ email: string | null; name: string | null }> {
+  const id = typeof sub.customer === "string" ? sub.customer : sub.customer?.id;
+  if (!id) return { email: null, name: null };
+  try {
+    const c = await stripe.customers.retrieve(id);
+    if ((c as Stripe.DeletedCustomer).deleted) return { email: null, name: null };
+    const cu = c as Stripe.Customer;
+    return { email: cu.email ?? null, name: cu.name ?? null };
+  } catch (err) {
+    console.warn("customer lookup failed:", err instanceof Error ? err.message : err);
+    return { email: null, name: null };
+  }
+}
+
 /* The monthly amount, in dollars, off the subscription's first price. */
 function subAmount(sub: Stripe.Subscription): number | null {
   const cents = sub.items?.data?.[0]?.price?.unit_amount;
@@ -45,16 +70,18 @@ async function writeSubscription(
   sub: Stripe.Subscription,
   eventType: string,
   extra: Record<string, unknown> = {},
+  contact: { email?: string | null; name?: string | null } = {},
 ) {
+  const known = await contactFor(sub);
   const { error } = await db.rpc("record_subscription", {
     p_stripe_event_id: eventId,
     p_subscription_id: sub.id,
     p_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
     p_status: sub.status,
     p_event_type: eventType,
-    p_email: (sub.metadata?.email as string) ?? null,
+    p_email: (sub.metadata?.email as string) ?? contact.email ?? known.email ?? null,
     p_home_name: (sub.metadata?.funeral_home ?? sub.metadata?.home_name) as string ?? null,
-    p_contact_name: (sub.metadata?.contact_name as string) ?? null,
+    p_contact_name: (sub.metadata?.contact_name as string) ?? contact.name ?? known.name ?? null,
     p_amount: subAmount(sub),
     p_trial_ends_at: ts(sub.trial_end),
     p_period_end: ts(sub.current_period_end),
@@ -173,10 +200,16 @@ Deno.serve(async (req) => {
         const s = event.data.object as Stripe.Checkout.Session;
 
         // A subscription checkout is a trial starting, not a VR upgrade. The
-        // subscription events above own it; recording it here as well would
-        // book $150 as a VR sale.
+        // subscription events own its state, but this is the only event that
+        // carries what the person typed at checkout, so record that.
         if (s.mode === "subscription") {
-          console.log(`Subscription checkout ${s.id} — handled by subscription events`);
+          const subId = typeof s.subscription === "string" ? s.subscription : s.subscription?.id;
+          if (subId) {
+            const sub = await stripe.subscriptions.retrieve(subId);
+            await writeSubscription(event.id, sub, "updated",
+              { checkout: s.id, reference: s.client_reference_id ?? null },
+              { email: s.customer_details?.email ?? null, name: s.customer_details?.name ?? null });
+          }
           break;
         }
 
@@ -184,8 +217,12 @@ Deno.serve(async (req) => {
         // unpaid status is not a payment.
         if (s.payment_status !== "paid") break;
 
-        const memorialId = s.client_reference_id ?? s.metadata?.memorial_id;
-        if (!memorialId) {
+        const memorialId = memorialRef(s.client_reference_id) ?? memorialRef(s.metadata?.memorial_id);
+        const amount = (s.amount_total ?? 0) / 100;   // Stripe works in cents
+        // No memorial and the Sec. 5.2 amount: a Partner settling the discount
+        // recapture from pay.html, not a family buying a VR model.
+        const isRecapture = !memorialId && amount === 200;
+        if (!memorialId && !isRecapture) {
           // Nothing to attach it to. Record it anyway so it is never invisible.
           console.warn("Paid session with no memorial reference:", s.id);
         }
@@ -194,12 +231,14 @@ Deno.serve(async (req) => {
         // deliveries, and a duplicate must change nothing.
         const { data, error } = await db.rpc("record_payment", {
           p_stripe_event_id: event.id,
-          p_memorial_id: memorialId ?? null,
+          p_memorial_id: memorialId,
           p_stripe_ref: s.id,
-          p_amount: (s.amount_total ?? 0) / 100,   // Stripe works in cents
-          p_event_type: "payment_succeeded",
+          p_amount: amount,
+          p_event_type: isRecapture ? "recapture" : "payment_succeeded",
           p_metadata: {
             email: s.customer_details?.email ?? null,
+            name: s.customer_details?.name ?? null,
+            reference: s.client_reference_id ?? null,   // the partner slug from pay.html?ref=
             mode: s.livemode ? "live" : "test",
           },
         });
@@ -215,7 +254,7 @@ Deno.serve(async (req) => {
         if (s.mode === "subscription") break;
         await db.rpc("record_payment", {
           p_stripe_event_id: event.id,
-          p_memorial_id: s.client_reference_id ?? null,
+          p_memorial_id: memorialRef(s.client_reference_id),
           p_stripe_ref: s.id,
           p_amount: null,
           p_event_type: event.type.endsWith("expired") ? "payment_cancelled" : "payment_failed",
@@ -228,7 +267,7 @@ Deno.serve(async (req) => {
         const c = event.data.object as Stripe.Charge;
         await db.rpc("record_payment", {
           p_stripe_event_id: event.id,
-          p_memorial_id: c.metadata?.memorial_id ?? null,
+          p_memorial_id: memorialRef(c.metadata?.memorial_id),
           p_stripe_ref: c.payment_intent as string,
           p_amount: (c.amount_refunded ?? 0) / 100,
           p_event_type: "refunded",

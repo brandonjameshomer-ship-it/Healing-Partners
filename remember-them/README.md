@@ -56,10 +56,52 @@ RememberThem.interview.configure({
 });
 ```
 
-Until that call is made the fixed questions carry the interview on their own, which is why the page
-is worth demoing before any backend exists.
+Nothing calls that yet. The definition in `intake.html` is real, but no page loads `supabase-js`
+and nothing signs anyone in, so `getToken` currently has no source to draw from — see
+[Configuration](#configuration). Until the call is made the fixed questions carry the interview on
+their own, which is why the page is worth demoing before any backend exists.
 
 Tests are in `tests/` — see the README there.
+
+## Configuration
+
+Two kinds of secret, in two different places, and a `.env` only covers one of them.
+
+**Edge function secrets live on Supabase.** `supabase/.env.example` lists every variable the
+functions actually read. Copy it, fill it in, push it:
+
+```sh
+supabase link --project-ref <ref>            # once; there is no config.toml yet
+cp supabase/.env.example supabase/.env       # git-ignored
+supabase secrets set --env-file supabase/.env
+supabase functions deploy interview
+```
+
+`interview` needs `ANTHROPIC_API_KEY` and `ALLOWED_ORIGINS`; `media-sign` needs the four `R2_*`
+values and the same origin list; `stripe-webhook` needs its two Stripe keys. `SUPABASE_URL`,
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are injected by the platform at runtime and
+must not be set by hand.
+
+`ALLOWED_ORIGINS` is comma-separated, no trailing slashes, and it is a real control rather than a
+formality. An origin missing from it is a CORS failure, and the intake page treats a CORS failure
+like every other failure: it falls back to the fixed questions and says nothing. A misconfigured
+origin therefore looks exactly like a working demo. It has to be checked deliberately, because the
+page is built never to complain.
+
+**Client configuration is typed into the pages.** These are plain static HTML with no build step,
+so nothing substitutes a variable at load time — `dashboard/index.html`,
+`dashboard/subscriptions.html` and the intake page carry an empty `SUPABASE_URL` for someone to
+fill in. The project URL and the **anon** key belong there: the anon key is a public identifier and
+row-level security is what protects the data. The service-role key must never appear in a page.
+
+A session token is not configuration either. It comes from a signed-in Supabase client at runtime,
+which is what `configure({ getToken })` is asking for, and it is the piece that does not exist yet.
+Supabase verifies the JWT before the function body runs, so an unauthenticated page reaching
+`interview` gets a 401 and — silently, by design — the fixed questions. Deploying with
+`--no-verify-jwt` would make it work and is the wrong trade: it puts a metered Anthropic key behind
+nothing but a CORS header.
+
+`media.js` takes the same shape for `media-sign`, and is unconfigured in the same way.
 
 ## `catalogue.js` — what can be ordered
 
@@ -98,10 +140,13 @@ distinction is real and lives in the catalogue; the renderer does not pretend to
 does not have.
 
 `preview.html` draws every shape against every render family, then prices every product, size and
-category through `Catalogue.price()`. There is no test runner on this project, so that page is the
-test: anything that throws lands in a red box, and a handful of figures are asserted against the
-printed sheet so a silently-wrong total cannot pass as a right one. It is a working page, not part
-of the customer flow.
+category through `Catalogue.price()`. Anything that throws lands in a red box, and a handful of
+figures are asserted against the printed sheet so a silently-wrong total cannot pass as a right
+one. It is a working page, not part of the customer flow.
+
+`tests/catalogue.test.mjs` and `tests/stone.test.mjs` make the same checks without anyone having to
+open the page — the catalogue one finishes by loading `preview.html` and reading its verdict, so
+the two cannot drift apart in silence. See `tests/README.md`.
 
 ## What a preview is not
 

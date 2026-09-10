@@ -235,15 +235,45 @@
     font-size:var(--f-xs); color:var(--ink-3); line-height:1.6;
   }
   footer.legal p { margin:.5rem 0; }
+  /* ---- sign-in ---- */
+  .signin-btn { font:inherit; font-size:.8rem; color:var(--ink-2); background:none;
+    border:1px solid var(--line-strong); border-radius:999px; padding:.3rem .8rem;
+    min-height:2rem; cursor:pointer; margin-left:.75rem; }
+  .signin-btn:hover { color:var(--ink); }
+  .signin { border-top:1px solid var(--line); background:var(--surface-2); padding:.9rem 1rem; }
+  .signin form { max-width:60rem; margin:0 auto; display:flex; flex-wrap:wrap; gap:.5rem .75rem; align-items:end; }
+  .signin label { font-size:.72rem; font-weight:600; color:var(--ink-3); display:block; margin-bottom:.2rem; }
+  .signin input { font:inherit; font-size:.95rem; padding:.45rem .6rem; border:1px solid var(--line-strong);
+    border-radius:6px; background:var(--surface); color:var(--ink); min-width:14rem; }
+  .signin button { font:inherit; font-size:.9rem; padding:.45rem 1rem; min-height:2.5rem; cursor:pointer;
+    border-radius:6px; border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); }
+  .signin button.quiet { background:none; color:var(--ink-3); border-color:transparent; }
+  .signin-msg { max-width:60rem; margin:.5rem auto 0; font-size:.85rem; color:var(--ink-3); }
+  @media (pointer:coarse) { .signin-btn { min-height:2.75rem; } }
 </style>
 </head>
 <body>
+<script src="auth.js"></script>
 
 <header class="masthead">
   <div class="in">
     <span class="wordmark">Remember Them<span class="tm">™</span></span>
     <span class="spacer"></span>
     <span class="stepcount" id="stepcount">Step 1 of 3</span>
+    <button type="button" class="signin-btn" id="signinToggle" aria-expanded="false">Sign in</button>
+  </div>
+  <!-- Signed out, the interview still runs on its own fixed questions. Signing
+       in is what lets it read what the family has actually said and follow it. -->
+  <div class="signin" id="signinPanel" hidden>
+    <form id="signinForm" autocomplete="on">
+      <label for="si-email">Email</label>
+      <input id="si-email" type="email" name="email" autocomplete="username" required>
+      <label for="si-pass">Password</label>
+      <input id="si-pass" type="password" name="password" autocomplete="current-password" required>
+      <button type="submit" id="si-go">Sign in</button>
+      <button type="button" class="quiet" id="si-out" hidden>Sign out</button>
+    </form>
+    <p class="signin-msg" id="si-msg" role="status" aria-live="polite"></p>
   </div>
   <div class="rail" aria-hidden="true">
     <span id="r1" class="done"></span><span id="r2"></span><span id="r3"></span>
@@ -940,10 +970,106 @@
       save();
     });
   });
+  /* ---- sign-in wiring -------------------------------------------------
+     Configuring the interview is what turns the fixed question list into a
+     biographer. Unconfigured is a supported state, not a broken one, so
+     everything below is additive: if none of it runs, the page behaves
+     exactly as it did before. */
+  var A = window.RememberThem && window.RememberThem.auth;
+
+  function applySession() {
+    if (!A) return;
+    var on = A.signedIn();
+    $("signinToggle").textContent = on ? (A.email() || "Signed in") : "Sign in";
+    $("si-out").hidden = !on;
+    $("si-go").hidden = on;
+    $("si-email").disabled = on;
+    $("si-pass").disabled = on;
+    if (on) {
+      window.RememberThem.interview.configure({
+        functionsUrl: A.functionsUrl,
+        getToken: function () { return A.token(); }
+      });
+    }
+  }
+
+  if (A) {
+    $("signinToggle").addEventListener("click", function () {
+      var panel = $("signinPanel");
+      panel.hidden = !panel.hidden;
+      this.setAttribute("aria-expanded", panel.hidden ? "false" : "true");
+      if (!panel.hidden && !A.signedIn()) $("si-email").focus();
+    });
+
+    $("signinForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (A.signedIn()) return;
+      $("si-msg").textContent = "Signing in…";
+      $("si-go").disabled = true;
+      A.signIn($("si-email").value, $("si-pass").value, function (err) {
+        $("si-go").disabled = false;
+        $("si-msg").textContent = err || "Signed in. The questions will follow what the family says.";
+        if (!err) { $("si-pass").value = ""; applySession(); }
+      });
+    });
+
+    $("si-out").addEventListener("click", function () {
+      A.signOut();
+      $("si-msg").textContent = "Signed out. The interview will use its own questions.";
+      applySession();
+    });
+
+    applySession();
+  }
+
   renderThread();
   renderWords();
   show(1);
 })();
 </script>
+
+<!-- ============================ CONTACT FOOTER ============================ -->
+<footer class="hp-contact">
+  <div class="hp-contact-in">
+    <div class="hp-contact-col">
+      <p class="hp-contact-name">Healing Partners LLC</p>
+      <p><a href="tel:+15094609254">(509)&nbsp;460-9254</a></p>
+      <p><a href="mailto:bhomer@healingpartners.us">bhomer@healingpartners.us</a></p>
+      <p class="hp-contact-addr">111 SW 5th Avenue, Floor 5<br>Portland, Oregon 97204</p>
+    </div>
+    <div class="hp-contact-col">
+      <p class="hp-contact-name">Remember Them</p>
+      <p><a href="../index.html">Home</a></p>
+      <p><a href="../remember-them/">Try the designer</a></p>
+      <p><a href="https://healingpartners.us/pages/for-funeral-homes">For funeral homes</a></p>
+      <p><a href="https://healingpartners.us/pages/about">About us</a></p>
+    </div>
+    <div class="hp-contact-col hp-contact-note">
+      <p>A screen cannot reproduce stone, bronze, etching or polish &mdash; the finished memorial
+        will differ, and that is not a design error (Partner User Agreement &sect;3.8).</p>
+      <p>Healing Partners supplies designs, proofs and production files. It does not engrave,
+        fabricate, transport, set or sell physical memorials.</p>
+    </div>
+  </div>
+  <div class="hp-contact-in hp-contact-base">
+    <span>&copy; 2026 Healing Partners LLC</span>
+    <a href="https://healingpartners.us">healingpartners.us</a>
+  </div>
+</footer>
+<style>
+.hp-contact{border-top:1px solid rgba(128,128,128,.28);margin-top:3rem;padding:2.5rem 1.25rem 2rem;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;line-height:1.6}
+.hp-contact-in{max-width:64rem;margin:0 auto;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:2rem}
+.hp-contact p{margin:0 0 .3rem}
+.hp-contact-name{font-weight:600;margin-bottom:.6rem!important}
+.hp-contact-addr{margin-top:.6rem;opacity:.75}
+.hp-contact-note p{font-size:.82rem;opacity:.75;margin-bottom:.6rem;max-width:44ch}
+.hp-contact a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(128,128,128,.4)}
+.hp-contact a:hover{border-bottom-color:currentColor}
+.hp-contact-base{margin-top:2rem;padding-top:1.25rem;border-top:1px solid rgba(128,128,128,.18);
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.82rem;opacity:.7}
+@media (pointer:coarse){.hp-contact a{display:inline-block;min-height:2.75rem;line-height:2.75rem}}
+</style>
 </body>
 </html>

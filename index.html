@@ -147,6 +147,155 @@
   .steps h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0; }
   .steps p { color:var(--ink-2); font-size:var(--f-sm); margin:0; }
 
+  /* ---- Test drive: the road ahead, made touchable ------------------
+     Four panels behind one <select>. Everything past "Design and
+     pricing" is a preview of work in progress, and each panel says so
+     in its own words — a funeral home reading this page must never
+     come away thinking VR ships today. Nothing here invents a price;
+     prices live in the designer, off the real supplier sheet.
+     ------------------------------------------------------------------ */
+  .ahead { margin-top:2.75rem; }
+  .ahead-head {
+    display:flex; align-items:center; gap:.75rem 1rem; flex-wrap:wrap;
+    margin-bottom:1rem;
+  }
+  .ahead-label {
+    font-family:var(--serif); font-size:var(--f-lg); font-weight:600;
+    margin-right:auto;
+  }
+  .ahead-pick {
+    font:inherit; font-size:var(--f-sm); color:var(--ink);
+    background:var(--surface); border:1px solid var(--line-strong);
+    border-radius:var(--radius); padding:.5rem 2rem .5rem .75rem;
+    max-width:100%; appearance:none; cursor:pointer;
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),
+                     linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+    background-position:right 1.05rem center, right .8rem center;
+    background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+  }
+  .ahead-pick:hover { border-color:var(--accent); }
+  .ahead-pick:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  .ahead-stage {
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
+  }
+  .panel { padding:1.5rem; }
+  .panel + .panel { border-top:1px solid var(--line); }   /* only seen with JS off */
+  .panel-head { display:flex; align-items:baseline; gap:.75rem; flex-wrap:wrap; margin-bottom:.25rem; }
+  .panel-head h3 { font-family:var(--serif); font-size:var(--f-lg); font-weight:600; margin:0; }
+  .stage-tag {
+    font-size:var(--f-xs); letter-spacing:.1em; text-transform:uppercase;
+    font-weight:600; padding:.1875rem .5rem; border-radius:99px;
+    background:var(--surface-2); color:var(--ink-2); border:1px solid var(--line-strong);
+  }
+  .stage-tag.live { background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent); }
+  .panel > p.lede { color:var(--ink-2); font-size:var(--f-sm); margin:0 0 1.25rem; max-width:38rem; }
+  .readout {
+    font-size:var(--f-sm); color:var(--ink-2); margin:1rem 0 0;
+    min-height:2.6em;
+  }
+  .readout b { color:var(--ink); font-weight:600; }
+  .caveat {
+    font-size:var(--f-sm); color:var(--ink-2); margin:.75rem 0 0;
+    border-left:2px solid var(--line-strong); padding-left:.75rem;
+  }
+  .panel-go { display:inline-block; margin-top:1rem; font-size:var(--f-sm);
+              color:var(--accent); font-weight:550; text-decoration:none; }
+  .panel-go:hover { text-decoration:underline; }
+
+  /* the drawn scene shared by the design and VR panels */
+  .scene {
+    background:var(--surface-2); border:1px solid var(--line);
+    border-radius:var(--radius); overflow:hidden;
+  }
+  .scene { max-width:38rem; }
+  .scene svg { display:block; width:100%; height:auto; }
+  #designScene { max-width:24rem; }
+  .scene.grab { cursor:grab; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
+  .scene.grab:active { cursor:grabbing; }
+  .scene:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* small pill controls used by several panels */
+  .chips { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .chip {
+    font:inherit; font-size:var(--f-sm); cursor:pointer;
+    background:var(--surface); color:var(--ink-2);
+    border:1px solid var(--line-strong); border-radius:99px;
+    padding:.375rem .75rem; display:inline-flex; align-items:center; gap:.4375rem;
+  }
+  .chip:hover { border-color:var(--accent); color:var(--ink); }
+  .chip[aria-pressed="true"] { border-color:var(--accent); background:var(--accent-soft); color:var(--accent-ink); font-weight:550; }
+  .chip:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .swatch { width:.875rem; height:.875rem; border-radius:3px; border:1px solid rgba(0,0,0,.25); }
+
+  .slider-row { display:flex; align-items:center; gap:.75rem; margin-top:.875rem; font-size:var(--f-xs); color:var(--ink-3); }
+  .slider-row input[type=range] { flex:1; accent-color:var(--accent); min-width:8rem; }
+
+  /* voice panel */
+  .voice-count {
+    font-family:var(--serif); font-size:var(--f-2xl); font-weight:600;
+    font-variant-numeric:tabular-nums; color:var(--accent-ink); line-height:1;
+  }
+  .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .voice-count small { display:block; font-family:var(--sans); font-size:var(--f-xs);
+    font-weight:400; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-top:.375rem; }
+  .voice-body { display:grid; grid-template-columns:auto 1fr; gap:1.5rem; align-items:start; }
+  .turns { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.625rem; }
+  .turns li { font-size:var(--f-sm); line-height:1.5; max-width:32rem; transition:opacity .45s ease; }
+  .turns li.pending { opacity:0; }
+  @media (prefers-reduced-motion: reduce) { .turns li { transition:none; } }
+  .turns .who { display:block; font-size:var(--f-xs); letter-spacing:.1em;
+                text-transform:uppercase; color:var(--ink-3); margin-bottom:.125rem; }
+  .turns li.them { color:var(--ink-2); }
+  .turns li.us { color:var(--ink); border-left:2px solid var(--accent); padding-left:.75rem; }
+  @media (max-width:34rem) { .voice-body { grid-template-columns:1fr; gap:1rem; } }
+
+  /* plot panel */
+  .plotmap {
+    display:grid; grid-template-columns:repeat(4,minmax(1.75rem,1fr)) 1rem repeat(4,minmax(1.75rem,1fr));
+    /* the rows must be explicit or the path's "1 / -1" span collapses to a
+       single row and the plots flow into the path column */
+    grid-template-rows:repeat(5,auto);
+    gap:.375rem; min-width:min-content;
+    background:var(--surface-2); border:1px solid var(--line);
+    border-radius:var(--radius); padding:.875rem;
+  }
+  .plotscroll { max-width:28rem; overflow-x:auto; overscroll-behavior-x:contain; }
+  .plotmap .walk {
+    grid-column:5; grid-row:1 / -1; border-radius:2px;
+    background:repeating-linear-gradient(90deg,transparent,transparent 2px,var(--line) 2px,var(--line) 4px);
+    opacity:.9;
+  }
+  .plot {
+    aspect-ratio:3/4; border-radius:3px; cursor:pointer; padding:0;
+    border:1px solid var(--line-strong); background:var(--surface);
+    position:relative;
+  }
+  .plot[data-state="taken"] { background:var(--line-strong); border-color:var(--line-strong); cursor:default; }
+  .plot[data-state="reserved"] { background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 3px,var(--line) 3px,var(--line) 6px); cursor:default; }
+  .plot[data-state="open"]:hover { border-color:var(--accent); background:var(--accent-soft); }
+  .plot[aria-pressed="true"] { border-color:var(--accent); background:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+  .plot:focus-visible { outline:2px solid var(--accent); outline-offset:2px; z-index:1; }
+  .legend { display:flex; gap:1rem; flex-wrap:wrap; margin-top:.75rem; font-size:var(--f-xs); color:var(--ink-2); }
+  .legend span { display:inline-flex; align-items:center; gap:.375rem; }
+  .key { width:.75rem; height:.75rem; border-radius:2px; border:1px solid var(--line-strong); background:var(--surface); }
+  .key.taken { background:var(--line-strong); }
+  .key.reserved { background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 3px,var(--line) 3px,var(--line) 6px); }
+  .key.open { border-color:var(--accent); background:var(--accent-soft); }
+
+  /* With scripting off the four panels simply stack and read as prose;
+     the picker only appears once it can actually do something. */
+  .ahead-pick { display:none; }
+  .ahead.js .ahead-pick { display:inline-block; }
+  /* drawn by script, so they are nothing at all without it */
+  .ahead:not(.js) .scene,
+  .ahead:not(.js) .plotscroll,
+  .ahead:not(.js) .legend,
+  .ahead:not(.js) .slider-row,
+  .ahead:not(.js) .readout { display:none; }
+  .ahead.js .panel + .panel { border-top:0; }
+
   footer.site {
     border-top:1px solid var(--line); background:var(--surface);
     padding:2rem 0; font-size:var(--f-sm); color:var(--ink-3);
@@ -157,6 +306,13 @@
   footer.site .spacer { margin-left:auto; }
 
   @media (max-width:34rem) { :root { --f-3xl:2.25rem; } .hero { padding:3.5rem 0 3rem; } }
+  /* Touch screens: 44px minimum on the test-drive controls (Apple HIG / WCAG 2.5.8).
+     The plot grid is excluded on purpose: eight 44px plots plus the path do not fit
+     in 320px, and the plots already clear the 24px AA floor. */
+  @media (pointer:coarse) {
+    .chip, .ahead-pick { min-height:2.75rem; }
+    .panel-go { display:inline-flex; align-items:center; min-height:2.75rem; }
+  }
 </style>
 </head>
 <body>
@@ -214,6 +370,134 @@
         <p>The same clarity extended to choosing where someone rests, not only what marks it.</p>
       </li>
     </ol>
+
+    <div class="ahead">
+      <div class="ahead-head">
+        <label class="ahead-label" for="aheadPick">Test drive what&rsquo;s coming</label>
+        <select class="ahead-pick" id="aheadPick">
+          <!-- Status first: the closed control clips its tail at 320px, and
+               the tail was carrying the only warning in the picker. -->
+          <option value="design">Available now &mdash; Design and pricing</option>
+          <option value="vr">In development &mdash; Explore in VR and AR</option>
+          <option value="voice">In development &mdash; Guided by voice</option>
+          <option value="plot">In development &mdash; Grave site and niche selection</option>
+        </select>
+      </div>
+
+      <div class="ahead-stage" id="aheadStage">
+
+        <!-- ---------------------------------------------- available now -->
+        <section class="panel" data-mode="design" aria-label="Design and pricing">
+          <div class="panel-head">
+            <h3>Design and pricing</h3>
+            <span class="stage-tag live">Available now</span>
+          </div>
+          <p class="lede">Choose the stone and the shape and watch the memorial change. This is
+             the part that already works &mdash; the full designer adds lettering, emblems,
+             sizes and the order form.</p>
+
+          <div class="chips" role="group" aria-label="Granite">
+            <button type="button" class="chip" data-granite="georgia-gray" aria-pressed="true"><i class="swatch" style="background:#A9ABA4"></i>Georgia Gray</button>
+            <button type="button" class="chip" data-granite="barre-gray" aria-pressed="false"><i class="swatch" style="background:#8B8E93"></i>Barre Gray</button>
+            <button type="button" class="chip" data-granite="sunset-red" aria-pressed="false"><i class="swatch" style="background:#8C4038"></i>Sunset Red</button>
+            <button type="button" class="chip" data-granite="mesabi-black" aria-pressed="false"><i class="swatch" style="background:#2B2D33"></i>Mesabi Black</button>
+          </div>
+          <div class="chips" role="group" aria-label="Shape">
+            <button type="button" class="chip" data-shape="serp" aria-pressed="true">Serpentine top</button>
+            <button type="button" class="chip" data-shape="flat" aria-pressed="false">Flat top</button>
+            <button type="button" class="chip" data-shape="oval" aria-pressed="false">Oval top</button>
+          </div>
+
+          <div class="scene" id="designScene"></div>
+          <p class="readout" id="designRead" role="status"></p>
+          <p class="caveat">Colours are drawn, not photographed, so treat them as a likeness
+             rather than a sample. Nothing here quotes a price: prices come off your
+             supplier&rsquo;s own sheet inside Remember Them.</p>
+          <a class="panel-go" href="./remember-them/">Design one properly &rarr;</a>
+        </section>
+
+        <!-- ------------------------------------------------------- VR/AR -->
+        <section class="panel" data-mode="vr" aria-label="Explore in VR and AR">
+          <div class="panel-head">
+            <h3>Explore in VR and AR</h3>
+            <span class="stage-tag">In development</span>
+          </div>
+          <p class="lede">A catalogue photograph has no size. Drag the stone to walk around it,
+             and the figure beside it stays a real 5&prime;9&Prime; so the memorial has a scale you
+             can feel. In a headset, or held up on a phone in the cemetery, this is the whole idea.</p>
+
+          <div class="scene grab" id="vrScene" tabindex="0" role="img"
+               aria-describedby="vrRead" aria-label="A granite tablet beside a person for scale. Drag, or use the slider below, to turn it."></div>
+          <div class="slider-row">
+            <span>Turn</span>
+            <input type="range" id="vrAngle" min="-70" max="70" value="-22" step="1" aria-label="Turn the memorial">
+            <span id="vrDeg">22&deg;</span>
+          </div>
+          <p class="readout" id="vrRead" role="status"></p>
+          <p class="caveat">A flat-screen stand-in for the headset build. It shows the framing and
+             the scale reference we are designing toward &mdash; not a shipping feature, and not
+             part of what a subscription buys today.</p>
+        </section>
+
+        <!-- ------------------------------------------------------- voice -->
+        <section class="panel" data-mode="voice" aria-label="Guided by voice">
+          <div class="panel-head">
+            <h3>Guided by voice</h3>
+            <span class="stage-tag">In development</span>
+          </div>
+          <p class="lede">Nobody grieving wants to read a catalogue. A few spoken sentences about
+             the person cut every orderable combination down to the handful that actually fit.
+             Play the conversation and watch what is left to decide.</p>
+
+          <div class="voice-body">
+            <p class="voice-count"><span id="voiceN" aria-live="polite">618</span><small>Still on the table</small></p>
+            <ol class="turns" id="voiceTurns">
+              <li class="us"   data-left="618"><span class="who">Remember Them</span>Take your time. Tell me about her.</li>
+              <li class="them" data-left="96"><span class="who">You</span>My mother. She taught fourth grade for forty-one years, and she was out in her garden every evening until the light went.</li>
+              <li class="us"   data-left="96"><span class="who">Remember Them</span>A teacher and a gardener. Is there a family plot already, or is this the first?</li>
+              <li class="them" data-left="14"><span class="who">You</span>There&rsquo;s a plot. My father&rsquo;s stone is already there &mdash; grey, upright, quite plain.</li>
+              <li class="us"   data-left="14"><span class="who">Remember Them</span>Then we match his stone and his cemetery&rsquo;s rules, and let the garden into the carving rather than the shape.</li>
+              <li class="them" data-left="3"><span class="who">You</span>She&rsquo;d have wanted it simple. Roses, maybe.</li>
+              <li class="us"   data-left="3"><span class="who">Remember Them</span>Three designs, then. Here they are.</li>
+            </ol>
+          </div>
+          <div class="chips" style="margin:1.25rem 0 0">
+            <button type="button" class="chip" id="voicePlay" aria-describedby="voiceNote">Play the conversation</button>
+            <span class="sr-only" id="voiceNote">Replays the conversation line by line. The whole transcript is already above.</span>
+          </div>
+          <p class="caveat">A scripted illustration of the narrowing, not a recording and not a
+             live model. It opens on 618 because that is what the supplier catalogue currently
+             makes orderable &mdash; the same figure the designer shows. The steps down from
+             there, and the words, are written.</p>
+        </section>
+
+        <!-- -------------------------------------------------------- plot -->
+        <section class="panel" data-mode="plot" aria-label="Grave site and niche selection">
+          <div class="panel-head">
+            <h3>Grave site and niche selection</h3>
+            <span class="stage-tag">In development</span>
+          </div>
+          <p class="lede">The same clarity pointed at where someone rests. Pick an open space and
+             see what it is actually like to stand there &mdash; the light, what is nearby, how far
+             the walk is &mdash; instead of following someone across a lawn in the rain.</p>
+
+          <div class="plotscroll">
+            <div class="plotmap" id="plotMap" role="group" aria-label="Section G, rows 1 to 5"></div>
+          </div>
+          <div class="legend">
+            <span><i class="key open"></i>Open</span>
+            <span><i class="key reserved"></i>Reserved</span>
+            <span><i class="key taken"></i>Occupied</span>
+            <span>The dotted strip is the walking path; the old oak stands off the top left corner.</span>
+          </div>
+          <p class="readout" id="plotRead" role="status"></p>
+          <p class="caveat">An invented section, not any cemetery&rsquo;s real inventory. Live
+             availability has to come from the cemetery&rsquo;s own records, and no space is
+             held or sold from a web page.</p>
+        </section>
+
+      </div>
+    </div>
   </section>
 
   <section class="products">
@@ -234,5 +518,471 @@
   </div>
 </footer>
 
+
+<script>
+/* ==================================================================
+   Test drive — four panels behind one <select>.
+
+   Everything is drawn from scratch here rather than pulled from the
+   designer: the hub page should not have to load the catalogue and the
+   renderer to show a thumbnail. That means no price is ever computed
+   on this page, which is deliberate — a quoted price has to come off
+   the supplier's real sheet, and the only place that happens is the
+   designer itself.
+
+   Three of the four panels describe work that is not built. Each says
+   so on its own, in the panel, so the claim travels with the picture
+   if someone screenshots it.
+   ================================================================== */
+(function () {
+  "use strict";
+
+  var root  = document.querySelector(".ahead");
+  var pick  = document.getElementById("aheadPick");
+  var stage = document.getElementById("aheadStage");
+  if (!root || !pick || !stage) return;
+
+  var panels = {};
+  Array.prototype.forEach.call(stage.querySelectorAll(".panel"), function (p) {
+    panels[p.getAttribute("data-mode")] = p;
+  });
+
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* ---------------------------------------------------- the stone -----
+     An orthographic turntable. A point is given in plan as (u across,
+     z back) plus a world y, spun by the view angle and then dropped on
+     screen with a small downward tilt so the top face is visible.
+     Everything else — profiles, shading, lettering — hangs off this.  */
+
+  var TILT = 0.20;          /* how far above eye level we are standing  */
+  var PPI  = 3.4;           /* pixels per inch, so the figure means something */
+
+  function view(deg) {
+    var r = deg * Math.PI / 180;
+    return { c: Math.cos(r), s: Math.sin(r) };
+  }
+  function pt(v, cx, u, z, y) {
+    var x2 =  u * v.c + z * v.s;
+    var z2 = -u * v.s + z * v.c;
+    return [cx + x2, y - z2 * TILT];
+  }
+  function poly(points, fill) {
+    return '<polygon points="' + points.map(function (p) {
+      return p[0].toFixed(1) + "," + p[1].toFixed(1);
+    }).join(" ") + '" fill="' + fill + '"/>';
+  }
+  function path(points, fill) {
+    return '<path d="M' + points.map(function (p) {
+      return p[0].toFixed(1) + " " + p[1].toFixed(1);
+    }).join("L") + 'Z" fill="' + fill + '"/>';
+  }
+
+  /* Lambert shading against a light over the viewer's left shoulder.
+     `lift` in [0,1] is how square-on the face is; the caller turns that
+     into a colour with shade(). */
+  function lambert(v, nu, nz) {
+    var nx =  nu * v.c + nz * v.s;
+    var nzz = -nu * v.s + nz * v.c;
+    var d = nx * 0.35 + nzz * -0.94;
+    return 0.45 + 0.55 * Math.max(0, d);
+  }
+  function shade(rgb, k) {
+    return "rgb(" + rgb.map(function (n) {
+      return Math.max(0, Math.min(255, Math.round(n * k)));
+    }).join(",") + ")";
+  }
+
+  var GRANITE = {
+    "georgia-gray": { label: "Georgia Gray", cat: 1, rgb: [169, 171, 164], ink: "#5C5E59" },
+    "barre-gray":   { label: "Barre Gray",   cat: 2, rgb: [139, 142, 147], ink: "#4E5055" },
+    "sunset-red":   { label: "Sunset Red",   cat: 1, rgb: [140,  64,  56], ink: "#E8CFC8" },
+    "mesabi-black": { label: "Mesabi Black", cat: 2, rgb: [ 43,  45,  51], ink: "#C9CBD2" }
+  };
+
+  var SHAPES = {
+    serp: { label: "Serpentine top", drop: 26, f: function (t) { return 0.5 - 0.5 * Math.cos(Math.PI * t); } },
+    flat: { label: "Flat top",       drop: 0,  f: function ()  { return 0; } },
+    oval: { label: "Oval top",       drop: 34, f: function (t) { return 1 - Math.sqrt(Math.max(0, 1 - t * t)); } }
+  };
+
+  /* A slab: front profile swept back by its depth. Returns SVG. */
+  function slab(v, cx, halfW, halfD, yBottom, yTop, profile, rgb, tag) {
+    var N = 28, i, t, u, out = "";
+    var front = [], back = [];
+    for (i = 0; i <= N; i++) {
+      u = -halfW + (2 * halfW) * (i / N);
+      t = halfW ? Math.abs(u) / halfW : 0;
+      var y = yTop + profile.drop * profile.f(t) * (halfW ? 1 : 0);
+      front.push(pt(v, cx, u, -halfD, y));
+      back .push(pt(v, cx, u,  halfD, y));
+    }
+
+    /* the side we can see, if any */
+    var edge = v.s > 0 ? halfW : -halfW;
+    var nu   = v.s > 0 ? 1 : -1;
+    if (Math.abs(v.s) > 0.02) {
+      var eT = profile.drop * profile.f(1);
+      var a = pt(v, cx, edge, -halfD, yTop + eT), b = pt(v, cx, edge, halfD, yTop + eT);
+      var cpt = pt(v, cx, edge, halfD, yBottom), d = pt(v, cx, edge, -halfD, yBottom);
+      out += poly([a, b, cpt, d], shade(rgb, lambert(v, nu, 0)));
+    }
+
+    /* the swept top, lighter because it faces the sky */
+    out += path(front.concat(back.slice().reverse()), shade(rgb, 1.25));
+
+    /* the inscribed face */
+    var fl = pt(v, cx, -halfW, -halfD, yBottom), fr = pt(v, cx, halfW, -halfD, yBottom);
+    out += path(front.concat([fr, fl]), shade(rgb, lambert(v, 0, -1)));
+
+    /* a hairline along the top edge reads as a polished arris */
+    out += '<path fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1" d="M' +
+           front.map(function (p) { return p[0].toFixed(1) + " " + p[1].toFixed(1); }).join("L") + '"/>';
+
+    if (tag) out += tag;
+    return out;
+  }
+
+  /* 24 x 36 x 6 tablet on a 30 x 6 x 12 base — an ordinary upright. */
+  var W = 24 * PPI / 2, D = 6 * PPI / 2, H = 36 * PPI;
+  var BW = 30 * PPI / 2, BD = 12 * PPI / 2, BH = 6 * PPI;
+  var GROUND = 300, CX = 372;
+
+  function drawScene(deg, graniteId, shapeId, withFigure) {
+    var v = view(deg);
+    var g = GRANITE[graniteId], sh = SHAPES[shapeId];
+    var baseTop  = GROUND - BH;
+    var stoneTop = baseTop - H;
+
+    /* Two crops of one scene: the design panel is a portrait of the stone,
+       the VR panel has to hold the figure beside it. */
+    var box = withFigure ? "60 44 456 300" : "232 108 280 232";
+    var svg = '<svg viewBox="' + box + '" role="presentation" aria-hidden="true">';
+
+    svg += '<rect x="0" y="' + (GROUND - 4) + '" width="560" height="' + (348 - GROUND + 4) +
+           '" fill="currentColor" opacity=".07"/>';
+    svg += '<ellipse cx="' + (CX + 14 * v.s) + '" cy="' + (GROUND + 4) + '" rx="' +
+           (BW * 1.5) + '" ry="9" fill="currentColor" opacity=".13"/>';
+
+    if (withFigure) {
+      /* 5'9" for scale, kept deliberately anonymous */
+      var fh = 69 * PPI, fx = 132, top = GROUND - fh;
+      var lw = fh * 0.075, tw = fh * 0.098, aw = fh * 0.042;
+      svg += '<g fill="currentColor" opacity=".22">' +
+             '<circle cx="' + fx + '" cy="' + (top + fh * 0.072) + '" r="' + (fh * 0.070) + '"/>' +
+             '<rect x="' + (fx - tw) + '" y="' + (top + fh * 0.155) + '" width="' + (tw * 2) +
+                  '" height="' + (fh * 0.34) + '" rx="' + (fh * 0.03) + '"/>' +
+             '<rect x="' + (fx - tw - aw - 1) + '" y="' + (top + fh * 0.175) + '" width="' + aw +
+                  '" height="' + (fh * 0.30) + '" rx="' + (aw / 2) + '"/>' +
+             '<rect x="' + (fx + tw + 1) + '" y="' + (top + fh * 0.175) + '" width="' + aw +
+                  '" height="' + (fh * 0.30) + '" rx="' + (aw / 2) + '"/>' +
+             '<rect x="' + (fx - lw - 2) + '" y="' + (top + fh * 0.46) + '" width="' + lw +
+                  '" height="' + (fh * 0.54) + '" rx="' + (lw / 2) + '"/>' +
+             '<rect x="' + (fx + 2) + '" y="' + (top + fh * 0.46) + '" width="' + lw +
+                  '" height="' + (fh * 0.54) + '" rx="' + (lw / 2) + '"/></g>';
+      svg += '<text x="' + fx + '" y="' + (GROUND + 22) + '" text-anchor="middle" ' +
+             'font-size="11" fill="currentColor" opacity=".5">5&#8242;9&#8243;</text>';
+    }
+
+    svg += slab(v, CX, BW, BD, GROUND, baseTop, SHAPES.flat, g.rgb, "");
+    svg += slab(v, CX, W, D, baseTop, stoneTop, sh, g.rgb, "");
+
+    /* Lettering sits on the front face, so it narrows with the face. */
+    var anchor = pt(v, CX, 0, -D, stoneTop);
+    var squash = Math.max(0.04, Math.abs(v.c));
+    svg += '<g transform="translate(' + anchor[0].toFixed(1) + ',' + anchor[1].toFixed(1) +
+           ') scale(' + squash.toFixed(3) + ',1)" fill="' + g.ink +
+           '" text-anchor="middle" font-family="ui-serif, Georgia, serif" opacity=".85">' +
+           '<text y="30" font-size="14" letter-spacing=".5">MERCER</text>' +
+           '<text y="58" font-size="9.5">Ellen Ruth</text>' +
+           '<text y="74" font-size="8" opacity=".8">1941 &#8212; 2024</text>' +
+           '<path d="M-15 41h30" stroke="' + g.ink +
+           '" stroke-width="1" opacity=".45"/></g>';
+
+    return svg + "</svg>";
+  }
+
+  /* ------------------------------------------------- panel: design ---- */
+  var dGranite = "georgia-gray", dShape = "serp";
+  var dScene = document.getElementById("designScene");
+  var dRead  = document.getElementById("designRead");
+
+  function renderDesign() {
+    dScene.innerHTML = drawScene(-18, dGranite, dShape, false);
+    var g = GRANITE[dGranite];
+    dRead.innerHTML = "<b>" + g.label + "</b>, " + SHAPES[dShape].label.toLowerCase() +
+      " &mdash; 24&Prime; &times; 36&Prime; &times; 6&Prime; on a 30&Prime; base. " +
+      "Category " + g.cat + " on the supplier&rsquo;s sheet.";
+  }
+
+  Array.prototype.forEach.call(panels.design.querySelectorAll("[data-granite]"), function (b) {
+    b.addEventListener("click", function () {
+      dGranite = b.getAttribute("data-granite");
+      setPressed(panels.design, "data-granite", dGranite);
+      renderDesign();
+    });
+  });
+  Array.prototype.forEach.call(panels.design.querySelectorAll("[data-shape]"), function (b) {
+    b.addEventListener("click", function () {
+      dShape = b.getAttribute("data-shape");
+      setPressed(panels.design, "data-shape", dShape);
+      renderDesign();
+    });
+  });
+  function setPressed(scope, attr, val) {
+    Array.prototype.forEach.call(scope.querySelectorAll("[" + attr + "]"), function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute(attr) === val));
+    });
+  }
+
+  /* ----------------------------------------------------- panel: VR ---- */
+  var vScene = document.getElementById("vrScene");
+  var vAngle = document.getElementById("vrAngle");
+  var vDeg   = document.getElementById("vrDeg");
+  var vRead  = document.getElementById("vrRead");
+
+  function renderVR() {
+    var deg = Number(vAngle.value);
+    vScene.innerHTML = drawScene(deg, "barre-gray", "serp", true);
+    vDeg.innerHTML = Math.abs(deg) + "&deg;";
+    var side = deg === 0 ? "square on" : (deg < 0 ? "from the left" : "from the right");
+    vRead.innerHTML = "Barre Gray tablet, 24&Prime; &times; 36&Prime; &times; 6&Prime;, seen <b>" + side +
+      "</b> at " + Math.abs(deg) + "&deg;. With the base it stands 42&Prime; against a " +
+      "5&#8242;9&Prime; figure &mdash; about waist high.";
+  }
+  vAngle.addEventListener("input", renderVR);
+
+  /* Dragging is a convenience on top of the slider, never the only way
+     in: the slider is the keyboard and screen-reader path and stays
+     the source of truth. */
+  var dragging = false, dragX = 0, dragFrom = 0;
+  function dragStart(x) { dragging = true; dragX = x; dragFrom = Number(vAngle.value); }
+  function dragMove(x) {
+    if (!dragging) return;
+    var next = Math.max(-70, Math.min(70, dragFrom + (x - dragX) * 0.42));
+    vAngle.value = String(Math.round(next));
+    renderVR();
+  }
+  vScene.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    dragStart(e.clientX);
+    if (vScene.setPointerCapture) { try { vScene.setPointerCapture(e.pointerId); } catch (err) {} }
+  });
+  vScene.addEventListener("pointermove", function (e) { if (dragging) { e.preventDefault(); dragMove(e.clientX); } });
+  ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) {
+    vScene.addEventListener(ev, function () { dragging = false; });
+  });
+  vScene.addEventListener("keydown", function (e) {
+    var step = e.key === "ArrowLeft" ? -5 : e.key === "ArrowRight" ? 5 : 0;
+    if (!step) return;
+    e.preventDefault();
+    vAngle.value = String(Math.max(-70, Math.min(70, Number(vAngle.value) + step)));
+    renderVR();
+  });
+
+  /* -------------------------------------------------- panel: voice ---- */
+  var vTurns = document.getElementById("voiceTurns");
+  var TURNS  = Array.prototype.slice.call(vTurns.children);
+  var vN     = document.getElementById("voiceN");
+  var vPlay  = document.getElementById("voicePlay");
+  var timers = [];
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  /* Lines are dimmed rather than removed, so the box never changes height
+     mid-playback and a screen reader has the whole transcript from the
+     start — the reveal is a visual flourish, not the content. */
+  function voiceReset() {
+    clearTimers();
+    TURNS.forEach(function (li, i) { li.classList.toggle("pending", i > 0); });
+    vN.textContent = "618";
+    vPlay.textContent = "Play the conversation";
+  }
+  vPlay.addEventListener("click", function () {
+    clearTimers();
+    if (calm && calm.matches) {
+      TURNS.forEach(function (li) { li.classList.remove("pending"); });
+      vN.textContent = "3";
+      vPlay.textContent = "Play again";
+      return;
+    }
+    TURNS.forEach(function (li) { li.classList.add("pending"); });
+    vN.textContent = "618";
+    vPlay.textContent = "Playing…";
+    TURNS.forEach(function (li, i) {
+      timers.push(setTimeout(function () {
+        li.classList.remove("pending");
+        vN.textContent = Number(li.getAttribute("data-left")).toLocaleString("en-US");
+        if (i === TURNS.length - 1) vPlay.textContent = "Play again";
+      }, 500 + i * 1500));
+    });
+  });
+
+  /* --------------------------------------------------- panel: plot ---- */
+  var ROWS = 5, COLS = 8;
+  /* Filled the way a section actually fills — from one end, row by row,
+     with gaps where families bought ahead. Invented, and the panel says so. */
+  var TAKEN = [1, 2, 3, 6, 9, 10, 11, 14, 17, 18, 19, 22, 25, 26, 29, 33, 34];
+  var HELD  = [4, 13, 20, 31];
+  var pMap  = document.getElementById("plotMap");
+  var pRead = document.getElementById("plotRead");
+
+  function plotState(i) {
+    return TAKEN.indexOf(i) > -1 ? "taken" : HELD.indexOf(i) > -1 ? "reserved" : "open";
+  }
+  function plotWords(r, c) {
+    var bits = [];
+    bits.push(r <= 2 && c <= 4 ? "afternoon shade from the oak"
+            : c >= 6 ? "open to the morning sun"
+            : "sun most of the day");
+    var toPath = c <= 4 ? 5 - c : c - 4;      /* 1 for the two columns either side of it */
+    if (toPath === 1) bits.push("right on the path, so it is a level walk from the gate");
+    else bits.push((toPath - 1) * 12 + " feet in off the path");
+    if (r === ROWS) bits.push("backs onto the hedge");
+    return bits.join(", ");
+  }
+  (function buildMap() {
+    var html = '<div class="walk" aria-hidden="true"></div>', i = 0;
+    for (var r = 1; r <= ROWS; r++) {
+      for (var c = 1; c <= COLS; c++) {
+        i++;
+        var st = plotState(i);
+        var label = "Row " + r + ", plot " + c + ", " +
+                    (st === "open" ? "open" : st === "reserved" ? "reserved" : "occupied");
+        html += '<button type="button" class="plot" data-state="' + st + '" data-r="' + r +
+                '" data-c="' + c + '" aria-pressed="false" aria-label="' + label + '"' +
+                (st === "open" ? "" : ' aria-disabled="true"') + '></button>';
+      }
+    }
+    pMap.innerHTML = html;
+  }());
+  /* Roving tabindex: the map is a single tab stop, arrows walk the grid.
+     Occupied spaces stay reachable — a keyboard user should be able to land
+     on one and hear that it is occupied — so they are aria-disabled rather
+     than disabled. */
+  var plots = Array.prototype.slice.call(pMap.querySelectorAll(".plot"));
+  plots.forEach(function (b, i) { b.tabIndex = i ? -1 : 0; });
+
+  function focusPlot(i) {
+    if (i < 0 || i >= plots.length) return;
+    plots.forEach(function (b) { b.tabIndex = -1; });
+    plots[i].tabIndex = 0;
+    plots[i].focus();
+  }
+  pMap.addEventListener("keydown", function (e) {
+    var i = plots.indexOf(document.activeElement);
+    if (i < 0) return;
+    var to = e.key === "ArrowRight" ? i + 1
+           : e.key === "ArrowLeft"  ? i - 1
+           : e.key === "ArrowDown"  ? i + COLS
+           : e.key === "ArrowUp"    ? i - COLS
+           : e.key === "Home"       ? i - (i % COLS)
+           : e.key === "End"        ? i - (i % COLS) + COLS - 1
+           : -1;
+    if (to < 0 || to === i) return;
+    e.preventDefault();
+    focusPlot(to);
+  });
+
+  pMap.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest(".plot") : null;
+    if (!b) return;
+    if (b.getAttribute("data-state") !== "open") {
+      pRead.innerHTML = "That space is " +
+        (b.getAttribute("data-state") === "reserved" ? "reserved by another family" : "occupied") +
+        ". Pick one of the open spaces.";
+      return;
+    }
+    plots.forEach(function (o) {
+      o.setAttribute("aria-pressed", String(o === b));
+      o.tabIndex = o === b ? 0 : -1;      /* keep the roving stop where they clicked */
+    });
+    var r = b.getAttribute("data-r"), c = b.getAttribute("data-c");
+    pRead.innerHTML = "<b>Section G &middot; Row " + r + " &middot; Plot " + c + "</b> &mdash; " +
+      plotWords(Number(r), Number(c)) + ". In the real product this is where you would ask " +
+      "the cemetery to hold it.";
+  });
+
+  /* ------------------------------------------------------ switching --- */
+  function show(mode) {
+    if (!panels[mode]) mode = "design";
+    Object.keys(panels).forEach(function (k) { panels[k].hidden = (k !== mode); });
+    if (mode !== "voice") voiceReset();
+    if (mode === "vr") renderVR();
+  }
+  pick.addEventListener("change", function () {
+    show(pick.value);
+    /* replaceState, not a hash assignment: linkable without hijacking Back
+       or yanking the page to the panel on every click. */
+    if (history.replaceState) history.replaceState(null, "", "#" + pick.value);
+  });
+
+  /* index.html#voice opens straight into that panel — and scrolls to it,
+     or the link lands on the hero with the panel a screen and a half down.
+     hasOwnProperty, not a bare lookup: "#constructor" is truthy otherwise
+     and leaves the picker showing nothing. */
+  var want = (location.hash || "").replace("#", "");
+  var deepLinked = Object.prototype.hasOwnProperty.call(panels, want);
+  if (deepLinked) pick.value = want;
+
+  root.classList.add("js");
+  renderDesign();
+  renderVR();
+  voiceReset();
+  pRead.innerHTML = "Pick an open space to see what standing there is like.";
+  show(pick.value);
+
+  /* Scroll only once the panel is actually showing, and instantly: a deep
+     link means "put me on this panel", not "animate me down to it". No
+     element carries these ids — the panels are keyed by data-mode and are
+     hidden when the fragment resolves — so the browser cannot do it for us. */
+  if (deepLinked) root.scrollIntoView();
+}());
+</script>
+
+
+<!-- ============================ CONTACT FOOTER ============================ -->
+<footer class="hp-contact">
+  <div class="hp-contact-in">
+    <div class="hp-contact-col">
+      <p class="hp-contact-name">Healing Partners LLC</p>
+      <p><a href="tel:+15094609254">(509)&nbsp;460-9254</a></p>
+      <p><a href="mailto:bhomer@healingpartners.us">bhomer@healingpartners.us</a></p>
+      <p class="hp-contact-addr">111 SW 5th Avenue, Floor 5<br>Portland, Oregon 97204</p>
+    </div>
+    <div class="hp-contact-col">
+      <p class="hp-contact-name">Remember Them</p>
+      <p><a href="./index.html">Home</a></p>
+      <p><a href="./remember-them/">Try the designer</a></p>
+      <p><a href="https://healingpartners.us/pages/for-funeral-homes">For funeral homes</a></p>
+      <p><a href="https://healingpartners.us/pages/about">About us</a></p>
+    </div>
+    <div class="hp-contact-col hp-contact-note">
+      <p>A screen cannot reproduce stone, bronze, etching or polish &mdash; the finished memorial
+        will differ, and that is not a design error (Partner User Agreement &sect;3.8).</p>
+      <p>Healing Partners supplies designs, proofs and production files. It does not engrave,
+        fabricate, transport, set or sell physical memorials.</p>
+    </div>
+  </div>
+  <div class="hp-contact-in hp-contact-base">
+    <span>&copy; 2026 Healing Partners LLC</span>
+    <a href="https://healingpartners.us">healingpartners.us</a>
+  </div>
+</footer>
+<style>
+.hp-contact{border-top:1px solid rgba(128,128,128,.28);margin-top:3rem;padding:2.5rem 1.25rem 2rem;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:.9rem;line-height:1.6}
+.hp-contact-in{max-width:64rem;margin:0 auto;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:2rem}
+.hp-contact p{margin:0 0 .3rem}
+.hp-contact-name{font-weight:600;margin-bottom:.6rem!important}
+.hp-contact-addr{margin-top:.6rem;opacity:.75}
+.hp-contact-note p{font-size:.82rem;opacity:.75;margin-bottom:.6rem;max-width:44ch}
+.hp-contact a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(128,128,128,.4)}
+.hp-contact a:hover{border-bottom-color:currentColor}
+.hp-contact-base{margin-top:2rem;padding-top:1.25rem;border-top:1px solid rgba(128,128,128,.18);
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.82rem;opacity:.7}
+@media (pointer:coarse){.hp-contact a{display:inline-block;min-height:2.75rem;line-height:2.75rem}}
+</style>
 </body>
 </html>

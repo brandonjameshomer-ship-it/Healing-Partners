@@ -548,7 +548,21 @@ window.RememberThem.Stone = (function () {
               inner + '</g>';
     }
 
-    svg += inner + '</svg>';
+    svg += inner;
+
+    /* Cast bronze is the one lettering that is itself a mirror: the faces
+     * stand proud and are polished bright, so the specular sweep crossing the
+     * ground crosses the letters too. A sandblasted or carved cut is matte and
+     * correctly stays out of it, which is why the pass above the lettering is
+     * conditional rather than always on. Reduced, because the earlier pass has
+     * already lit the ground once. */
+    if (st.engrave === "raised") {
+      svg += '<g clip-path="url(#clip' + uid + ')">' +
+               '<rect width="300" height="400" fill="url(#spec' + uid + ')" opacity=".5"/>' +
+             '</g>';
+    }
+
+    svg += '</svg>';
     return svg;
   }
 

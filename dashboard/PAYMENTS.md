@@ -213,6 +213,10 @@ events:
 | `customer.subscription.deleted` | They cancelled |
 | `charge.refunded` | Money returned |
 
+The Sec. 5.2 discount recapture from `pay.html` also arrives as `checkout.session.completed`. It has
+no memorial, so the handler records it as a `recapture` event in `payment_events` — never as a VR
+sale — with the `?ref=` partner slug in its metadata. That event type comes from migration `0005`.
+
 ### 3. Copy the signing secret
 
 Stripe shows a **Signing secret** beginning `whsec_`. Put it where the function can read it:

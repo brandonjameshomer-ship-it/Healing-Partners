@@ -4,7 +4,11 @@
 // Secrets: supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 //          supabase secrets set ALLOWED_ORIGINS=https://healingpartners.us,https://...
 //
-// Deployed WITH jwt verification (the default), same as classify-story.
+// Deployed WITH jwt verification (the default), same as classify-story. The
+// gateway checks the signature; this file checks there is a signed-in user
+// behind it and asks the database for a call budget (migration 0005).
+//
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //
 // ---------------------------------------------------------------------------
 // Why this exists
@@ -121,11 +125,18 @@ Deno.serve(async (req) => {
   // it had obtained elsewhere.
   const ALLOWED = (Deno.env.get("ALLOWED_ORIGINS") ?? "").split(",").map((o) => o.trim()).filter(Boolean);
   const origin = req.headers.get("origin") ?? "";
-  const cors = {
-    "Access-Control-Allow-Origin": ALLOWED.includes(origin) ? origin : (ALLOWED[0] ?? "null"),
+  // Only ever echo an origin we actually allow. The previous fallback returned
+  // ALLOWED[0] for a non-matching origin, which the browser rejects anyway, and
+  // returned the literal string "null" when ALLOWED was empty — and "null" MATCHES
+  // a sandboxed iframe and a file:// page, so the unconfigured state failed OPEN.
+  // Omitting the header entirely fails closed, which is what an unset allow-list
+  // should do.
+  const allow = ALLOWED.includes(origin) ? origin : null;
+  const cors: Record<string, string> = {
     "Access-Control-Allow-Headers": "authorization, content-type",
     "Vary": "Origin",
   };
+  if (allow) cors["Access-Control-Allow-Origin"] = allow;
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: cors });
 
@@ -133,6 +144,24 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("Authorization") ?? "";
     if (!authHeader.startsWith("Bearer ")) {
       return new Response("Unauthorized", { status: 401, headers: cors });
+    }
+    // A bearer header alone is not authorization: the public anon key is a
+    // valid JWT too. Require a signed-in user (anonymous share-link sessions
+    // qualify) and ask the database for a call budget before spending model
+    // tokens. A refusal is a soft reply — the browser carries on without the model.
+    if (!jwtClaims(authHeader)?.sub) {
+      return new Response("Unauthorized", { status: 401, headers: cors });
+    }
+    {
+      const gate = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } },
+      );
+      const { data: allowed, error: gateErr } =
+        await gate.rpc("allow_model_call", { p_kind: "interview", p_per_hour: 60 });
+      if (gateErr) { console.warn("call budget unavailable:", gateErr.message); return json({ reason: "unavailable" }, cors); }
+      if (!allowed) return json({ reason: "rate_limited" }, cors);
     }
 
     const body = await req.json();
@@ -149,7 +178,7 @@ Deno.serve(async (req) => {
     // the model needs the family's own words to follow the energy.
     const transcript = turns
       .filter((t) => typeof t.a === "string" && (t.a as string).trim())
-      .map((t) => `Q: ${String(t.q ?? "").slice(0, 300)}\nA: ${redact(String(t.a))}`)
+      .map((t) => `Q: ${String(t.q ?? "").slice(0, 300)}\nA: ${redact(String(t.a).slice(0, 4000))}`)
       .join("\n\n");
 
     const covered = turns
@@ -157,15 +186,34 @@ Deno.serve(async (req) => {
       .filter((a) => (AREAS as readonly string[]).includes(a));
 
     const who = known || "them";
-    const user = transcript
+
+    /* ------------------------------------------------------------------
+       Ordered for the cache, not for reading.
+
+       Caching is a prefix match: one changed byte invalidates everything
+       after it. "Areas already touched" changes on every single turn, and
+       it used to sit BEFORE the transcript — so the transcript, which is
+       the part that grows and costs, could never be cached behind it.
+
+       Now the stable, append-only material comes first (the name, the
+       fixed area list, then the transcript), a cache breakpoint sits at
+       the end of it, and everything that varies per turn comes after.
+       Turn N then reads turn N-1's transcript from cache at a tenth of
+       the price instead of paying for it again.
+
+       This is input-side only. Output is billed in full every turn.
+       ------------------------------------------------------------------ */
+    const stable = transcript
       ? `The family calls the person who died "${who}".\n\n` +
-        `Areas already touched: ${covered.length ? covered.join(", ") : "none"}\n` +
         `Areas available: ${AREAS.join(", ")}\n\n` +
-        `The interview so far:\n\n${transcript}\n\n` +
-        `Ask the next question. Follow what they have given you rather than moving to a new area for its own sake.`
+        `The interview so far:\n\n${transcript}`
       : `The family calls the person who died "${who}". Nothing has been said yet.\n\n` +
-        `Areas available: ${AREAS.join(", ")}\n\n` +
-        `Open the interview. Start wide and unstructured — invite them to say whatever comes, in whatever order. Do not lead with a specific area.`;
+        `Areas available: ${AREAS.join(", ")}`;
+
+    const volatile_ = transcript
+      ? `\n\nAreas already touched: ${covered.length ? covered.join(", ") : "none"}\n\n` +
+        `Ask the next question. Follow what they have given you rather than moving to a new area for its own sake.`
+      : `\n\nOpen the interview. Start wide and unstructured — invite them to say whatever comes, in whatever order. Do not lead with a specific area.`;
 
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -186,7 +234,15 @@ Deno.serve(async (req) => {
         // worth caching. Check usage.cache_read_input_tokens if you suspect
         // it has stopped hitting.
         system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-        messages: [{ role: "user", content: user }],
+        messages: [{
+          role: "user",
+          content: [
+            /* The breakpoint goes at the end of the growing-but-append-only
+               half, so each turn reads the previous turn's transcript. */
+            { type: "text", text: stable, cache_control: { type: "ephemeral" } },
+            { type: "text", text: volatile_ },
+          ],
+        }],
       }),
     });
 
@@ -230,6 +286,14 @@ Deno.serve(async (req) => {
   }
 });
 
+/* The gateway has already verified the signature; this only reads the claims. */
+function jwtClaims(header: string): { sub?: string; role?: string } | null {
+  try {
+    const part = header.slice(7).split(".")[1];
+    const pad = part + "=".repeat((4 - part.length % 4) % 4);
+    return JSON.parse(atob(pad.replace(/-/g, "+").replace(/_/g, "/")));
+  } catch { return null; }
+}
 function str(v: unknown, max: number): string {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
 }

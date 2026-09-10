@@ -27,3 +27,6 @@ build/
 .vscode/
 .idea/
 supabase/.temp/
+
+# ...but the example, which holds no secrets, is committed
+!.env.example
