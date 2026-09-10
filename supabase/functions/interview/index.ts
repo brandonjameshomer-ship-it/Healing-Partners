@@ -186,15 +186,34 @@ Deno.serve(async (req) => {
       .filter((a) => (AREAS as readonly string[]).includes(a));
 
     const who = known || "them";
-    const user = transcript
+
+    /* ------------------------------------------------------------------
+       Ordered for the cache, not for reading.
+
+       Caching is a prefix match: one changed byte invalidates everything
+       after it. "Areas already touched" changes on every single turn, and
+       it used to sit BEFORE the transcript — so the transcript, which is
+       the part that grows and costs, could never be cached behind it.
+
+       Now the stable, append-only material comes first (the name, the
+       fixed area list, then the transcript), a cache breakpoint sits at
+       the end of it, and everything that varies per turn comes after.
+       Turn N then reads turn N-1's transcript from cache at a tenth of
+       the price instead of paying for it again.
+
+       This is input-side only. Output is billed in full every turn.
+       ------------------------------------------------------------------ */
+    const stable = transcript
       ? `The family calls the person who died "${who}".\n\n` +
-        `Areas already touched: ${covered.length ? covered.join(", ") : "none"}\n` +
         `Areas available: ${AREAS.join(", ")}\n\n` +
-        `The interview so far:\n\n${transcript}\n\n` +
-        `Ask the next question. Follow what they have given you rather than moving to a new area for its own sake.`
+        `The interview so far:\n\n${transcript}`
       : `The family calls the person who died "${who}". Nothing has been said yet.\n\n` +
-        `Areas available: ${AREAS.join(", ")}\n\n` +
-        `Open the interview. Start wide and unstructured — invite them to say whatever comes, in whatever order. Do not lead with a specific area.`;
+        `Areas available: ${AREAS.join(", ")}`;
+
+    const volatile_ = transcript
+      ? `\n\nAreas already touched: ${covered.length ? covered.join(", ") : "none"}\n\n` +
+        `Ask the next question. Follow what they have given you rather than moving to a new area for its own sake.`
+      : `\n\nOpen the interview. Start wide and unstructured — invite them to say whatever comes, in whatever order. Do not lead with a specific area.`;
 
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -215,7 +234,15 @@ Deno.serve(async (req) => {
         // worth caching. Check usage.cache_read_input_tokens if you suspect
         // it has stopped hitting.
         system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-        messages: [{ role: "user", content: user }],
+        messages: [{
+          role: "user",
+          content: [
+            /* The breakpoint goes at the end of the growing-but-append-only
+               half, so each turn reads the previous turn's transcript. */
+            { type: "text", text: stable, cache_control: { type: "ephemeral" } },
+            { type: "text", text: volatile_ },
+          ],
+        }],
       }),
     });
 

@@ -80,15 +80,19 @@ function userMessage({ SYSTEM, AREAS }, known, turns) {
   const covered = turns.map((t) => t.area).filter((a) => AREAS.includes(a));
   const who = known || "them";
 
-  return transcript
+  /* Two blocks, stable then volatile, matching the function exactly — the
+     cache breakpoint goes between them. */
+  const stable = transcript
     ? `The family calls the person who died "${who}".\n\n` +
-      `Areas already touched: ${covered.length ? covered.join(", ") : "none"}\n` +
       `Areas available: ${AREAS.join(", ")}\n\n` +
-      `The interview so far:\n\n${transcript}\n\n` +
-      `Ask the next question. Follow what they have given you rather than moving to a new area for its own sake.`
+      `The interview so far:\n\n${transcript}`
     : `The family calls the person who died "${who}". Nothing has been said yet.\n\n` +
-      `Areas available: ${AREAS.join(", ")}\n\n` +
-      `Open the interview. Start wide and unstructured — invite them to say whatever comes, in whatever order. Do not lead with a specific area.`;
+      `Areas available: ${AREAS.join(", ")}`;
+  const volatile_ = transcript
+    ? `\n\nAreas already touched: ${covered.length ? covered.join(", ") : "none"}\n\n` +
+      `Ask the next question. Follow what they have given you rather than moving to a new area for its own sake.`
+    : `\n\nOpen the interview. Start wide and unstructured — invite them to say whatever comes, in whatever order. Do not lead with a specific area.`;
+  return { stable, volatile_ };
 }
 
 /* ---- one call ---------------------------------------------------------- */
@@ -98,7 +102,10 @@ async function ask(model, prompt, user) {
     model: model.id,
     max_tokens: 2000,
     system: [{ type: "text", text: prompt.SYSTEM, cache_control: { type: "ephemeral" } }],
-    messages: [{ role: "user", content: user }],
+    messages: [{ role: "user", content: [
+      { type: "text", text: user.stable, cache_control: { type: "ephemeral" } },
+      { type: "text", text: user.volatile_ },
+    ]}],
   };
   if (model.effort) body.output_config = { effort: model.effort };
 

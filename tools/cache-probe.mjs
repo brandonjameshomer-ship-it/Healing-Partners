@@ -57,19 +57,24 @@ const turns = Array.from({ length: 8 }, (_, n) => ({
   a: "She kept the creek in her pocket and never said why. Thirty-one years teaching third " +
      "grade at the same school, and she could name every child she ever taught, in order.",
 }));
-const user =
+/* Same two-block shape as the function: stable prefix, breakpoint, volatile tail. */
+const stable =
   `The family calls the person who died "Ruthie".\n\n` +
-  `Areas already touched: childhood, work\nAreas available: childhood, sports, young_adult\n\n` +
+  `Areas available: childhood, sports, young_adult\n\n` +
   `The interview so far:\n\n` +
-  turns.map((t) => `Q: ${t.q}\nA: ${t.a}`).join("\n\n") +
-  `\n\nAsk the next question.`;
+  turns.map((t) => `Q: ${t.q}\nA: ${t.a}`).join("\n\n");
+const volatile_ =
+  `\n\nAreas already touched: childhood, work\n\nAsk the next question.`;
 
 async function call() {
   const body = {
     model: MODEL,
     max_tokens: 2000,
     system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-    messages: [{ role: "user", content: user }],
+    messages: [{ role: "user", content: [
+      { type: "text", text: stable, cache_control: { type: "ephemeral" } },
+      { type: "text", text: volatile_ },
+    ]}],
   };
   if (R.effort) body.output_config = { effort: R.effort };
   const res = await fetch("https://api.anthropic.com/v1/messages", {
