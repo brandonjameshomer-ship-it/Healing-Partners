@@ -50,35 +50,80 @@ comments in `pay.html`, `pricing.html` and `for-funeral-homes.html`.
 
 ## 2 · Build the design subscription
 
-Stripe → **Product catalogue → Add product**.
+**Two items on one subscription, not one.** A flat base fee, plus a metered price that charges
+nothing until the allotment is used up.
+
+The obvious alternative — a single graduated price with the $75 as `flat_amount` on tier one — has a
+hole in it. Whether a tier's flat fee is charged when usage is **zero** is not clearly documented,
+and a month in which a partner makes no designs must still bill the subscription fee: §6.2.3 sells
+access, not designs. Splitting it removes the question rather than betting on the answer.
+
+### 2a · The base fee
+
+**Product catalogue → Add product**
 
 - **Name** — "Remember Them — subscription"
-- **Pricing model** — *Usage-based*, then **Graduated tiers**
+- **Pricing model** — *Recurring*, **Flat rate**
+- **Amount** — **$75.00**, **Monthly**
+
+Add a second price on the same product at **$149.00 monthly** for the standard rate. Two prices on
+one product, so the end of the beta is a price swap on the subscription item rather than a migration.
+
+### 2b · The meter
+
+**Billing → Meters → Create meter**
+
+- **Event name** — `designs`
+- **Aggregation** — **Sum**
+- **Value field** — the numeric field your app sends (`value`)
+
+Since API version `2025-03-31.basil` the legacy usage-records API is gone: **every metered price
+needs a backing meter**, and usage is reported as meter events. There is no way to attach usage to a
+price without one.
+
+### 2c · The overage price
+
+On the **same product** as the base fee, **Add another price**:
+
+- **Pricing model** — *Usage-based* → **Per tier** → **Graduated**
+- **Meter** — `designs`
 - **Billing period** — Monthly
-- **Usage metering** — create a meter named `designs`, aggregated by **sum** over the billing period
 
-Then enter the tiers. **Beta price** (create this one first — it is what a partner signing today
-pays):
-
-| First unit | Last unit | Per unit | Flat fee |
+| First unit | Last unit | Per unit | Why |
 |---|---|---|---|
-| 1 | 50 | $0 | **$75.00** |
-| 51 | 125 | **$2.00** | $0 |
-| 126 | 200 | $0 | $0 |
-| 201 | 250 | **$2.00** | $0 |
-| 251 | ∞ | $0 | $0 |
+| 1 | 50 | **$0.00** | included in the base fee |
+| 51 | 125 | **$2.00** | climbs from $75 to $225 |
+| 126 | 200 | **$0.00** | flat across Professional's allotment |
+| 201 | 250 | **$2.00** | climbs from $225 to $325 |
+| 251 | ∞ | **$0.00** | the ceiling — §6.2.5 |
 
-Then add a **second price on the same product** for the standard rate, identical but with **$149**
-flat and **$4.00** per unit in the two metered bands.
+Stripe's "up to" is **inclusive**, so "up to 50" means units 1–50.
 
-Two prices on one product, not two products — that makes the beta-to-standard move a price swap on
-the subscription item rather than a migration.
+Then a second overage price for standard rates: identical bands, **$4.00** in place of each $2.00.
 
-**Check it before going further.** Stripe's tier editor previews a total; confirm 125 designs gives
-$225 on the beta price and 250 gives $325. If either is off by a unit, the boundary is
-inclusive/exclusive in the other direction than you entered.
+### 2d · Prove it before going on
 
----
+Stripe previews the total as you enter tiers. Check all six:
+
+| Designs | Base | Overage | Total |
+|---|---|---|---|
+| 0 | $75 | $0 | **$75** |
+| 50 | $75 | $0 | **$75** |
+| 125 | $75 | $150 | **$225** |
+| 200 | $75 | $150 | **$225** |
+| 250 | $75 | $250 | **$325** |
+| 1,000 | $75 | $250 | **$325** |
+
+If 125 comes out at $227 or $223 the boundaries are off by one; if 1,000 is not $325 the last tier is
+not free. Both are far cheaper to catch here than on a partner's first invoice.
+
+### 2e · What the app must send
+
+Report one meter event per delivered Design, with the customer's Stripe id. **Do not report:**
+designs made during the free trial (§6.5.1), regenerations correcting a Company error, withdrawn or
+undelivered variants, previews and intermediate renders, or a re-render of an existing design at a
+different size or file type (§6.3.2). §6.3.5 resolves inconclusive billing disputes in the partner's
+favour, so an over-counting meter is a liability, not a rounding error.
 
 ## 3 · Build the seat subscription
 
