@@ -5,6 +5,7 @@
  *   export ANTHROPIC_API_KEY=sk-ant-...        (Terminal only)
  *   node tools/cache-probe.mjs
  *   node tools/cache-probe.mjs --model claude-sonnet-5
+ *   node tools/cache-probe.mjs --sweep        # also sweep effort, the output lever
  *
  * The function marks its system prompt with cache_control and the comment says
  * to check usage.cache_read_input_tokens if you suspect it has stopped hitting.
@@ -66,7 +67,7 @@ const stable =
 const volatile_ =
   `\n\nAreas already touched: childhood, work\n\nAsk the next question.`;
 
-async function call() {
+async function call(effortOverride) {
   const body = {
     model: MODEL,
     max_tokens: 2000,
@@ -76,7 +77,8 @@ async function call() {
       { type: "text", text: volatile_ },
     ]}],
   };
-  if (R.effort) body.output_config = { effort: R.effort };
+  const eff = effortOverride === undefined ? R.effort : effortOverride;
+  if (eff) body.output_config = { effort: eff };
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": KEY, "anthropic-version": "2023-06-01" },
@@ -121,3 +123,38 @@ const outCost = lastOut / 1e6 * R.out;
 console.log(`\nWhere the money is on a warm run:  input $${inCost.toFixed(4)}  ` +
             `output $${outCost.toFixed(4)}  (${Math.round(outCost / (inCost + outCost) * 100)}% is output)`);
 console.log("Caching can only ever touch the input side. Output is billed in full every time.");
+
+
+/* ---------------------------------------------------------------------------
+   Effort sweep — the only lever short of changing model that touches OUTPUT.
+
+   On Opus 5 thinking is on by default, and thinking tokens are billed as
+   output tokens. So effort is not just a quality dial: lowering it removes
+   billed output. Caching cannot do this and the advisor tool cannot either —
+   both act on the input side, and the advisor adds a call.
+
+   This prints output tokens and output cost at each level, on the same
+   request, so the tradeoff is a number rather than an argument. Read the
+   questions too: if low produces a question you would have been happy with,
+   that is the saving taken.
+   --------------------------------------------------------------------------- */
+if (process.argv.includes("--sweep")) {
+  if (!R.effort) {
+    console.log("\n(No effort sweep: " + MODEL + " does not accept output_config.effort.)");
+  } else {
+    console.log("\n" + "─".repeat(72));
+    console.log("Effort sweep — output tokens are where the money is on this call\n");
+    for (const level of ["low", "medium", "high"]) {
+      try {
+        const u = await call(level);
+        const out = u.output_tokens ?? 0;
+        const cost = out / 1e6 * R.out;
+        console.log(`  effort ${level.padEnd(6)}  output ${String(out).padStart(5)} tokens  ` +
+                    `$${cost.toFixed(4)}  ($${(cost * 50).toFixed(2)} / month at 50 arrangements)`);
+      } catch (e) {
+        console.log(`  effort ${level.padEnd(6)}  failed: ${e.message.slice(0, 80)}`);
+      }
+    }
+    console.log("\nindex.ts currently sends effort: medium.");
+  }
+}
