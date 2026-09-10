@@ -125,11 +125,18 @@ Deno.serve(async (req) => {
   // it had obtained elsewhere.
   const ALLOWED = (Deno.env.get("ALLOWED_ORIGINS") ?? "").split(",").map((o) => o.trim()).filter(Boolean);
   const origin = req.headers.get("origin") ?? "";
-  const cors = {
-    "Access-Control-Allow-Origin": ALLOWED.includes(origin) ? origin : (ALLOWED[0] ?? "null"),
+  // Only ever echo an origin we actually allow. The previous fallback returned
+  // ALLOWED[0] for a non-matching origin, which the browser rejects anyway, and
+  // returned the literal string "null" when ALLOWED was empty — and "null" MATCHES
+  // a sandboxed iframe and a file:// page, so the unconfigured state failed OPEN.
+  // Omitting the header entirely fails closed, which is what an unset allow-list
+  // should do.
+  const allow = ALLOWED.includes(origin) ? origin : null;
+  const cors: Record<string, string> = {
     "Access-Control-Allow-Headers": "authorization, content-type",
     "Vary": "Origin",
   };
+  if (allow) cors["Access-Control-Allow-Origin"] = allow;
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: cors });
 
