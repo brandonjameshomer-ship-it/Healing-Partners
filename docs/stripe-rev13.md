@@ -139,7 +139,7 @@ Do not put seats on the graduated price. They must not be capped by the ceiling.
 
 ## 4 · The free trial, and the part Stripe cannot do
 
-§6.5.1 as amended is *seven days, or the first seven Designs, whichever ends later*.
+§6.5.1 as amended is *seven days, or the first 70 Designs, whichever ends later*.
 (The agreement artifact still reads three Memorial Projects — it needs the same change.)
 
 Stripe trials are time-based only. Set **`trial_period_days = 7`** on the subscription, then handle
@@ -147,8 +147,8 @@ the second half in code:
 
 - `customer.subscription.trial_will_end` fires three days before the trial ends. The webhook
   already listens for it.
-- On that event, count the partner's reported Designs. If fewer than seven, extend `trial_end`.
-- Repeat until seven designs exist, then let it end.
+- On that event, count the partner's reported Designs. If fewer than 70, extend `trial_end`.
+- Repeat until 70 designs exist, then let it end.
 
 Counting Designs rather than Projects makes this simpler: the meter already counts them, so the
 trial condition reads the same number the invoice will.
